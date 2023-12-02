@@ -33,10 +33,10 @@
 (setq org-roam-file-exclude-regexp "\\(\\.gpg\\)$")
 
 ;; Set the eww-bookmarks directory
-(setq eww-bookmarks-directory (concat my-home-directory "Documents/"))
+(setq eww-bookmarks-directory (concat my-home-directory "Documents/bookmarks/"))
 
 ;; Set the default bookmarks file
-(setq bookmark-default-file (concat my-home-directory "Documents/bookmarks"))
+(setq bookmark-default-file (concat my-home-directory "Documents/bookmarks/bookmarks"))
 
 ;; Customize custom faces in org-mode
 (with-eval-after-load 'org
