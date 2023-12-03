@@ -8,7 +8,6 @@
 ;;; Code:
 
 ;;; --------- Text editing and completion ---------
-;;
 ;; Ensure that company package is installed and loaded
 (unless (package-installed-p 'company)
   (package-install 'company))
@@ -58,20 +57,28 @@
   (setq touch-screen-display-keyboard t)))
 
 ;;; --------- Dashboard ---------
-;;
 ;; Ensure that dashboard package is installed and loaded
 (unless (package-installed-p 'dashboard)
   (package-install 'dashboard))
 (require 'dashboard)
 
-;; Configure dashboard as minimal as possible
+;; Configure dashboard
 (setq dashboard-startup-banner 'official)
 (setq dashboard-center-content t)
 (setq dashboard-banner-logo-title "Welcome to Emacs")
 (setq dashboard-items nil)
 (setq dashboard-set-footer nil)
+(setq dashboard-set-init-info t)
 (setq dashboard-set-heading-icons t)
+(setq dashboard-agenda-time-string-format "%Y-%m-%d %H:%M")
+(setq dashboard-agenda-sort-strategy  '((agenda time-up priority-down category-keep)
+                                        (todo time-up priority-down category-keep)
+                                        (tags time-up priority-down category-keep)
+                                        (search time-up priority-down category-keep)))
+(add-to-list 'dashboard-items '(agenda) t)
 (dashboard-setup-startup-hook)
 
 ;; Provide package for use
 (provide 'editor-config)
+
+;; editor-config.el ends here
