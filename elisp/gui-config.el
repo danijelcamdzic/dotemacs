@@ -8,7 +8,6 @@
 ;;; Code:
 
 ;;; --------- GUI menu ---------
-;;
 ;; Add tool-bar options for zooming in
 (tool-bar-add-item "zoom-in" 'text-scale-increase
                    'text-scale-increase
@@ -29,6 +28,13 @@
      ["Week View" my/org-agenda-week-view t]
      ["Year View" my/org-agenda-year-view t]
      ["Inventory View" my/org-agenda-inventory t])
+    ("Roam"
+     ("Dailies"
+      ["Go to Today" org-roam-dailies-goto-today t]
+      ["Go to Date" org-roam-dailies-find-date t])
+     ("Nodes"
+      ["Find Node" org-roam-node-find t]
+      ["Open Graph" org-roam-ui-open t]))
     ("Schedule"
      ["Add" my/add-schedule t]
      ["Remove" my/remove-schedule t])
@@ -45,17 +51,10 @@
      ["Show Clock Analysis" org-analyzer-start t])
     ("Note"
      ["Add Note" my/add-note t])
-    ("Roam"
-     ("Dailies"
-      ["Go to Today" org-roam-dailies-goto-today t]
-      ["Go to Date" org-roam-dailies-find-date t])
-     ("Nodes"
-      ["Find Node" org-roam-node-find t]
-      ["Open Graph" org-roam-ui-open t])
-     ("Insert"
-      ["Insert Date and Time" my/insert-current-date-time t]
-      ["Insert Node" org-roam-node-insert t]
-      ["Insert Nodes By Tags" my/insert-org-roam-nodes-by-tag t]))))
+    ("Insert"
+     ["Insert Date and Time" my/insert-current-date-time t]
+     ["Insert Node" org-roam-node-insert t]
+     ["Insert Nodes By Tags" my/insert-org-roam-nodes-by-tag t])))
 
 ;; Add the menu option to the toolbas to the left of "Tools" section
 (easy-menu-add-item global-map '("menu-bar") my/command-center-menu "Tools")
@@ -72,3 +71,5 @@
 
 ;; Provide package for use
 (provide 'gui-config)
+
+;; gui-config.el ends here
