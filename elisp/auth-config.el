@@ -8,7 +8,6 @@
 ;;; Code:
 
 ;;; --------- EPA (GnuPG) ---------
-;;
 ;; Set the environment variable and configure EPA only if running on Android
 (when (eq system-type 'android)
   ;; Set the environment variable to use GPG on Termux
@@ -35,7 +34,6 @@
 (setq epa-pinentry-mode 'loopback)
 
 ;;; --------- Auth-sources ---------
-;;
 (require 'auth-source)
 
 ;; Set auth-sources files
@@ -57,11 +55,10 @@
 ;; Enable authinfo-mode for auth-source files
 (add-to-list 'auto-mode-alist '("\\.authinfo.*\\.gpg\\'" . authinfo-mode))
 
-;; Clear cached passwords after save command
-(add-hook 'after-save-hook 'auth-source-forget-all-cached)
+;; Clear cached passwords after buffers are switched
+(add-hook 'buffer-list-update-hook 'auth-source-forget-all-cached)
 
 ;;; --------- TOTP ---------
-;;
 ;; Taken from Jürgen Hötzel's `totp.el':
 ;; https://github.com/juergenhoetzel/emacs-totp
 
@@ -140,8 +137,6 @@ DIGITS is tre  number of pin digits and defaults to 6."
     code))
 
 ;;; --------- Passwords ---------
-;;
-;;
 (defun pass--display (auth)
   "Select a password entry (PASS) from `auth-sources', and briefly display its password."
   (interactive
@@ -162,3 +157,5 @@ DIGITS is tre  number of pin digits and defaults to 6."
 
 ;; Provide package for use
 (provide 'auth-config)
+
+;; auth-config.el ends here
