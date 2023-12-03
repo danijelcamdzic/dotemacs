@@ -8,7 +8,6 @@
 ;;; Code:
 
 ;;; --------- Org-agenda ---------
-;;
 ;; Ensure the org-super-agenda package is installed and loaded
 (unless (package-installed-p 'org-super-agenda)
   (package-install 'org-super-agenda))
@@ -22,10 +21,14 @@
       '((sequence "TODO(t)" "|" "DONE(d!)" "SKIP(s!)" "FAIL(f!)")))
 
 ;; Customize org-agenda view
-(setq org-agenda-prefix-format '((agenda . "%t ")
-                                 (todo . "%t ")
-                                 (tags . "")
-                                 (search . "%i")))
+(setq org-agenda-prefix-format  '((agenda . "  %t ")
+                                  (todo . "%t ")
+                                  (tags . "")
+                                  (search . "%i")))
+(setq org-agenda-sorting-strategy '((agenda time-up priority-down category-keep)
+                                    (todo time-up priority-down category-keep)
+                                    (tags time-up priority-down category-keep)
+                                    (search time-up priority-down category-keep)))
 (setq org-agenda-scheduled-leaders '("" ""))
 (setq org-agenda-span 7)
 (setq org-agenda-show-future-repeats 'next)
@@ -266,3 +269,5 @@ org file on the year calendar."
 
 ;; Provide package for use
 (provide 'org-agenda-config)
+
+;; org-agenda-config.el ends here
