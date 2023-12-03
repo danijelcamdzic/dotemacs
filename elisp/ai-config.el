@@ -6,7 +6,6 @@
 ;;; Code:
 
 ;;; --------- Chatgpt-shell ---------
-;;
 ;; Ensure that company package is installed and loaded
 (unless (package-installed-p 'chatgpt-shell)
   (package-install 'chatgpt-shell))
@@ -29,3 +28,5 @@
 
 ;; Provide package for use
 (provide 'ai-config)
+
+;; ai-config.el ends here
