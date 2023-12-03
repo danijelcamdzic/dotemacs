@@ -8,7 +8,6 @@
 ;;; Code:
 
 ;;; --------- Org-mode ---------
-;;
 ;; Use org-mode
 (require 'org)
 
@@ -75,7 +74,6 @@ the format YYYY-MM-DD Day H:M."
   (insert (format-time-string "%Y-%m-%d %a %H:%M")))
 
 ;;; --------- Org-roam ---------
-;;
 ;; Ensure org-roam package is installed and loaded
 (unless (package-installed-p 'org-roam)
   (package-install 'org-roam))
@@ -159,7 +157,6 @@ and when nil is returned the node will be filtered out."
   (deactivate-mark))
 
 ;;; --------- Org-analyzer ---------
-;;
 ;; Ensure the org-analyzer package is installed and loaded
 (unless (package-installed-p 'org-analyzer )
   (package-install 'org-analyzer ))
@@ -170,7 +167,6 @@ and when nil is returned the node will be filtered out."
 (setq org-analyzer-org-directory org-directory)
 
 ;;; --------- Websocket ---------
-;;
 ;; Ensure the websocket package is installed and loaded
 (unless (package-installed-p 'websocket)
   (package-install 'websocket))
@@ -178,7 +174,6 @@ and when nil is returned the node will be filtered out."
   (require 'websocket))
 
 ;;; --------- Org-roam-ui ---------
-;;
 ;; Ensure the org-roam-ui package is installed and loaded
 (unless (package-installed-p 'org-roam-ui)
   (package-install 'org-roam-ui))
@@ -186,14 +181,12 @@ and when nil is returned the node will be filtered out."
   (require 'org-roam-ui))
 
 ;;; --------- Org-transclusion ---------
-;;
 ;; Ensure the org-transclusion package is installed and loaded
 (unless (package-installed-p 'org-transclusion)
   (package-install 'org-transclusion))
 (require 'org-transclusion)
 
 ;;; --------- Org-download ---------
-;;
 ;; Ensure the org-download package is installed and loaded
 (unless (package-installed-p 'org-download)
   (package-install 'org-download))
@@ -201,3 +194,5 @@ and when nil is returned the node will be filtered out."
 
 ;; Provide package for use
 (provide `org-mode-config)
+
+;; org-mode-config.el ends here
