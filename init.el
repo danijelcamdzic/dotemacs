@@ -4,22 +4,20 @@
 ;; Maintainer: Danijel Camdzic <danijelcamdzic@tuta.com>
 ;;
 ;; Description:
-;; This is the personal Emacs initialization file of Danijel Camdzic.
-;; It sets up the Emacs environment to suit personal preferences and workflows.
-;; This file is a living document, regularly updated to incorporate new tools,
-;; tweaks, and improvements to the Emacs experience.
+;; This is my personal Emacs initialization file. It sets up Emacs with a focus
+;; on improved productivity and ease of use, incorporating various packages and
+;; custom settings. Regularly updated to include new tools and optimizations.
 ;;
 ;; Usage:
-;; This file is loaded by Emacs at startup. It is not meant to be manually
-;; executed. Instead, changes are to be made with an understanding of Emacs
-;; lisp and the current Emacs configuration.
+;; Loaded by Emacs at startup. Not for manual execution. Modify with knowledge
+;; of Emacs Lisp and the configuration's specifics.
+;;
 ;;
 ;; License: NO LICENCE
 ;;
 ;;; Code:
 
 ;;; --------- Melpa ---------
-;;
 ;; Add melpa package archives
 (require 'package)
 (add-to-list 'package-archives
@@ -29,25 +27,26 @@
 (package-initialize)
 
 ;;; --------- elisp ---------
-;;
-;; Provide custom configuration .el files for the init
+;; Custom .el files for additional configuration
 (let ((my-dir (file-name-directory (or load-file-name buffer-file-name))))
   (add-to-list 'load-path (expand-file-name "elisp" my-dir)))
 
-;; Editor configuration
+;; Basic editor configuration
 (require 'editor-config)
 
-;; GUI configuration
+;; GUI appearance and behavior
 (require 'gui-config)
 
-;; Org-mode configuration
-(require `org-mode-config)
+;; Org-mode for note taking
+(require 'org-mode-config)
 
-;; Org-agenda configuration
+;; Org-agenda for task management
 (require 'org-agenda-config)
 
-;; GPG and  auth-sources configuration
+;; GPG and authentication settings
 (require 'auth-config)
 
-;; AI tools
+;; AI tools and integrations
 (require 'ai-config)
+
+;;; init.el ends here
