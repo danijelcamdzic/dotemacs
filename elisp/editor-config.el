@@ -70,7 +70,9 @@
 (setq dashboard-set-footer nil)
 (setq dashboard-set-init-info t)
 (setq dashboard-set-heading-icons t)
+(setq dashboard-agenda-prefix-format "%-10:s %t")
 (setq dashboard-agenda-time-string-format "%Y-%m-%d %H:%M")
+(setq dashboard-agenda-sort-strategy '(time-up))
 (add-to-list 'dashboard-items '(agenda) t)
 
 (defun my/dashboard-agenda--formatted-time-advice (orig-fun &rest args)
@@ -106,11 +108,6 @@ TIME is expected to be in Emacs internal time format."
 ;; Add advice to change the date format to 'yesterday', 'today' or 'tomorrow' if it suits
 (advice-add 'dashboard-agenda--formatted-time :around #'my/dashboard-agenda--formatted-time-advice)
 
-;; Set up sorting strategy
-(setq dashboard-agenda-sort-strategy  '((agenda time-up priority-down category-keep)
-                                        (todo time-up priority-down category-keep)
-                                        (tags time-up priority-down category-keep)
-                                        (search time-up priority-down category-keep)))
 (dashboard-setup-startup-hook)
 
 ;; Provide package for use
