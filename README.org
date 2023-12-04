@@ -1,0 +1,4 @@
+#+TITLE: DotEmacs
+#+AUTHOR: Danijel Camdzic
+
+This repository contains my personal Emacs configuration.
