@@ -73,6 +73,8 @@
 (setq dashboard-agenda-prefix-format "%-10:s %t")
 (setq dashboard-agenda-time-string-format "%Y-%m-%d %H:%M")
 (setq dashboard-agenda-sort-strategy '(time-up))
+;; Filter the times shown
+(setq dashboard-match-agenda-entry "+SCHEDULED<=\"<+2d>\"")
 (add-to-list 'dashboard-items '(agenda) t)
 
 (defun my/dashboard-agenda--formatted-time-advice (orig-fun &rest args)
