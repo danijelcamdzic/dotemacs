@@ -53,6 +53,13 @@
 (add-hook 'org-mode-hook (lambda () (setq fill-column 80)))
 (add-hook 'org-mode-hook #'turn-on-auto-fill)
 
+;; Set the time-stamp package to update the time an org file
+;; was last edited
+(setq time-stamp-format "%Y-%m-%d %H:%M")
+(setq time-stamp-start ";; last-edited: ")
+(setq time-stamp-end "$")
+(add-hook 'before-save-hook 'time-stamp)
+
 (defun my/clock-in ()
   "Clock in the current org heading."
   (interactive)
