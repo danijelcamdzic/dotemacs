@@ -2,3 +2,17 @@
 #+AUTHOR: Danijel Camdzic
 
 This repository contains my personal Emacs configuration.
+
+* Repository Structure
+The repository is organized as follows:
+
+├── early-init.el               - Early initialization settings for Android GUI Emacs using Termux packages.
+├── elisp
+│   ├── ai-config.el            - Configuration settings for AI-related functionalities in Emacs.
+│   ├── auth-config.el          - Authentication and security configurations for Emacs.
+│   ├── editor-config.el        - Editor behavior and customization settings.
+│   ├── gui-config.el           - Graphical User Interface (GUI) related configurations for Emacs.
+│   ├── org-agenda-config.el    - Configurations for Org mode's agenda features.
+│   └── org-mode-config.el      - Settings and customizations specific to Org mode.
+├── init.el                     - The main Emacs initialization file that loads all configurations.
+└── README.org                  - This file, providing an overview and documentation for the repository.
