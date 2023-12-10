@@ -37,20 +37,11 @@
 (require 'auth-source)
 
 ;; Set auth-sources files
+;; Set auth-sources files using the my-documents-directory variable
 (setq auth-sources
-      (cond
-       ((eq system-type 'gnu/linux)
-        '((:source "~/Documents/.auth-sources/.authinfo-api.gpg")
-          (:source "~/Documents/.auth-sources/.authinfo-totp.gpg")
-          (:source "~/Documents/.auth-sources/.authinfo-pass.gpg")))
-       ((eq system-type 'android)
-        '((:source "/storage/emulated/0/Documents/.auth-sources/.authinfo-api.gpg")
-          (:source "/storage/emulated/0/Documents/.auth-sources/.authinfo-totp.gpg")
-          (:source "/storage/emulated/0/Documents/.auth-sources/.authinfo-pass.gpg")))
-       (t
-        '((:source "~/Documents/.auth-sources/.authinfo-api.gpg")
-          (:source "~/Documents/.auth-sources/.authinfo-totp.gpg")
-          (:source "~/Documents/.auth-sources/.authinfo-pass.gpg")))))
+      `((:source ,(concat my-documents-directory ".auth-sources/.authinfo-api.gpg"))
+        (:source ,(concat my-documents-directory ".auth-sources/.authinfo-totp.gpg"))
+        (:source ,(concat my-documents-directory ".auth-sources/.authinfo-pass.gpg"))))
 
 ;; Enable authinfo-mode for auth-source files
 (add-to-list 'auto-mode-alist '("\\.authinfo.*\\.gpg\\'" . authinfo-mode))

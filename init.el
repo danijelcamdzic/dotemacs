@@ -9,8 +9,7 @@
 ;; custom settings. Regularly updated to include new tools and optimizations.
 ;;
 ;; Usage:
-;; Loaded by Emacs at startup. Not for manual execution. Modify with knowledge
-;; of Emacs Lisp and the configuration's specifics.
+;; Loaded by Emacs at startup. Not for manual execution.
 ;;
 ;;
 ;; License: NO LICENCE

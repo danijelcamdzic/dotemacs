@@ -37,6 +37,8 @@
 (setq-default indent-tabs-mode nil)
 (setq-default tab-width 4)
 (setq indent-line-function 'insert-tab)
+
+;; Disable displaying line numbers (in all file types)
 (global-display-line-numbers-mode 0)
 
 ;; Disable backup and lock files
@@ -50,8 +52,7 @@
          (display-buffer-same-window)
          (inhibit-same-window . nil))))
 
-;; Set touch-screen-display-keyboard if Android is the system
-;; type
+;; Set touch-screen-display-keyboard if Android is the system type
 (cond
  ((eq system-type 'android)
   (setq touch-screen-display-keyboard t)))
@@ -77,7 +78,7 @@
 (setq dashboard-match-agenda-entry "+SCHEDULED<=\"<+1d>\"")
 (add-to-list 'dashboard-items '(agenda) t)
 
-(defun my/dashboard-agenda--formatted-time-advice (orig-fun &rest args)
+(defun my/dashboard-agenda--formatted-time-advice-use-relative-days (orig-fun &rest args)
   "Modifies the display of time in the dashboard agenda.
 If the time corresponds to 'today', 'yesterday', or 'tomorrow', it replaces the date with these words.
 Keeps the time part unless it's exactly 00:00, in which case only the relative date is displayed."
@@ -107,9 +108,10 @@ TIME is expected to be in Emacs internal time format."
             ((eq day-difference 1) "yesterday")
             ((eq day-difference -1) "tomorrow")))))
 
-;; Add advice to change the date format to 'yesterday', 'today' or 'tomorrow' if it suits
-(advice-add 'dashboard-agenda--formatted-time :around #'my/dashboard-agenda--formatted-time-advice)
+;; Add advice to change the date format to 'yesterday', 'today' or 'tomorrow'
+(advice-add 'dashboard-agenda--formatted-time :around #'my/dashboard-agenda--formatted-time-advice-use-relative-days)
 
+;; Start dashboard
 (dashboard-setup-startup-hook)
 
 ;; Provide package for use

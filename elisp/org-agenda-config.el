@@ -40,7 +40,7 @@
         (0000 0200 0400 0600 0800 1000 1200 1400 1600 1800 2000 2200 2359)
         "......" "----------------"))
 
-;; Set the org-agenda-files to use every file in org-directory (except "/dailies")
+;; Set the org-agenda-files to use every file in org-directory
 (setq org-agenda-files (list org-directory))
 
 ;; Configure TODO properties to be logged in "LOGBOOK" drawer

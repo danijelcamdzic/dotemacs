@@ -54,7 +54,7 @@
     ("Insert"
      ["Insert Date and Time" my/insert-current-date-time t]
      ["Insert Node" org-roam-node-insert t]
-     ["Insert Nodes By Tags" my/insert-org-roam-nodes-by-tag t])))
+     ["Insert Nodes with Tags" my/insert-org-roam-nodes-by-tag t])))
 
 ;; Add the menu option to the toolbas to the left of "Tools" section
 (easy-menu-add-item global-map '("menu-bar") my/command-center-menu "Tools")
@@ -63,7 +63,7 @@
 (easy-menu-define my-ai-menu nil "My AI Menu"
   '("AI"
     ("OpenAI"
-     ["Open ChatGPT" my/open-chatgpt-shell t])))
+     ["Open ChatGPT Shell" my/open-chatgpt-shell t])))
 
 ;; Add the "AI" menu to the "Tools" menu, before "Games"
 (easy-menu-add-item nil '("tools") my-ai-menu "Games")

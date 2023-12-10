@@ -14,15 +14,20 @@
 ;; Use org-tempo
 (require 'org-tempo)
 
-;; Define and set the home directory based on system type
+;; Define and set the directory names
+;; Home directory
 (setq my-home-directory
       (cond
        ((eq system-type 'gnu/linux) "~/")
        ((eq system-type 'android) "/storage/emulated/0/")
        (t "~/")))
+;; Notes directory
+(setq my-notes-directory (concat my-home-directory "Notes/"))
+;; Documents directory
+(setq my-documents-directory (concat my-home-directory "Documents/"))
 
 ;; Set the org-directory
-(setq org-directory (concat my-home-directory "Notes/"))
+(setq org-directory my-notes-directory)
 
 ;; Set the main Org Roam directory and the directory for daily notes
 (setq org-roam-directory org-directory)
@@ -32,10 +37,10 @@
 (setq org-roam-file-exclude-regexp "\\(\\.gpg\\)$")
 
 ;; Set the eww-bookmarks directory
-(setq eww-bookmarks-directory (concat my-home-directory "Documents/bookmarks/"))
+(setq eww-bookmarks-directory (concat my-documents-directory "bookmarks/"))
 
 ;; Set the default bookmarks file
-(setq bookmark-default-file (concat my-home-directory "Documents/bookmarks/bookmarks"))
+(setq bookmark-default-file (concat my-documents-directory "bookmarks/bookmarks"))
 
 ;; Customize custom faces in org-mode
 (with-eval-after-load 'org
@@ -53,10 +58,9 @@
 (add-hook 'org-mode-hook (lambda () (setq fill-column 80)))
 (add-hook 'org-mode-hook #'turn-on-auto-fill)
 
-;; Set the time-stamp package to update the time an org file
-;; was last edited
+;; Set the time-stamp package to update the time an org file was last edited
 (setq time-stamp-format "%Y-%m-%d %H:%M")
-(setq time-stamp-start ";; last-edited: ")
+(setq time-stamp-start "# Last-edited: ")
 (setq time-stamp-end "$")
 (add-hook 'before-save-hook 'time-stamp)
 
