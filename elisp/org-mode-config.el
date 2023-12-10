@@ -58,6 +58,10 @@
 (add-hook 'org-mode-hook (lambda () (setq fill-column 80)))
 (add-hook 'org-mode-hook #'turn-on-auto-fill)
 
+;; Show everything when opening org file but hide code blocks and drawers
+(add-hook 'org-mode-hook 'org-hide-block-all)
+(add-hook 'org-mode-hook 'org-hide-drawer-all)
+
 ;; Set the time-stamp package to update the time an org file was last edited
 (setq time-stamp-format "%Y-%m-%d %H:%M")
 (setq time-stamp-start "# Last-edited: ")
