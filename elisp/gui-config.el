@@ -39,6 +39,7 @@
      ["Add" my/add-schedule t]
      ["Remove" my/remove-schedule t])
     ("States"
+     ["Log as TODO" my/todo-log-todo t]
      ["Log as DONE" my/todo-log-done t]
      ["Log as SKIP" my/todo-log-skip t]
      ["Log as FAIL" my/todo-log-fail t]

@@ -120,25 +120,29 @@ or in an org-mode file."
         (org-back-to-heading t)
         (org-schedule '(4))))))
 
+(defun my/todo-log-todo ()
+  "Mark current heading as TODO"
+  (interactive)
+  (if (eq major-mode 'org-agenda-mode)
+      (org-agenda-todo "TODO")
+    (org-todo "TODO")))
+
 (defun my/todo-log-done ()
-  "Mark current org task as DONE from the agenda view or directly on
-the TODO heading."
+  "Mark current heading as DONE"
   (interactive)
   (if (eq major-mode 'org-agenda-mode)
       (org-agenda-todo "DONE")
     (org-todo "DONE")))
 
 (defun my/todo-log-skip ()
-  "Mark current org task as SKIP from the agenda view or directly on
-the TODO heading."
+  "Mark current heading as SKIP"
   (interactive)
   (if (eq major-mode 'org-agenda-mode)
       (org-agenda-todo "SKIP")
     (org-todo "SKIP")))
 
 (defun my/todo-log-fail ()
-  "Mark current org task as FAIL from the agenda view or directly on
-the TODO heading."
+  "Mark current heading as FAIL"
   (interactive)
   (if (eq major-mode 'org-agenda-mode)
       (org-agenda-todo "FAIL")
