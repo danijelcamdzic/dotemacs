@@ -82,7 +82,7 @@ length)."
          (seq-map (lambda (s) (hexl-htoi (aref s 0) (aref s 1)))
                   (seq-partition string 2))))
 
-(defun totp(string &optional time digits)
+(defun totp (string &optional time digits)
   "Return a TOTP token using the secret STRING and current time.
 TIME is used as counter value instead of current time, if non-nil.
 DIGITS is tre  number of pin digits and defaults to 6."
