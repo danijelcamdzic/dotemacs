@@ -1,13 +1,12 @@
-;;; gui-config.el
+;; gui-config.el
 ;;
 ;; Author: Danijel Camdzic
 ;; Maintainer: Danijel Camdzic <danijelcamdzic@tuta.com>
 ;;
 ;; License: NO LICENCE
-;;
-;;; Code:
 
-;;; --------- GUI menu ---------
+;; --------- GUI menu ---------
+
 ;; Add tool-bar options for zooming in
 (tool-bar-add-item "zoom-in" 'text-scale-increase
                    'text-scale-increase
@@ -31,7 +30,7 @@
     ("Roam"
      ("Dailies"
       ["Go to Today" org-roam-dailies-goto-today t]
-      ["Go to Date" org-roam-dailies-find-date t])
+      ["Find Date" org-roam-dailies-find-date t])
      ("Nodes"
       ["Find Node" org-roam-node-find t]
       ["Open Graph" org-roam-ui-open t]))
@@ -44,18 +43,15 @@
      ["Log as SKIP" my/todo-log-skip t]
      ["Log as FAIL" my/todo-log-fail t]
      ["Change State" my/todo-change-state t]
-     ["Show in Calendar" my/show-todo-in-calendar t])
+     ["Show in Calendar" my/show-states-in-calendar t])
     ("Clock"
      ["Clock In" my/clock-in t]
      ["Clock Out" my/clock-out t]
      ["Display Clocks" org-clock-display]
      ["Show Clock Analysis" org-analyzer-start t])
     ("Note"
-     ["Add Note" my/add-note t])
-    ("Insert"
-     ["Insert Date and Time" my/insert-current-date-time t]
-     ["Insert Node" org-roam-node-insert t]
-     ["Insert Nodes with Tags" my/insert-org-roam-nodes-by-tag t])))
+     ["Add Note" my/add-note t]
+     ["Show in Calendar" my/show-notes-in-calendar t])))
 
 ;; Add the menu option to the toolbas to the left of "Tools" section
 (easy-menu-add-item global-map '("menu-bar") my/command-center-menu "Tools")
@@ -72,5 +68,3 @@
 
 ;; Provide package for use
 (provide 'gui-config)
-
-;; gui-config.el ends here

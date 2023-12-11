@@ -1,13 +1,12 @@
-;;; editor-config.el
+;; editor-config.el
 ;;
 ;; Author: Danijel Camdzic
 ;; Maintainer: Danijel Camdzic <danijelcamdzic@tuta.com>
 ;;
 ;; License: NO LICENCE
-;;
-;;; Code:
 
-;;; --------- Text editing and completion ---------
+;; --------- Text editing and completion ---------
+
 ;; Ensure that company package is installed and loaded
 (unless (package-installed-p 'company)
   (package-install 'company))
@@ -22,16 +21,16 @@
   (package-install 'vertico))
 (require 'vertico)
 
-;; Enable and configure company mode
-(vertico-mode 1)
-(setq completion-styles '(orderless)
-      completion-category-defaults nil
-      completion-category-overrides '((file (styles . (partial-completion)))))
-
 ;; Ensure that orderless package is installed loaded
 (unless (package-installed-p 'orderless)
   (package-install 'orderless))
 (require 'orderless)
+
+;; Enable and configure vertico
+(vertico-mode 1)
+(setq completion-styles '(orderless)
+      completion-category-defaults nil
+      completion-category-overrides '((file (styles . (partial-completion)))))
 
 ;; Configure text formatting
 (setq-default indent-tabs-mode nil)
@@ -57,7 +56,8 @@
  ((eq system-type 'android)
   (setq touch-screen-display-keyboard t)))
 
-;;; --------- Dashboard ---------
+;; --------- Dashboard ---------
+
 ;; Ensure that dashboard package is installed and loaded
 (unless (package-installed-p 'dashboard)
   (package-install 'dashboard))
@@ -116,5 +116,3 @@ TIME is expected to be in Emacs internal time format."
 
 ;; Provide package for use
 (provide 'editor-config)
-
-;; editor-config.el ends here

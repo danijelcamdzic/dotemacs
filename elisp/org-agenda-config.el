@@ -1,13 +1,12 @@
-;;; org-agenda.el
+;; org-agenda.el
 ;;
 ;; Author: Danijel Camdzic
 ;; Maintainer: Danijel Camdzic <danijelcamdzic@tuta.com>
 ;;
 ;; License: NO LICENCE
-;;
-;;; Code:
 
-;;; --------- Org-agenda ---------
+;; --------- Org-agenda ---------
+
 ;; Ensure the org-super-agenda package is installed and loaded
 (unless (package-installed-p 'org-super-agenda)
   (package-install 'org-super-agenda))
@@ -167,8 +166,9 @@ or in an org-mode file."
 (defface my-mark-DONE '((t :background "#006400")) "")
 (defface my-mark-SKIP '((t :background "#999900")) "")
 (defface my-mark-FAIL '((t :background "#8B0000")) "")
+(defface my-mark-NOTE '((t :background "#008000")) "")
 
-(defun my/parse-logbook (logbook beg buffer)
+(defun my/parse-logbook-states (logbook beg buffer)
   "Parse a logbook string and return a list of entries."
   (let ((lines (split-string logbook "\n" t))
         (line-start-pos beg)
@@ -183,7 +183,21 @@ or in an org-mode file."
           (push (list state date entry-begin-pos buffer) entries)))
       (setq line-start-pos (+ line-start-pos (length line) 1)))))
 
-(defun my/mark-todo-entries (entries)
+(defun my/parse-logbook-notes (logbook beg buffer)
+  "Parse a logbook string and return a list of entries with notes."
+  (let ((lines (split-string logbook "\n" t))
+        (line-start-pos beg)
+        entries)
+    (dolist (line lines entries)
+      (when (string-match "- Note taken on \\[\\(.*?\\)\\]" line)
+        (let* ((date-string (match-string 1 line))
+               (time (org-parse-time-string date-string))
+               (date (list (nth 4 time) (nth 3 time) (nth 5 time)))
+               (entry-begin-pos line-start-pos))
+          (push (list "NOTE" date entry-begin-pos buffer) entries)))
+      (setq line-start-pos (+ line-start-pos (length line) 1)))))
+
+(defun my/mark-entries (entries)
   "Mark days in the calendar for each entry in ENTRIES."
   (setq my-marked-entries entries)
   (dolist (entry entries)
@@ -196,7 +210,7 @@ or in an org-mode file."
 (defvar my/calendar-todo-view-active nil
   "Flag to indicate if the custom TODO calendar view is active.")
 
-(defun my/show-todo-in-calendar ()
+(defun my/show-states-in-calendar ()
   "Show the state history of the TODO at point in the org-agenda buffer or an
 org file on the year calendar."
   (interactive)
@@ -222,15 +236,45 @@ org file on the year calendar."
                    (setq end (line-beginning-position)))
               (progn
                 (setq logbook (buffer-substring-no-properties beg end))
-                (setq entries (my/parse-logbook logbook beg buffer))
+                (setq entries (my/parse-logbook-states logbook beg buffer))
                 (calendar)
-                (my/mark-todo-entries entries))
+                (my/mark-entries entries))
+            (error "No LOGBOOK found for this TODO.")))))))
+
+(defun my/show-notes-in-calendar ()
+  "Show the notes of the TODO at point in the org-agenda buffer or an org file on the year calendar."
+  (interactive)
+  (setq my/calendar-todo-view-active t)
+  (setq my-marked-entries '())
+  (let* ((marker (if (eq major-mode 'org-agenda-mode)
+                     (or (org-get-at-bol 'org-marker)
+                         (org-agenda-error))
+                   (point-marker)))
+         (buffer (marker-buffer marker))
+         (pos (marker-position marker))
+         beg end logbook entries)
+    (with-current-buffer buffer
+      (widen)
+      (goto-char pos)
+      (let ((current-pos (point)))
+        (outline-next-heading)
+        (let ((section-end (point)))
+          (goto-char current-pos)
+          (if (and (search-forward ":LOGBOOK:" section-end t)
+                   (setq beg (line-beginning-position 2))
+                   (search-forward ":END:" section-end t)
+                   (setq end (line-beginning-position)))
+              (progn
+                (setq logbook (buffer-substring-no-properties beg end))
+                (setq entries (my/parse-logbook-notes logbook beg buffer))
+                (calendar)
+                (my/mark-entries entries))
             (error "No LOGBOOK found for this TODO.")))))))
 
 (defun my/reapply-markings ()
   "Reapply markings to the calendar."
   (when my/calendar-todo-view-active
-    (my/mark-todo-entries my-marked-entries)))
+    (my/mark-entries my-marked-entries)))
 
 ;; Add hook to reapply markings each time the calendar is moved
 (add-hook 'calendar-move-hook 'my/reapply-markings)
@@ -273,5 +317,3 @@ org file on the year calendar."
 
 ;; Provide package for use
 (provide 'org-agenda-config)
-
-;; org-agenda-config.el ends here

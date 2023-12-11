@@ -1,13 +1,12 @@
-;;; org-mode-config.el
+;; org-mode-config.el
 ;;
 ;; Author: Danijel Camdzic
 ;; Maintainer: Danijel Camdzic <danijelcamdzic@tuta.com>
 ;;
 ;; License: NO LICENCE
-;;
-;;; Code:
 
-;;; --------- Org-mode ---------
+;; --------- Org-mode ---------
+
 ;; Use org-mode
 (require 'org)
 
@@ -88,7 +87,8 @@ the format YYYY-MM-DD Day H:M."
   (interactive)
   (insert (format-time-string "%Y-%m-%d %a %H:%M")))
 
-;;; --------- Org-roam ---------
+;; --------- Org-roam ---------
+
 ;; Ensure org-roam package is installed and loaded
 (unless (package-installed-p 'org-roam)
   (package-install 'org-roam))
@@ -171,7 +171,8 @@ and when nil is returned the node will be filtered out."
                                   arrow-chain))))))
   (deactivate-mark))
 
-;;; --------- Org-analyzer ---------
+;; --------- Org-analyzer ---------
+
 ;; Ensure the org-analyzer package is installed and loaded
 (unless (package-installed-p 'org-analyzer )
   (package-install 'org-analyzer ))
@@ -181,27 +182,31 @@ and when nil is returned the node will be filtered out."
 ;; Set directory for org-analyzer
 (setq org-analyzer-org-directory org-directory)
 
-;;; --------- Websocket ---------
+;; --------- Websocket ---------
+
 ;; Ensure the websocket package is installed and loaded
 (unless (package-installed-p 'websocket)
   (package-install 'websocket))
 (with-eval-after-load 'org-roam
   (require 'websocket))
 
-;;; --------- Org-roam-ui ---------
+;; --------- Org-roam-ui ---------
+
 ;; Ensure the org-roam-ui package is installed and loaded
 (unless (package-installed-p 'org-roam-ui)
   (package-install 'org-roam-ui))
 (with-eval-after-load 'org-roam
   (require 'org-roam-ui))
 
-;;; --------- Org-transclusion ---------
+;; --------- Org-transclusion ---------
+
 ;; Ensure the org-transclusion package is installed and loaded
 (unless (package-installed-p 'org-transclusion)
   (package-install 'org-transclusion))
 (require 'org-transclusion)
 
-;;; --------- Org-download ---------
+;; --------- Org-download ---------
+
 ;; Ensure the org-download package is installed and loaded
 (unless (package-installed-p 'org-download)
   (package-install 'org-download))
@@ -209,5 +214,3 @@ and when nil is returned the node will be filtered out."
 
 ;; Provide package for use
 (provide `org-mode-config)
-
-;; org-mode-config.el ends here

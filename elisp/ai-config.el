@@ -1,11 +1,10 @@
-;;; ai-config.el
+;; ai-config.el
 ;;
 ;; Author: Danijel Camdzic
 ;; Maintainer: Danijel Camdzic <danijelcamdzic@tuta.com>
-;;
-;;; Code:
 
-;;; --------- Chatgpt-shell ---------
+;; --------- Chatgpt-shell ---------
+
 ;; Ensure that company package is installed and loaded
 (unless (package-installed-p 'chatgpt-shell)
   (package-install 'chatgpt-shell))
@@ -28,5 +27,3 @@
 
 ;; Provide package for use
 (provide 'ai-config)
-
-;; ai-config.el ends here
