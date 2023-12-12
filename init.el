@@ -1,11 +1,6 @@
-;; init.el
-;;
-;; Author: Danijel Camdzic
-;; Maintainer: Danijel Camdzic <danijelcamdzic@tuta.com>
-;;
-;; License: NO LICENCE
-
-;; --------- Melpa ---------
+;; ---------------------
+;; Use-package
+;; ---------------------
 
 ;; Add melpa package archives
 (require 'package)
@@ -15,130 +10,144 @@
 ;; Initialize packages
 (package-initialize)
 
-;; --------- Directories ---------
+;; Ensure that use-package is installed and loaded
+(unless (package-installed-p 'use-package)
+  (package-refresh-contents)
+  (package-install 'use-package))
+(require 'use-package)
 
-;; Define and set the directory names
-;; Home directory
-(setq my-home-directory
-      (cond
-       ((eq system-type 'gnu/linux) "~/")
-       ((eq system-type 'android) "/storage/emulated/0/")
-       (t "~/")))
-;; Notes directory
-(setq my-notes-directory (concat my-home-directory "Notes/"))
-;; Documents directory
-(setq my-documents-directory (concat my-home-directory "Documents/"))
+;; --------------------
+;; User
+;; --------------------
 
-;; --------- Text editing and completion ---------
+(use-package emacs
+  :config
 
-;; Ensure that company package is installed and loaded
-(unless (package-installed-p 'company)
-  (package-install 'company))
-(require 'company)
+  ;; ----- Personal Information -----
+  ;; Set user's name and email address
+  (setq user-full-name "Danijel Camdzic")
+  (setq user-mail-address "danijelcamdzic@tuta.com")
 
-;; Enable company mode and add hook
-(company-mode 1)
-(add-hook 'after-init-hook 'global-company-mode)
+  ;; ----- Directories -----
+  ;; Home directory
+  (setq my-home-directory
+        (cond
+         ((eq system-type 'gnu/linux) "~/")
+         ((eq system-type 'android) "/storage/emulated/0/")
+         (t "~/"))
+        ;; Notes directory
+        my-notes-directory (concat my-home-directory "Notes/")
+        ;; Documents directory
+        my-documents-directory (concat my-home-directory "Documents/")))
 
-;; Ensure that vertico package is installed and loaded
-(unless (package-installed-p 'vertico)
-  (package-install 'vertico))
-(require 'vertico)
+;; ---------------------
+;; Editing
+;; ---------------------
 
-;; Ensure that orderless package is installed loaded
-(unless (package-installed-p 'orderless)
-  (package-install 'orderless))
-(require 'orderless)
+(use-package company
+  :ensure t
+  :config
+  (global-company-mode 1))
 
-;; Enable and configure vertico
-(vertico-mode 1)
-(setq completion-styles '(orderless)
-      completion-category-defaults nil
-      completion-category-overrides '((file (styles . (partial-completion)))))
+(use-package vertico
+  :ensure t
+  :config
+  (vertico-mode 1))
 
-;; Configure text formatting
-(setq-default indent-tabs-mode nil)
-(setq-default tab-width 4)
-(setq indent-line-function 'insert-tab)
+(use-package orderless
+  :ensure t
+  :custom
+  (completion-styles '(orderless))
+  (completion-category-defaults nil)
+  (completion-category-overrides '((file (styles . (partial-completion))))))
 
-;; Disable displaying line numbers (in all file types)
-(global-display-line-numbers-mode 0)
+(use-package emacs
+  :config
 
-;; Disable backup and lock files
-(setq create-lockfiles nil)
-(setq auto-save-default nil)
-(setq make-backup-files nil)
+  ;; ----- General text editing -----
+  ;; Text formatting
+  (setq-default indent-tabs-mode nil
+                tab-width 4
+                indent-line-function 'insert-tab)
 
-;; Open everything in a separate buffer
-(setq display-buffer-alist
-      '((".*"
-         (display-buffer-same-window)
-         (inhibit-same-window . nil))))
+  ;; Disable line numbers
+  (global-display-line-numbers-mode 0)
 
-;; Set touch-screen-display-keyboard if Android is the system type
-(cond
- ((eq system-type 'android)
-  (setq touch-screen-display-keyboard t)))
+  ;; Disable backup and lock files
+  (setq create-lockfiles nil
+        auto-save-default nil
+        make-backup-files nil)
 
-;; --------- Dashboard ---------
+  ;; Buffer display settings
+  (setq display-buffer-alist
+        '((".*" (display-buffer-same-window) (inhibit-same-window . nil))))
 
-;; Ensure that dashboard package is installed and loaded
-(unless (package-installed-p 'dashboard)
-  (package-install 'dashboard))
-(require 'dashboard)
+  ;; Touch-screen keyboard settings for Android
+  (when (eq system-type 'android)
+    (setq touch-screen-display-keyboard t)))
 
-;; Configure dashboard
-(setq dashboard-startup-banner 'official)
-(setq dashboard-center-content t)
-(setq dashboard-banner-logo-title "Welcome to Emacs")
-(setq dashboard-items nil)
-(setq dashboard-set-footer nil)
-(setq dashboard-set-init-info t)
-(setq dashboard-set-heading-icons t)
-(setq dashboard-agenda-prefix-format "%-10:s %t")
-(setq dashboard-agenda-time-string-format "%Y-%m-%d %H:%M")
-(setq dashboard-agenda-sort-strategy '(time-up))
-;; Filter the times shown
-(setq dashboard-match-agenda-entry "+SCHEDULED<=\"<+1d>\"")
-(add-to-list 'dashboard-items '(agenda) t)
+;; ---------------------
+;; Dashboard
+;; ---------------------
 
-(defun my/dashboard-agenda--formatted-time-advice-use-relative-days (orig-fun &rest args)
-  "Modifies the display of time in the dashboard agenda.
-If the time corresponds to 'today', 'yesterday', or 'tomorrow', it replaces the date with these words.
-Keeps the time part unless it's exactly 00:00, in which case only the relative date is displayed."
-  (let* ((original-time-string (apply orig-fun args))
-         (entry-time (org-get-scheduled-time (point)))
-         (relative-date (my/relative-date entry-time))
-         (time-part (format-time-string "%H:%M" entry-time))
-         (time-is-midnight (string= time-part "00:00")))
-    (if relative-date
-        (if time-is-midnight
-            relative-date
-          (concat relative-date " " time-part))
-      original-time-string)))
+(use-package dashboard
+  :ensure t
+  :config
 
-(defun my/relative-date (time)
-  "Determines if the given TIME is 'today', 'yesterday', or 'tomorrow'.
-Returns the corresponding string or nil if the time doesn't match any of these.
-TIME is expected to be in Emacs internal time format."
-  (when time
-    (let* ((current-time (current-time))
-           (current-date (decode-time current-time))
-           (entry-date (decode-time time))
-           (current-day-num (time-to-days (apply #'encode-time (decode-time (current-time)))))
-           (entry-day-num (time-to-days (apply #'encode-time (decode-time time))))
-           (day-difference (- current-day-num entry-day-num)))
-      (cond ((eq day-difference 0) "today")
-            ((eq day-difference 1) "yesterday")
-            ((eq day-difference -1) "tomorrow")))))
+  ;; ------- Dashboard configuration --------
+  (setq dashboard-startup-banner 'official
+        dashboard-center-content t
+        dashboard-banner-logo-title "Welcome to Emacs"
+        dashboard-items nil
+        dashboard-set-footer nil
+        dashboard-set-init-info t
+        dashboard-set-heading-icons t
+        dashboard-agenda-prefix-format "%-10:s %t"
+        dashboard-agenda-time-string-format "%Y-%m-%d %H:%M"
+        dashboard-agenda-sort-strategy '(time-up)
+        dashboard-match-agenda-entry "+SCHEDULED<=\"<+1d>\"")
+  (add-to-list 'dashboard-items '(agenda) t)
 
-;; Add advice to change the date format to 'yesterday', 'today' or 'tomorrow'
-(advice-add 'dashboard-agenda--formatted-time :around #'my/dashboard-agenda--formatted-time-advice-use-relative-days)
+  ;; ------- Dashboard functions --------
+  (defun my/dashboard-agenda--formatted-time-advice-use-relative-days (orig-fun &rest args)
+    "Modifies the display of time in the dashboard agenda.
+  If the time corresponds to 'today', 'yesterday', or 'tomorrow', it replaces the date with these words.
+  Keeps the time part unless it's exactly 00:00, in which case only the relative date is displayed."
+    (let* ((original-time-string (apply orig-fun args))
+          (entry-time (org-get-scheduled-time (point)))
+          (relative-date (my/relative-date entry-time))
+          (time-part (format-time-string "%H:%M" entry-time))
+          (time-is-midnight (string= time-part "00:00")))
+      (if relative-date
+          (if time-is-midnight
+              relative-date
+            (concat relative-date " " time-part))
+        original-time-string)))
 
-;; Start dashboard
-(dashboard-setup-startup-hook)
+  (defun my/relative-date (time)
+    "Determines if the given TIME is 'today', 'yesterday', or 'tomorrow'.
+  Returns the corresponding string or nil if the time doesn't match any of these.
+  TIME is expected to be in Emacs internal time format."
+    (when time
+      (let* ((current-time (current-time))
+            (current-date (decode-time current-time))
+            (entry-date (decode-time time))
+            (current-day-num (time-to-days (apply #'encode-time (decode-time (current-time)))))
+            (entry-day-num (time-to-days (apply #'encode-time (decode-time time))))
+            (day-difference (- current-day-num entry-day-num)))
+        (cond ((eq day-difference 0) "today")
+              ((eq day-difference 1) "yesterday")
+              ((eq day-difference -1) "tomorrow")))))
 
-;; --------- GUI menu ---------
+  ;; Add advice to change the date format to 'yesterday', 'today' or 'tomorrow'
+  (advice-add 'dashboard-agenda--formatted-time :around #'my/dashboard-agenda--formatted-time-advice-use-relative-days)
+
+  ;; Start dashboard
+  (dashboard-setup-startup-hook))
+
+;; ----------------------
+;; GUI Menu Configuration
+;; ----------------------
 
 ;; Add tool-bar options for zooming in
 (tool-bar-add-item "zoom-in" 'text-scale-increase
@@ -150,6 +159,7 @@ TIME is expected to be in Emacs internal time format."
                    'text-scale-decrease
                    :help "Zoom Out")
 
+;; Used to manage the menu
 (require 'easymenu)
 
 ;; Add a toolbar falling menu for easy access to functions
@@ -201,73 +211,67 @@ TIME is expected to be in Emacs internal time format."
 
 ;; --------- Org-mode ---------
 
-;; Use org-mode
-(require 'org)
+(use-package org
+  :ensure t
+  :config
+  ;; Set directories and files
+  (setq org-directory my-notes-directory
+        org-roam-directory org-directory
+        org-roam-dailies-directory (concat org-directory "dailies/")
+        org-roam-file-exclude-regexp "\\(\\.gpg\\)$"
+        eww-bookmarks-directory (concat my-documents-directory "bookmarks/")
+        bookmark-default-file (concat my-documents-directory "bookmarks/bookmarks"))
 
-;; Use org-tempo
-(require 'org-tempo)
-
-;; Set the org-directory
-(setq org-directory my-notes-directory)
-
-;; Set the main Org Roam directory and the directory for daily notes
-(setq org-roam-directory org-directory)
-(setq org-roam-dailies-directory (concat org-directory "dailies/"))
-
-;; Include only .org files and exclude all else
-(setq org-roam-file-exclude-regexp "\\(\\.gpg\\)$")
-
-;; Set the eww-bookmarks directory
-(setq eww-bookmarks-directory (concat my-documents-directory "bookmarks/"))
-
-;; Set the default bookmarks file
-(setq bookmark-default-file (concat my-documents-directory "bookmarks/bookmarks"))
-
-;; Customize custom faces in org-mode
-(with-eval-after-load 'org
+  ;; Customize org-mode appearance
   (custom-set-faces
    '(bold ((t (:foreground "#008000" :weight bold))))
    '(italic ((t (:foreground "#B0A030" :slant italic))))
    '(org-scheduled ((t (:foreground "#555555"))))
    '(org-scheduled-today ((t (:foreground "grey"))))
-   '(strike-through ((t (:foreground "#8B0000" :strike-through t))))))
+   '(strike-through ((t (:foreground "#8B0000" :strike-through t)))))
 
-;; Set up text indentation
-(setq org-startup-indented t)
+  ;; Org-mode settings
+  (setq org-startup-indented t)
+  (add-hook 'org-mode-hook (lambda () (setq fill-column 80)))
+  (add-hook 'org-mode-hook #'turn-on-auto-fill)
+  (add-hook 'org-mode-hook 'org-hide-block-all)
+  (add-hook 'org-mode-hook 'org-hide-drawer-all)
 
-;; Add a hook to org-mode to limit the column width to 80 characters
-(add-hook 'org-mode-hook (lambda () (setq fill-column 80)))
-(add-hook 'org-mode-hook #'turn-on-auto-fill)
+  ;; Time-stamp settings
+  (setq time-stamp-format "%Y-%m-%d %H:%M"
+        time-stamp-start "# Last-edited: "
+        time-stamp-end "$")
+  (add-hook 'before-save-hook 'time-stamp)
 
-;; Show everything when opening org file but hide code blocks and drawers
-(add-hook 'org-mode-hook 'org-hide-block-all)
-(add-hook 'org-mode-hook 'org-hide-drawer-all)
+  (defun my/clock-in ()
+    "Clock in the current org heading."
+    (interactive)
+    (if (eq major-mode 'org-agenda-mode)
+        (org-agenda-clock-in)
+      (org-clock-in)))
 
-;; Set the time-stamp package to update the time an org file was last edited
-(setq time-stamp-format "%Y-%m-%d %H:%M")
-(setq time-stamp-start "# Last-edited: ")
-(setq time-stamp-end "$")
-(add-hook 'before-save-hook 'time-stamp)
+  (defun my/clock-out ()
+    "Clock out of the current org heading."
+    (interactive)
+    (if (eq major-mode 'org-agenda-mode)
+        (org-agenda-clock-out)
+      (org-clock-out)))
 
-(defun my/clock-in ()
-  "Clock in the current org heading."
-  (interactive)
-  (if (eq major-mode 'org-agenda-mode)
-      (org-agenda-clock-in)
-    (org-clock-in)))
+  (defun my/insert-current-date-time ()
+    "Insert the current date and time along with the three-letter weekday name in
+  the format YYYY-MM-DD Day H:M."
+    (interactive)
+    (insert (format-time-string "%Y-%m-%d %a %H:%M"))))
 
-(defun my/clock-out ()
-  "Clock out of the current org heading."
-  (interactive)
-  (if (eq major-mode 'org-agenda-mode)
-      (org-agenda-clock-out)
-    (org-clock-out)))
+;; Set the default bookmarks file
+(setq bookmark-default-file (concat my-documents-directory "bookmarks/bookmarks"))
 
-(defun my/insert-current-date-time ()
-  "Insert the current date and time along with the three-letter weekday name in
-the format YYYY-MM-DD Day H:M."
-  (interactive)
-  (insert (format-time-string "%Y-%m-%d %a %H:%M")))
+;; Set the eww-bookmarks directory
+(setq eww-bookmarks-directory (concat my-documents-directory "bookmarks/"))
+
+;; Require org-tempo for additional features
+(use-package org-tempo
+  :after org)
 
 ;; --------- Org-roam ---------
 
@@ -847,24 +851,26 @@ DIGITS is tre  number of pin digits and defaults to 6."
              (propertize (plist-get auth :host) 'face 'font-lock-keyword-face)
              (propertize password 'face 'font-lock-string-face))))
 
-;; --------- Chatgpt-shell ---------
+;; ---------------------------
+;; ChatGPT Shell Configuration
+;; ---------------------------
 
-;; Ensure that company package is installed and loaded
-(unless (package-installed-p 'chatgpt-shell)
-  (package-install 'chatgpt-shell))
-(require 'chatgpt-shell)
+(use-package chatgpt-shell
+  :ensure t
+  :config
+  ;; Set API key to nil at the beginning
+  (setq chatgpt-shell-openai-key nil)
 
-;; Set API key to nil at the beginning
-(setq chatgpt-shell-openai-key nil)
+  ;; Function to set the chatgpt-shell-openai-key
+  (defun my/set-chatgpt-shell-openai-key ()
+    "Set the `chatgpt-shell-openai-key` variable from auth-source."
+    (interactive)
+    (setq chatgpt-shell-openai-key
+          (auth-source-pick-first-password :host "api.openai.com")))
 
-(defun my/set-chatgpt-shell-openai-key ()
-  "Set the `chatgpt-shell-openai-key` variable from auth-source."
-  (interactive)
-  (setq chatgpt-shell-openai-key
-        (auth-source-pick-first-password :host "api.openai.com")))
-
-(defun my/open-chatgpt-shell ()
-  "Set the OpenAI API key and then call the chatgpt-shell command."
-  (interactive)
-  (my/set-chatgpt-shell-openai-key)
-  (chatgpt-shell))
+  ;; Function to open chatgpt-shell
+  (defun my/open-chatgpt-shell ()
+    "Set the OpenAI API key and then call the chatgpt-shell command."
+    (interactive)
+    (my/set-chatgpt-shell-openai-key)
+    (chatgpt-shell)))
