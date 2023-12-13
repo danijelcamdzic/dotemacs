@@ -95,7 +95,6 @@
           (save-excursion
             (org-back-to-heading t)
             (org-schedule '(4)))))))
-
   (progn ;; State change functions
     (defun my/todo-log-todo ()
       "Mark current heading as TODO"
