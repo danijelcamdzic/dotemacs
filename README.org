@@ -2,3 +2,18 @@
 #+AUTHOR: Danijel Camdzic
 
 This repository contains my personal Emacs configuration.
+
+In order to use the init.el file found in this repository, edit your /.emacs.d/init.el file to look like this:
+
+#+begin_src emacs-lisp
+  ;; Determine the location of init.el based on the system type
+  (setq init-file-location
+        (cond
+         ((eq system-type 'gnu/linux) "~/Projects/dotemacs/init.el")
+         ((eq system-type 'android) "/storage/emulated/0/Projects/dotemacs/init.el")
+         (t "~/Projects/dotemacs/init.el")))
+
+  ;; Load the init.el file from the determined location
+  (when init-file-location
+    (load-file init-file-location))
+#+end_src
