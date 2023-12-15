@@ -33,11 +33,11 @@
     (setq epa-pinentry-mode 'loopback))
 )
 
-;; TOTP and Passwords
 (require 'bindat)
 (require 'gnutls)
 (require 'hexl)
 
+;; Auth-source
 (use-package auth-source
   :ensure t
   :config
@@ -50,6 +50,7 @@
 
     ;; Enable authinfo-mode for auth-source files
     (add-to-list 'auto-mode-alist '("\\.authinfo.*\\.gpg\\'" . authinfo-mode)))
+
   (progn ;; TOTP functions
     (defun totp--base32-char-to-n (char)
       "Return 5 bit integer value matching base32 CHAR."
@@ -120,7 +121,8 @@
                 time-remaining)
         (kill-new code)
         code)))
-  (progn ;; Passwords functions
+
+  (progn ;; Password functions
     (defun pass--display (auth)
       "Select a password entry (PASS) from `auth-sources', and briefly display its password."
       (interactive
@@ -137,9 +139,9 @@
       (let ((password (funcall (plist-get auth :secret))))
         (message "Your password for '%s' is: %s"
                 (propertize (plist-get auth :host) 'face 'font-lock-keyword-face)
-                (propertize password 'face 'font-lock-string-face))))
-    )
-  (progn ;; Setup
+                (propertize password 'face 'font-lock-string-face)))))
+
+  (progn ;; Cache clearing configuration
     ;; Clear cached passwords after buffers are switched
     (add-hook 'buffer-list-update-hook 'auth-source-forget-all-cached))
 )

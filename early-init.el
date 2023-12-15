@@ -1,4 +1,4 @@
-;;; early-init.el --- Pre-init script to setup Emacs
+;;; early-init.el --- Pre-init script to setup Emacs on different platforms
 
 ;;; Code:
 

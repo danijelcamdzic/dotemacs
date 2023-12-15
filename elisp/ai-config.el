@@ -13,6 +13,7 @@
   (progn ;; API key configuration
     ;; Set API key to nil at the beginning
     (setq chatgpt-shell-openai-key nil))
+
   (progn ;; Chatgpt-shell functions
     (defun my/set-chatgpt-shell-openai-key ()
       "Set the `chatgpt-shell-openai-key` variable from auth-source."

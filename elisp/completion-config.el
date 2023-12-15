@@ -11,28 +11,28 @@
   :ensure t
   :config
   (progn ;; Setup
-    (global-company-mode 1))
-)
-
-;; Vertico
-(use-package vertico
-  :ensure t
-  :config
-  (vertico-mode 1)
-  (progn ;; Setup
-    (vertico-mode 1))
+    (company-mode 1)
+    (add-hook 'after-init-hook 'global-company-mode))
 )
 
 ;; Orderless
 (use-package orderless
   :ensure t
-  :custom
-  (progn ;; Setup
-    (completion-styles '(orderless))
-    (completion-category-defaults nil)
-    (completion-category-overrides '((file (styles . (partial-completion))))))
 )
 
+;; Vertico
+(use-package vertico
+  :after orderless
+  :ensure t
+  :config
+  (progn ;; Setup
+    (vertico-mode 1)
+
+    ;; Set completion style
+    (setq completion-styles '(orderless)
+          completion-category-defaults nil
+          completion-category-overrides '((file (styles . (partial-completion))))))
+)
 
 (provide 'completion-config)
 

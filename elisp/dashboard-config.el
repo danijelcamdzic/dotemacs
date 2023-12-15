@@ -23,6 +23,7 @@
           dashboard-agenda-sort-strategy '(time-up)
           dashboard-match-agenda-entry "+SCHEDULED<=\"<+1d>\"")
     (add-to-list 'dashboard-items '(agenda) t))
+
   (progn ;; Agenda display functions
     (defun my/dashboard-agenda--formatted-time-advice-use-relative-days (orig-fun &rest args)
       "Modifies the display of time in the dashboard agenda.
@@ -52,10 +53,11 @@
               (day-difference (- current-day-num entry-day-num)))
           (cond ((eq day-difference 0) "today")
                 ((eq day-difference 1) "yesterday")
-                ((eq day-difference -1) "tomorrow"))))))
+                ((eq day-difference -1) "tomorrow")))))
 
     ;; Add advice to change the date format to 'yesterday', 'today' or 'tomorrow'
-    (advice-add 'dashboard-agenda--formatted-time :around #'my/dashboard-agenda--formatted-time-advice-use-relative-days)
+    (advice-add 'dashboard-agenda--formatted-time :around #'my/dashboard-agenda--formatted-time-advice-use-relative-days))
+
   (progn ;; Setup
     (dashboard-setup-startup-hook))
 )

@@ -12,6 +12,7 @@
   :config
   (progn ;; Directories configuration
     (setq org-directory my-notes-directory))
+
   (progn ;; Appearance configuration
     ;; Custom faces
     (custom-set-faces
@@ -24,6 +25,7 @@
     (add-hook 'org-mode-hook #'turn-on-auto-fill)
     (add-hook 'org-mode-hook 'org-hide-block-all)
     (add-hook 'org-mode-hook 'org-hide-drawer-all))
+
   (progn ;; States and logging configuration
     ;; Set the org-todo-keywords and their states
     (setq org-todo-keywords
@@ -38,6 +40,7 @@
     (defface my-mark-SKIP '((t :background "#999900")) "")
     (defface my-mark-FAIL '((t :background "#8B0000")) "")
     (defface my-mark-NOTE '((t :background "#008000")) ""))
+
   (progn ;; Clocking functions
     (defun my/clock-in ()
       "Clock in the current org heading."
@@ -58,6 +61,7 @@
     the format YYYY-MM-DD Day H:M."
       (interactive)
       (insert (format-time-string "%Y-%m-%d %a %H:%M"))))
+
   (progn ;; Scheduling functions
     (defun my/add-schedule ()
       "Add a scheduling timestamp to the current item in the Org Agenda or in
@@ -95,6 +99,7 @@
           (save-excursion
             (org-back-to-heading t)
             (org-schedule '(4)))))))
+
   (progn ;; State change functions
     (defun my/todo-log-todo ()
       "Mark current heading as TODO"
@@ -130,6 +135,7 @@
       (if (eq major-mode 'org-agenda-mode)
           (org-agenda-todo)
         (org-todo))))
+
   (progn ;; Note functions
     (defun my/add-note ()
       "Add a note to an Org item."
@@ -137,6 +143,7 @@
       (if (eq major-mode 'org-agenda-mode)
           (org-agenda-add-note)
         (org-add-note))))
+
   (progn ;; Parsing functions
     (defun my/parse-logbook-states (logbook beg buffer)
       "Parse a logbook string and return a list of entries."
@@ -166,6 +173,7 @@
                   (entry-begin-pos line-start-pos))
               (push (list "NOTE" date entry-begin-pos buffer) entries)))
           (setq line-start-pos (+ line-start-pos (length line) 1))))))
+
   (progn ;; Calendar integration functions
     ;; Global flag to determine if the custom calendar view is active
     (defvar my/calendar-todo-view-active nil
@@ -269,6 +277,7 @@
 
     ;; Add hook to reset the custom calendar view flag when the calendar is closed
     (add-hook 'calendar-exit-hook 'my/reset-calendar-view-flag))
+
   (progn ;; Binding configuration
     ;; Bind the mouse click on the date to logbook entry position
     (with-eval-after-load 'calendar
@@ -310,6 +319,7 @@
           '((daily weekly today require-timed)
             (0000 0200 0400 0600 0800 1000 1200 1400 1600 1800 2000 2200 2359)
             "......" "----------------")))
+
   (progn ;; Agenda view functions
     (defun my/org-agenda-switch-to-view (view-fn)
       "Switch to the given Org Agenda view function VIEW-FN."
@@ -363,11 +373,13 @@
     (setq org-roam-directory org-directory)
     (setq org-roam-dailies-directory (concat org-directory "dailies/"))
     (setq org-roam-file-exclude-regexp "\\(\\.gpg\\)$"))
+
   (progn ;; Appearance configuration
     ;; Setup preview of org-roam nodes
     (setq org-roam-node-display-template
           (concat "${title:*} "
                   (propertize "${tags:30}" 'face 'org-tag))))
+
   (progn ;; Insert functions
     (defun my/get-org-roam-node-hierarchy (node)
       "Get the hierarchy of NODE as a list of titles.
