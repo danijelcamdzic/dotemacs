@@ -2,6 +2,9 @@
 
 ;;; Code:
 
+;; Set theme
+(load-theme 'misterioso t)
+
 ;; Indentation
 (setq-default indent-tabs-mode nil
               tab-width 4
@@ -9,9 +12,9 @@
 
 ;; Custom faces
 (custom-set-faces
-     '(bold ((t (:foreground "#008000" :weight bold))))
-     '(italic ((t (:foreground "#B0A030" :slant italic))))
-     '(strike-through ((t (:foreground "#8B0000" :strike-through t)))))
+ '(bold ((t (:foreground "#008000" :weight bold))))
+ '(italic ((t (:foreground "#B0A030" :slant italic))))
+ '(strike-through ((t (:foreground "#8B0000" :strike-through t)))))
 
 ;; Disable line numbers
 (global-display-line-numbers-mode 0)
@@ -28,6 +31,28 @@
 ;; Touch-screen keyboard settings for Android
 (when (eq system-type 'android)
   (setq touch-screen-display-keyboard t))
+
+(use-package ibuffer-sidebar
+  :ensure t
+  :config
+  (progn ;; Sidebar toggling function
+    (defun my/ibuffer-sidebar-toggle ()
+      "Toggle `ibuffer-sidebar'"
+      (interactive)
+      (ibuffer-sidebar-mode)
+      (ibuffer-sidebar-toggle-sidebar)))
+  )
+
+(use-package dired-sidebar
+  :ensure t
+  :config
+  (progn ;; Sidebar toggling function
+    (defun my/dired-sidebar-toggle ()
+      "Toggle `dired-sidebar'"
+      (interactive)
+      (dired-sidebar-mode)
+      (dired-sidebar-toggle-sidebar)))
+  )
 
 
 (provide 'editor-config)

@@ -69,10 +69,10 @@
       (interactive)
       (if (eq major-mode 'org-agenda-mode)
           (let* ((marker (or (org-get-at-bol 'org-marker)
-                            (org-agenda-error)))
-                (buffer (marker-buffer marker))
-                (pos (marker-position marker))
-                (inhibit-read-only t))
+                             (org-agenda-error)))
+                 (buffer (marker-buffer marker))
+                 (pos (marker-position marker))
+                 (inhibit-read-only t))
             (org-with-remote-undo buffer
               (with-current-buffer buffer
                 (widen)
@@ -86,10 +86,10 @@
       (interactive)
       (if (eq major-mode 'org-agenda-mode)
           (let* ((marker (or (org-get-at-bol 'org-marker)
-                            (org-agenda-error)))
-                (buffer (marker-buffer marker))
-                (pos (marker-position marker))
-                (inhibit-read-only t))
+                             (org-agenda-error)))
+                 (buffer (marker-buffer marker))
+                 (pos (marker-position marker))
+                 (inhibit-read-only t))
             (org-with-remote-undo buffer
               (with-current-buffer buffer
                 (widen)
@@ -153,10 +153,10 @@
         (dolist (line lines entries)
           (when (string-match "- State \"\\(.*?\\)\".*?\\[\\(.*?\\)\\]" line)
             (let* ((state (match-string 1 line))
-                  (date-string (match-string 2 line))
-                  (time (org-parse-time-string date-string))
-                  (date (list (nth 4 time) (nth 3 time) (nth 5 time)))
-                  (entry-begin-pos line-start-pos))
+                   (date-string (match-string 2 line))
+                   (time (org-parse-time-string date-string))
+                   (date (list (nth 4 time) (nth 3 time) (nth 5 time)))
+                   (entry-begin-pos line-start-pos))
               (push (list state date entry-begin-pos buffer) entries)))
           (setq line-start-pos (+ line-start-pos (length line) 1)))))
 
@@ -168,9 +168,9 @@
         (dolist (line lines entries)
           (when (string-match "- Note taken on \\[\\(.*?\\)\\]" line)
             (let* ((date-string (match-string 1 line))
-                  (time (org-parse-time-string date-string))
-                  (date (list (nth 4 time) (nth 3 time) (nth 5 time)))
-                  (entry-begin-pos line-start-pos))
+                   (time (org-parse-time-string date-string))
+                   (date (list (nth 4 time) (nth 3 time) (nth 5 time)))
+                   (entry-begin-pos line-start-pos))
               (push (list "NOTE" date entry-begin-pos buffer) entries)))
           (setq line-start-pos (+ line-start-pos (length line) 1))))))
 
@@ -199,12 +199,12 @@
       (setq my/calendar-todo-view-active t)
       (setq my-marked-entries '())
       (let* ((marker (if (eq major-mode 'org-agenda-mode)
-                        (or (org-get-at-bol 'org-marker)
-                            (org-agenda-error))
-                      (point-marker)))
-            (buffer (marker-buffer marker))
-            (pos (marker-position marker))
-            beg end logbook entries)
+                         (or (org-get-at-bol 'org-marker)
+                             (org-agenda-error))
+                       (point-marker)))
+             (buffer (marker-buffer marker))
+             (pos (marker-position marker))
+             beg end logbook entries)
         (with-current-buffer buffer
           (widen)
           (goto-char pos)
@@ -213,9 +213,9 @@
             (let ((section-end (point)))
               (goto-char current-pos)
               (if (and (search-forward ":LOGBOOK:" section-end t)
-                      (setq beg (line-beginning-position 2))
-                      (search-forward ":END:" section-end t)
-                      (setq end (line-beginning-position)))
+                       (setq beg (line-beginning-position 2))
+                       (search-forward ":END:" section-end t)
+                       (setq end (line-beginning-position)))
                   (progn
                     (setq logbook (buffer-substring-no-properties beg end))
                     (setq entries (my/parse-logbook-states logbook beg buffer))
@@ -229,12 +229,12 @@
       (setq my/calendar-todo-view-active t)
       (setq my-marked-entries '())
       (let* ((marker (if (eq major-mode 'org-agenda-mode)
-                        (or (org-get-at-bol 'org-marker)
-                            (org-agenda-error))
-                      (point-marker)))
-            (buffer (marker-buffer marker))
-            (pos (marker-position marker))
-            beg end logbook entries)
+                         (or (org-get-at-bol 'org-marker)
+                             (org-agenda-error))
+                       (point-marker)))
+             (buffer (marker-buffer marker))
+             (pos (marker-position marker))
+             beg end logbook entries)
         (with-current-buffer buffer
           (widen)
           (goto-char pos)
@@ -243,9 +243,9 @@
             (let ((section-end (point)))
               (goto-char current-pos)
               (if (and (search-forward ":LOGBOOK:" section-end t)
-                      (setq beg (line-beginning-position 2))
-                      (search-forward ":END:" section-end t)
-                      (setq end (line-beginning-position)))
+                       (setq beg (line-beginning-position 2))
+                       (search-forward ":END:" section-end t)
+                       (setq end (line-beginning-position)))
                   (progn
                     (setq logbook (buffer-substring-no-properties beg end))
                     (setq entries (my/parse-logbook-notes logbook beg buffer))
@@ -281,9 +281,9 @@
   (progn ;; Binding configuration
     ;; Bind the mouse click on the date to logbook entry position
     (with-eval-after-load 'calendar
-    ;; for terminal emacs "Enter" clicks
+      ;; for terminal emacs "Enter" clicks
       (define-key calendar-mode-map (kbd "RET") 'my/goto-logbook-entry)
-    ;; for gui emacs "Enter" clicks
+      ;; for gui emacs "Enter" clicks
       (define-key calendar-mode-map (kbd "<return>") 'my/goto-logbook-entry))
 
     ;; Map keys to custom org functions
@@ -293,7 +293,7 @@
       (define-key org-agenda-mode-map (kbd "M-t") #'my/todo-change-state)
       (define-key org-agenda-mode-map (kbd "M-n") #'my/add-note)
       (define-key org-agenda-mode-map (kbd "M-v") #'my/show-todo-in-calendar)))
-)
+  )
 
 ;; Org-agenda
 (use-package org-agenda
@@ -353,7 +353,7 @@
       (let ((org-super-agenda-groups '((:auto-parent t))))
         (org-agenda nil "t")
         (setq org-super-agenda-groups '()))))
-)
+  )
 
 ;; Org-super-agenda
 (use-package org-super-agenda
@@ -362,7 +362,7 @@
   :config
   (progn ;; Setup
     (org-super-agenda-mode))
-)
+  )
 
 ;; Org-roam
 (use-package org-roam
@@ -406,43 +406,43 @@
     and when nil is returned the node will be filtered out."
       (interactive "sKeywords: \nsExclude Keywords: ")
       (unwind-protect
-        ;; Group functions together to avoid inconsistent state on quit
+          ;; Group functions together to avoid inconsistent state on quit
           (atomic-change-group
             (let* ((all-nodes (org-roam-node-list))
-                  (keywords-list (if (string= keywords "") '() (split-string keywords " ")))
-                  (exclude-keywords-list (if (string= exclude-keywords "") '() (split-string exclude-keywords " ")))
-                  (filtered-nodes (cl-remove-if-not
+                   (keywords-list (if (string= keywords "") '() (split-string keywords " ")))
+                   (exclude-keywords-list (if (string= exclude-keywords "") '() (split-string exclude-keywords " ")))
+                   (filtered-nodes (cl-remove-if-not
                                     (lambda (node)
                                       (and (if keywords-list
-                                              (cl-every (lambda (keyword)
-                                                          (or (string-match-p (regexp-quote keyword) (org-roam-node-title node))
-                                                              (cl-some (lambda (tag)
+                                               (cl-every (lambda (keyword)
+                                                           (or (string-match-p (regexp-quote keyword) (org-roam-node-title node))
+                                                               (cl-some (lambda (tag)
                                                                           (string-match-p (regexp-quote keyword) tag))
                                                                         (org-roam-node-tags node))))
-                                                        keywords-list)
-                                            t)
-                                          (if exclude-keywords-list
-                                              (cl-notany (lambda (exclude-keyword)
+                                                         keywords-list)
+                                             t)
+                                           (if exclude-keywords-list
+                                               (cl-notany (lambda (exclude-keyword)
                                                             (or (string-match-p (regexp-quote exclude-keyword) (org-roam-node-title node))
                                                                 (cl-some (lambda (tag)
-                                                                          (string-match-p (regexp-quote exclude-keyword) tag))
-                                                                        (org-roam-node-tags node))))
+                                                                           (string-match-p (regexp-quote exclude-keyword) tag))
+                                                                         (org-roam-node-tags node))))
                                                           exclude-keywords-list)
-                                            t)
-                                          (or (not filter-fn) (funcall filter-fn node))))
+                                             t)
+                                           (or (not filter-fn) (funcall filter-fn node))))
                                     all-nodes))
-                  (sorted-nodes (sort filtered-nodes
-                                      (lambda (a b)
-                                        (let ((hierarchy-a (mapconcat #'identity (my/get-org-roam-node-hierarchy a) "->"))
-                                              (hierarchy-b (mapconcat #'identity (my/get-org-roam-node-hierarchy b) "->")))
-                                          (string< hierarchy-a hierarchy-b))))))
+                   (sorted-nodes (sort filtered-nodes
+                                       (lambda (a b)
+                                         (let ((hierarchy-a (mapconcat #'identity (my/get-org-roam-node-hierarchy a) "->"))
+                                               (hierarchy-b (mapconcat #'identity (my/get-org-roam-node-hierarchy b) "->")))
+                                           (string< hierarchy-a hierarchy-b))))))
               (dolist (node sorted-nodes)
                 (let* ((id (org-roam-node-id node))
-                      (hierarchy (my/get-org-roam-node-hierarchy node))
-                      (arrow-chain (if (> (length hierarchy) 1)
+                       (hierarchy (my/get-org-roam-node-hierarchy node))
+                       (arrow-chain (if (> (length hierarchy) 1)
                                         (mapconcat #'identity hierarchy "->")
                                       (org-roam-node-title node)))
-                      (link (org-link-make-string (concat "id:" id) arrow-chain)))
+                       (link (org-link-make-string (concat "id:" id) arrow-chain)))
                   (insert link)
                   (insert "\n")
                   (run-hook-with-args 'org-roam-post-node-insert-hook
@@ -451,7 +451,7 @@
       (deactivate-mark)))
   (progn ;; Setup
     (org-roam-setup))
-)
+  )
 
 ;; Org-analyzer
 (use-package org-analyzer
@@ -460,31 +460,31 @@
   :config
   (progn ;; Directories configuration
     (setq org-analyzer-org-directory org-directory))
-)
+  )
 
 ;; Websocket
 (use-package websocket
   :after org-roam
   :ensure t
-)
+  )
 
 ;; Org-roam-ui
 (use-package org-roam-ui
   :after org-roam
   :ensure t
-)
+  )
 
 ;; Org-transclusion
 (use-package org-transclusion
   :after org
   :ensure t
-)
+  )
 
 ;; Org-download
 (use-package org-download
   :after org
   :ensure t
-)
+  )
 
 ;; Calendar
 (use-package calendar
@@ -492,22 +492,22 @@
   (progn ;; Appearance configuration
     ;; Set calendar to start on Monday
     (setq calendar-week-start-day 1))
-)
+  )
 
 ;; Time-stamp
 (use-package time-stamp
   :config
   (progn ;; Setup
     (setq time-stamp-format "%Y-%m-%d %H:%M"
-            time-stamp-start "# Edited: "
-            time-stamp-end "$")
+          time-stamp-start "# Edited: "
+          time-stamp-end "$")
     (add-hook 'before-save-hook 'time-stamp))
-)
+  )
 
 ;; Org-tempo
 (use-package org-tempo
   :after org
-)
+  )
 
 
 (provide 'org-config)

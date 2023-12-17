@@ -10,15 +10,15 @@
 (use-package bookmark
   :config
   (progn ;; Directories configuration
-    (setq bookmark-default-file (concat my-documents-directory "bookmarks/bookmarks")))
-)
+    (setq bookmark-default-file (concat my-documents-directory "Bookmarks/bookmarks")))
+  )
 
 ;; Eww
 (use-package eww
   :config
   (progn ;; Directories configurations
-    (setq eww-bookmarks-directory (concat my-documents-directory "bookmarks/")))
-)
+    (setq eww-bookmarks-directory (concat my-documents-directory "Bookmarks/")))
+  )
 
 
 (provide 'bookmarks-config)

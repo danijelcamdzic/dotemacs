@@ -19,14 +19,14 @@
       "Set the `chatgpt-shell-openai-key` variable from auth-source."
       (interactive)
       (setq chatgpt-shell-openai-key
-            (auth-source-pick-first-password :host "api.openai.com")))
+            (auth-source-pick-first-password :host "API:openai.com")))
 
     (defun my/open-chatgpt-shell ()
       "Set the OpenAI API key and then call the chatgpt-shell command."
       (interactive)
       (my/set-chatgpt-shell-openai-key)
       (chatgpt-shell)))
-)
+  )
 
 
 (provide 'ai-config)

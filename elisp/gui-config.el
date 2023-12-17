@@ -64,7 +64,8 @@
     (easy-menu-define my-auth-menu nil "My Authentication Menu"
       '("Authentication"
         ("TOTP"
-         ["Generate TOTP token" totp--display t]
+         ["Generate TOTP token" totp--display t])
+        ("Passwords" 
          ["Reveal Password" pass--display t])))
 
     ;; Add the "Authentication" menu to the "Tools" menu
@@ -78,7 +79,7 @@
 
     ;; Add the "AI" menu to the "Tools" menu
     (easy-menu-add-item nil '("tools") my-ai-menu "Games"))
-)
+  )
 
 
 (provide 'gui-config)
