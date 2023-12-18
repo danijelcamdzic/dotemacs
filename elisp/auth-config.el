@@ -115,10 +115,12 @@
              (time-step 30) ;; TOTP is typically valid for 30 seconds
              (time-remaining (- time-step (mod current-time time-step)))
              (code (totp (funcall (plist-get auth :secret)))))
-        (message "Your TOTP for '%s' is: %s (valid for %d more seconds, sent to kill ring)"
-                 (propertize (plist-get auth :host) 'face 'font-lock-keyword-face)
-                 (propertize code 'face 'font-lock-string-face)
-                 time-remaining)
+        ;; Temporarily disable logging in *Messages* buffer
+        (let ((message-log-max nil))
+          (message "Your TOTP for '%s' is: %s (valid for %d more seconds, sent to kill ring)"
+                   (propertize (plist-get auth :host) 'face 'font-lock-keyword-face)
+                   (propertize code 'face 'font-lock-string-face)
+                   time-remaining))
         (kill-new code)
         code)))
 
@@ -137,9 +139,11 @@
                                        (auth-source-search :max 10000)))))
           (cdr (assoc (completing-read "Pick a PASS entry> " candidates) candidates)))))
       (let ((password (funcall (plist-get auth :secret))))
-        (message "Your password for '%s' is: %s"
-                 (propertize (plist-get auth :host) 'face 'font-lock-keyword-face)
-                 (propertize password 'face 'font-lock-string-face)))))
+        ;; Temporarily disable logging in *Messages* buffer
+        (let ((message-log-max nil))
+          (message "Your password for '%s' is: %s"
+                   (propertize (plist-get auth :host) 'face 'font-lock-keyword-face)
+                   (propertize password 'face 'font-lock-string-face))))))
 
   (progn ;; Cache clearing configuration
     ;; Clear cached passwords after buffers are switched
