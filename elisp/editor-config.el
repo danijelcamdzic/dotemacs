@@ -39,8 +39,8 @@
     (defun my/ibuffer-sidebar-toggle ()
       "Toggle `ibuffer-sidebar'"
       (interactive)
-      (ibuffer-sidebar-mode)
-      (ibuffer-sidebar-toggle-sidebar)))
+      (ibuffer-sidebar-toggle-sidebar)
+      (ibuffer-sidebar-mode)))
   )
 
 (use-package dired-sidebar
@@ -50,8 +50,8 @@
     (defun my/dired-sidebar-toggle ()
       "Toggle `dired-sidebar'"
       (interactive)
-      (dired-sidebar-mode)
-      (dired-sidebar-toggle-sidebar)))
+      (dired-sidebar-toggle-sidebar)
+      (dired-sidebar-mode)))
   )
 
 

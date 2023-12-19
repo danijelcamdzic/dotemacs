@@ -5,6 +5,7 @@
 ;; Dependencies
 (require 'package-archive-config)       ; Melpa and use-package setup
 (require 'user-config)                  ; User name and directories
+(require 'authorization-config)         ; GnuPg and auth-sources configuration
 
 ;; Chatgpt-shell
 (use-package chatgpt-shell

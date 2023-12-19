@@ -7,7 +7,7 @@
 (require 'user-config)                  ; User name and directories
 (require 'org-config)                   ; Org and supporting/extending packages configuration
 (require 'bookmarks-config)             ; Eww and regular bookmarks configuration
-(require 'auth-config)                  ; GnuPg and auth-sources configuration
+(require 'authorization-config)         ; GnuPg and auth-sources configuration
 (require 'ai-config)                    ; AI tools configuration
 
 ;; Add tool-bar options for zooming in
@@ -64,9 +64,9 @@
     (easy-menu-define my-auth-menu nil "My Authentication Menu"
       '("Authentication"
         ("TOTP"
-         ["Generate TOTP token" totp--display t])
+         ["Generate TOTP token" my/totp-display t])
         ("Passwords" 
-         ["Reveal Password" pass--display t])))
+         ["Reveal Password" my/pass-display t])))
 
     ;; Add the "Authentication" menu to the "Tools" menu
     (easy-menu-add-item nil '("tools") my-auth-menu "Games")

@@ -14,7 +14,7 @@
 (require 'dashboard-config)             ; Dashboard package configuration
 (require 'org-config)                   ; Org and supporting/extending packages configuration
 (require 'bookmarks-config)             ; Eww and regular bookmarks configuration
-(require 'auth-config)                  ; GnuPg and auth-sources configuration
+(require 'authorization-config)         ; GnuPg and auth-sources configuration
 (require 'ai-config)                    ; AI tools configuration
 
 ;;; init.el ends here

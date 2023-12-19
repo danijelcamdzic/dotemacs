@@ -1,4 +1,4 @@
-;;; auth-config.el -- GnuPg and auth-sources configuration
+;;; authorization-config.el -- GnuPg and auth-sources configuration
 
 ;;; Code:
 
@@ -44,9 +44,9 @@
   (progn ;; Auth-sources files configuration
     ;; Set auth-sources files
     (setq auth-sources
-          `((:source ,(concat my-documents-directory ".auth-sources/.authinfo-api.gpg"))
-            (:source ,(concat my-documents-directory ".auth-sources/.authinfo-totp.gpg"))
-            (:source ,(concat my-documents-directory ".auth-sources/.authinfo-pass.gpg"))))
+          `((:source ,(concat my-documents-directory ".secrets/.authinfo-api.gpg"))
+            (:source ,(concat my-documents-directory ".secrets/.authinfo-totp.gpg"))
+            (:source ,(concat my-documents-directory ".secrets/.authinfo-pass.gpg"))))
 
     ;; Enable authinfo-mode for auth-source files
     (add-to-list 'auto-mode-alist '("\\.authinfo.*\\.gpg\\'" . authinfo-mode)))
@@ -98,7 +98,7 @@
                          #x7fffffff)
                  (expt 10 digits)))))
 
-    (defun totp--display (auth)
+    (defun my/totp-display (auth)
       "Select a TOTP AUTH from `auth-sources', display its TOTP, and show remaining valid time."
       (interactive
        (list
@@ -117,15 +117,14 @@
              (code (totp (funcall (plist-get auth :secret)))))
         ;; Temporarily disable logging in *Messages* buffer
         (let ((message-log-max nil))
-          (message "Your TOTP for '%s' is: %s (valid for %d more seconds, sent to kill ring)"
+          (message "Your TOTP for '%s' is: %s (valid for %d more seconds)"
                    (propertize (plist-get auth :host) 'face 'font-lock-keyword-face)
                    (propertize code 'face 'font-lock-string-face)
                    time-remaining))
-        (kill-new code)
         code)))
 
   (progn ;; Password functions
-    (defun pass--display (auth)
+    (defun my/pass-display (auth)
       "Select a password entry (PASS) from `auth-sources', and briefly display its password."
       (interactive
        (list
@@ -151,6 +150,6 @@
   )
 
 
-(provide 'auth-config)
+(provide 'authorization-config)
 
 ;;; auth-config.el ends here
