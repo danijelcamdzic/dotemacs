@@ -32,6 +32,12 @@
 (when (eq system-type 'android)
   (setq touch-screen-display-keyboard t))
 
+(use-package doc-view
+  :config
+  (progn ;; Setup
+    (setq doc-view-resolution 200))
+  )
+
 (use-package ibuffer-sidebar
   :ensure t
   :config
