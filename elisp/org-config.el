@@ -27,13 +27,20 @@
     (add-hook 'org-mode-hook 'org-hide-drawer-all))
 
   (progn ;; Org babel configuration
-    ;; Enable programming language support
+    ;; Python
     (org-babel-do-load-languages
      'org-babel-load-languages
      '((python . t)))  ; Enable Python
 
     ;; Specify python3 interpreter
-    (setq org-babel-python-command "python3"))
+    (setq org-babel-python-command "python3")
+
+    ;; Set indentation for python
+    (setq python-indent-offset 4)
+    (setq org-edit-src-content-indentation 0)
+
+    ;; Don't ask for confirmation during org babel execution
+    (setq org-confirm-babel-evaluate nil))
 
   (progn ;; States and logging configuration
     ;; Set the org-todo-keywords and their states
