@@ -26,6 +26,15 @@
     (add-hook 'org-mode-hook 'org-hide-block-all)
     (add-hook 'org-mode-hook 'org-hide-drawer-all))
 
+  (progn ;; Org babel configuration
+    ;; Enable programming language support
+    (org-babel-do-load-languages
+     'org-babel-load-languages
+     '((python . t)))  ; Enable Python
+
+    ;; Specify python3 interpreter
+    (setq org-babel-python-command "python3"))
+
   (progn ;; States and logging configuration
     ;; Set the org-todo-keywords and their states
     (setq org-todo-keywords
