@@ -7,27 +7,27 @@
 (require 'user-config)                  ; User name and directories
 (require 'authorization-config)         ; GnuPg and auth-sources configuration
 
-;; Chatgpt-shell
+;; Chatgpt-shell configuration
 (use-package chatgpt-shell
   :ensure t
   :config
   (progn ;; API key configuration
     ;; Set API key to nil at the beginning
     (setq chatgpt-shell-openai-key nil))
-
-  (progn ;; Chatgpt-shell functions
-    (defun my/set-chatgpt-shell-openai-key ()
-      "Set the `chatgpt-shell-openai-key` variable from auth-source."
-      (interactive)
-      (setq chatgpt-shell-openai-key
-            (auth-source-pick-first-password :host "API:openai.com")))
-
-    (defun my/open-chatgpt-shell ()
-      "Set the OpenAI API key and then call the chatgpt-shell command."
-      (interactive)
-      (my/set-chatgpt-shell-openai-key)
-      (chatgpt-shell)))
   )
+
+;; Chatgpt-shell functions
+(defun my/set-chatgpt-shell-openai-key ()
+  "Set the `chatgpt-shell-openai-key` variable from auth-source."
+  (interactive)
+  (setq chatgpt-shell-openai-key
+        (auth-source-pick-first-password :host "API:openai.com")))
+
+(defun my/open-chatgpt-shell ()
+  "Set the OpenAI API key and then call the chatgpt-shell command."
+  (interactive)
+  (my/set-chatgpt-shell-openai-key)
+  (chatgpt-shell))
 
 
 (provide 'ai-config)

@@ -10,16 +10,44 @@
 (require 'authorization-config)         ; GnuPg and auth-sources configuration
 (require 'ai-config)                    ; AI tools configuration
 
-;; Add tool-bar options for zooming in
-(tool-bar-add-item "zoom-in" 'text-scale-increase
-                   'text-scale-increase
-                   :help "Zoom In")
+;; GUI mode functions
+(defun my/hide-gui-bar ()
+  "Disable scroll bar, menu bar, and tool bar."
+  (interactive)
+  (scroll-bar-mode -1)
+  (menu-bar-mode -1)
+  (tool-bar-mode -1))
 
-;; Add tool-bar options for zooming out
-(tool-bar-add-item "zoom-out" 'text-scale-decrease
-                   'text-scale-decrease
-                   :help "Zoom Out")
+(defun my/show-gui-bar ()
+  "Enable scroll bar, menu bar, and tool bar."
+  (interactive)
+  (scroll-bar-mode 1)
+  (menu-bar-mode 1)
+  (tool-bar-mode 1))
 
+;; Add additional GUI options when Android system is detected
+(when (eq system-type 'android)
+  ;; Add tool-bar options for zooming in
+  (tool-bar-add-item "zoom-in" 'text-scale-increase
+                     'text-scale-increase
+                     :help "Zoom In")
+
+  ;; Add tool-bar options for zooming out
+  (tool-bar-add-item "zoom-out" 'text-scale-decrease
+                     'text-scale-decrease
+                     :help "Zoom Out")
+
+  ;; Add tool-bar option for Org Cycle
+  (tool-bar-add-item "right-arrow" 'org-cycle
+                     'org-cycle
+                     :help "Org Cycle")
+
+  ;; Add tool-bar option for Org Ctrl-C Ctrl-C
+  (tool-bar-add-item "prev-node" 'org-ctrl-c-ctrl-c
+                     'org-ctrl-c-ctrl-c
+                     :help "Execute Org Ctrl-C Ctrl-C"))
+
+;; Easymenu configuration
 (use-package easymenu
   :config
   (progn ;; Menu configuration
@@ -78,7 +106,10 @@
          ["Open ChatGPT Shell" my/open-chatgpt-shell t])))
 
     ;; Add the "AI" menu to the "Tools" menu
-    (easy-menu-add-item nil '("tools") my-ai-menu "Games"))
+    (easy-menu-add-item nil '("tools") my-ai-menu "Games")
+
+    ;; Remove "Games" from the "Tools" menu
+    (define-key global-map [menu-bar tools games] nil))
   )
 
 

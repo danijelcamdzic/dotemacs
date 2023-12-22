@@ -6,7 +6,7 @@
 (require 'package-archive-config)       ; Melpa and use-package setup
 (require 'user-config)                  ; User name and directories
 
-;; Company
+;; Company configuration
 (use-package company
   :ensure t
   :config
@@ -15,12 +15,12 @@
     (add-hook 'after-init-hook 'global-company-mode))
   )
 
-;; Orderless
+;; Orderless configuration
 (use-package orderless
   :ensure t
   )
 
-;; Vertico
+;; Vertico configuration
 (use-package vertico
   :after orderless
   :ensure t

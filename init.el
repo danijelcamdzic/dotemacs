@@ -1,4 +1,4 @@
-;;; init.el --- Personal configuration file
+;;; init.el --- Personal configuration file for Emacs
 
 ;;; Code:
 
@@ -6,6 +6,7 @@
 (let ((my-dir (file-name-directory (or load-file-name buffer-file-name))))
   (add-to-list 'load-path (expand-file-name "elisp" my-dir)))
 
+;; Load packages
 (require 'package-archive-config)       ; Melpa and use-package setup
 (require 'user-config)                  ; User name and directories
 (require 'editor-config)                ; Text editing and buffer display configuration

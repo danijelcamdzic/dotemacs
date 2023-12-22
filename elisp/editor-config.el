@@ -3,7 +3,7 @@
 ;;; Code:
 
 ;; Set theme
-(load-theme 'misterioso t)
+(load-theme 'tsdh-dark t)
 
 ;; Indentation
 (setq-default indent-tabs-mode nil
@@ -32,33 +32,38 @@
 (when (eq system-type 'android)
   (setq touch-screen-display-keyboard t))
 
+;; Doc-view configuration
 (use-package doc-view
   :config
   (progn ;; Setup
     (setq doc-view-resolution 200))
   )
 
+;; iBuffer-sidebar configuration
 (use-package ibuffer-sidebar
   :ensure t
   :config
-  (progn ;; Sidebar toggling function
-    (defun my/ibuffer-sidebar-toggle ()
-      "Toggle `ibuffer-sidebar'"
-      (interactive)
-      (ibuffer-sidebar-toggle-sidebar)
-      (ibuffer-sidebar-mode)))
   )
 
+;; iBuffer-sidebar functions
+(defun my/ibuffer-sidebar-toggle ()
+  "Toggle `ibuffer-sidebar'"
+  (interactive)
+  (ibuffer-sidebar-toggle-sidebar)
+  (ibuffer-sidebar-mode))
+
+;; Dired-sidebar configuration
 (use-package dired-sidebar
   :ensure t
   :config
-  (progn ;; Sidebar toggling function
-    (defun my/dired-sidebar-toggle ()
-      "Toggle `dired-sidebar'"
-      (interactive)
-      (dired-sidebar-toggle-sidebar)
-      (dired-sidebar-mode)))
   )
+
+;; Dired-sidebar functions
+(defun my/dired-sidebar-toggle ()
+  "Toggle `dired-sidebar'"
+  (interactive)
+  (dired-sidebar-toggle-sidebar)
+  (dired-sidebar-mode))
 
 
 (provide 'editor-config)
