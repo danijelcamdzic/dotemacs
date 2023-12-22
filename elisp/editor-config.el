@@ -3,7 +3,7 @@
 ;;; Code:
 
 ;; Set theme
-(load-theme 'misterioso t)
+(load-theme 'deeper-blue t)
 
 ;; Indentation
 (setq-default indent-tabs-mode nil

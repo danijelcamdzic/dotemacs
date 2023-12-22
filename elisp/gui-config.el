@@ -25,6 +25,10 @@
   (menu-bar-mode 1)
   (tool-bar-mode 1))
 
+;; Hide GUI if in LINUX mode
+(when (eq system-type 'gnu/linux)
+  (my/hide-gui-bar))
+
 ;; Add additional GUI options when Android system is detected
 (when (eq system-type 'android)
   ;; Add tool-bar options for zooming in
