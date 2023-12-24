@@ -24,13 +24,19 @@
       auto-save-default nil
       make-backup-files nil)
 
-;; Buffer display settings
-(setq display-buffer-alist
-      '((".*" (display-buffer-same-window) (inhibit-same-window . nil))))
-
-;; Touch-screen keyboard settings for Android
+;; Android specific settings
 (when (eq system-type 'android)
+  ;; Buffer display settings
+  (setq display-buffer-alist
+        '((".*" (display-buffer-same-window) (inhibit-same-window . nil))))
+  ;; Touchscreen keyboard spawn
   (setq touch-screen-display-keyboard t))
+
+;; Auto-saving configuration
+(setq auto-save-default t)
+(setq auto-save-timeout 30)
+(auto-save-visited-mode 1)
+(setq auto-save-visited-interval 30)
 
 ;; Doc-view configuration
 (use-package doc-view

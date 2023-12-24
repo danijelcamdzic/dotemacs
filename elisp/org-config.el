@@ -321,10 +321,10 @@
                                       (todo . "%t ")
                                       (tags . "")
                                       (search . "%i")))
-    (setq org-agenda-sorting-strategy '((agenda time-up priority-down category-keep)
-                                        (todo time-up priority-down category-keep)
-                                        (tags time-up priority-down category-keep)
-                                        (search time-up priority-down category-keep)))
+    (setq org-agenda-sorting-strategy '((agenda time-up priority-up category-keep)
+                                        (todo priority-up time-up category-keep)
+                                        (tags time-up priority-up category-keep)
+                                        (search time-up priority-up category-keep)))
     (setq org-agenda-scheduled-leaders '("" ""))
     (setq org-agenda-span 7)
     (setq org-agenda-show-future-repeats 'next)
@@ -366,6 +366,14 @@
   "Open Org Agenda in the todos view mode with super agenda."
   (interactive)
   (let ((org-super-agenda-groups '((:auto-parent t))))
+    (org-agenda nil "t")
+    (setq org-super-agenda-groups '())))
+
+(defun my/org-agenda-inventory ()
+  "Open Org Agenda in the todos view mode with super agenda."
+  (interactive)
+  (let ((org-super-agenda-groups '((:auto-parent t)))
+        (org-agenda-sorting-strategy '((todo priority-down category-keep))))
     (org-agenda nil "t")
     (setq org-super-agenda-groups '())))
 

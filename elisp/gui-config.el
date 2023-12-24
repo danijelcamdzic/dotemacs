@@ -25,7 +25,7 @@
   (menu-bar-mode 1)
   (tool-bar-mode 1))
 
-;; Hide GUI if in LINUX mode
+;; Hide GUI on startup if in LINUX mode
 (when (eq system-type 'gnu/linux)
   (my/hide-gui-bar))
 
@@ -49,7 +49,8 @@
   ;; Add tool-bar option for Org Ctrl-C Ctrl-C
   (tool-bar-add-item "prev-node" 'org-ctrl-c-ctrl-c
                      'org-ctrl-c-ctrl-c
-                     :help "Execute Org Ctrl-C Ctrl-C"))
+                     :help "Execute Org Ctrl-C Ctrl-C")
+  )
 
 ;; Easymenu configuration
 (use-package easymenu

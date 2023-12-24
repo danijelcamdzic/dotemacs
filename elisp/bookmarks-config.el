@@ -20,6 +20,31 @@
     (setq eww-bookmarks-directory (concat my-documents-directory "Bookmarks/")))
   )
 
+;; Bookmark+ configuration
+(use-package bookmark+
+  :quelpa (bookmark+ :fetcher github :repo "emacsmirror/bookmark-plus")
+  :config
+  (progn ;; Default files configuration for state and commands
+    (setq bmkp-bmenu-state-file (expand-file-name ".emacs-bmk-bmenu-state.el" user-emacs-directory))
+    (setq bmkp-bmenu-commands-file (expand-file-name ".emacs-bmk-bmenu-commands.el" user-emacs-directory))
+    )
+  )
+
+;; Bookmarks+ functions
+(defun modify-bookmark-path (orig-fun &rest args)
+  "Modify the bookmark filename based on system type before opening."
+  (let* ((bookmark (car args))
+         (bookmark-data (bookmark-get-bookmark bookmark))
+         (filename (alist-get 'filename bookmark-data)))
+    (if (eq system-type 'android)
+        (setq filename (replace-regexp-in-string (regexp-quote my-gnu-linux-home) my-android-home filename))
+      (setq filename (replace-regexp-in-string (regexp-quote my-android-home) my-gnu-linux-home filename)))
+    (setf (alist-get 'filename bookmark-data) filename)
+    (apply orig-fun args)))
+
+;; Add advice on how to open bookmarks
+(advice-add 'bookmark-jump :around #'modify-bookmark-path)
+
 
 (provide 'bookmarks-config)
 
