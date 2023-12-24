@@ -9,6 +9,7 @@
 ;; Define the home variables
 (defvar my-android-home "/storage/emulated/0/")
 (defvar my-gnu-linux-home "~/")
+(defvar my-gnu-linux-home-extended "/home/danijelcamdzic/")
 
 ;; Set the home directory based on system type
 (setq my-home-directory

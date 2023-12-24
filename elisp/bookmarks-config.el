@@ -37,8 +37,13 @@
          (bookmark-data (bookmark-get-bookmark bookmark))
          (filename (alist-get 'filename bookmark-data)))
     (if (eq system-type 'android)
-        (setq filename (replace-regexp-in-string (regexp-quote my-gnu-linux-home) my-android-home filename))
-      (setq filename (replace-regexp-in-string (regexp-quote my-android-home) my-gnu-linux-home filename)))
+        (progn
+          (when (string-match-p (regexp-quote my-gnu-linux-home) filename)
+            (setq filename (replace-regexp-in-string (regexp-quote my-gnu-linux-home) my-android-home filename)))
+          (when (string-match-p (regexp-quote my-gnu-linux-home-extended) filename)
+            (setq filename (replace-regexp-in-string (regexp-quote my-gnu-linux-home-extended) my-android-home filename))))
+      (when (string-match-p (regexp-quote my-android-home) filename)
+        (setq filename (replace-regexp-in-string (regexp-quote my-android-home) my-gnu-linux-home filename))))
     (setf (alist-get 'filename bookmark-data) filename)
     (apply orig-fun args)))
 
