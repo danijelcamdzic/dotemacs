@@ -21,6 +21,7 @@
   :ensure t
   :init
   (setq quelpa-self-upgrade-p nil)
+  (setq quelpa-update-melpa-p nil)
   )
 
 ;; Quelpa-use-package configuration
