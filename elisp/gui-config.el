@@ -88,7 +88,9 @@
          ["Show Clock Analysis" org-analyzer-start t])
         ("Note"
          ["Add Note" my/add-note t]
-         ["Show in Calendar" my/show-notes-in-calendar t])))
+         ["Show in Calendar" my/show-notes-in-calendar t])
+        ("Bookmarks"
+         ["List Bookmarks" list-bookmarks t])))
 
     ;; Add the command center menu to the toolbar to the left of "Tools" section
     (easy-menu-add-item global-map '("menu-bar") my/command-center-menu "Tools")
