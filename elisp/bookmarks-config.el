@@ -32,22 +32,36 @@
 
 ;; Bookmarks+ functions
 (defun modify-bookmark-path (orig-fun &rest args)
-  "Modify the bookmark filename based on system type before opening."
+  "Modify the bookmark filename and directory based on system type before opening."
   (let* ((bookmark (car args))
          (bookmark-data (bookmark-get-bookmark bookmark))
-         (filename (alist-get 'filename bookmark-data)))
-    (if (eq system-type 'android)
-        (progn
-          (when (string-match-p (regexp-quote my-gnu-linux-home) filename)
-            (setq filename (replace-regexp-in-string (regexp-quote my-gnu-linux-home) my-android-home filename)))
-          (when (string-match-p (regexp-quote my-gnu-linux-home-extended) filename)
-            (setq filename (replace-regexp-in-string (regexp-quote my-gnu-linux-home-extended) my-android-home filename))))
-      (when (string-match-p (regexp-quote my-android-home) filename)
-        (setq filename (replace-regexp-in-string (regexp-quote my-android-home) my-gnu-linux-home filename))))
-    (setf (alist-get 'filename bookmark-data) filename)
+         (filename (alist-get 'filename bookmark-data))
+         (dired-directory (alist-get 'dired-directory bookmark-data)))
+    ;; Modify filename for file bookmarks
+    (when filename
+      (if (eq system-type 'android)
+          (progn
+            (when (string-match-p (regexp-quote my-gnu-linux-home) filename)
+              (setq filename (replace-regexp-in-string (regexp-quote my-gnu-linux-home) my-android-home filename)))
+            (when (string-match-p (regexp-quote my-gnu-linux-home-extended) filename)
+              (setq filename (replace-regexp-in-string (regexp-quote my-gnu-linux-home-extended) my-android-home filename))))
+        (when (string-match-p (regexp-quote my-android-home) filename)
+          (setq filename (replace-regexp-in-string (regexp-quote my-android-home) my-gnu-linux-home filename))))
+      (setf (alist-get 'filename bookmark-data) filename))
+    ;; Modify dired-directory for directory bookmarks
+    (when dired-directory
+      (if (eq system-type 'android)
+          (progn
+            (when (string-match-p (regexp-quote my-gnu-linux-home) dired-directory)
+              (setq dired-directory (replace-regexp-in-string (regexp-quote my-gnu-linux-home) my-android-home dired-directory)))
+            (when (string-match-p (regexp-quote my-gnu-linux-home-extended) dired-directory)
+              (setq dired-directory (replace-regexp-in-string (regexp-quote my-gnu-linux-home-extended) my-android-home dired-directory))))
+        (when (string-match-p (regexp-quote my-android-home) dired-directory)
+          (setq dired-directory (replace-regexp-in-string (regexp-quote my-android-home) my-gnu-linux-home dired-directory))))
+      (setf (alist-get 'dired-directory bookmark-data) dired-directory))
+
     (apply orig-fun args)))
 
-;; Add advice on how to open bookmarks
 (advice-add 'bookmark-jump :around #'modify-bookmark-path)
 
 
