@@ -80,6 +80,7 @@
          ["Log as SKIP" my/todo-log-skip t]
          ["Log as FAIL" my/todo-log-fail t]
          ["Change State" my/todo-change-state t]
+         ["Automatically SKIP Overdues" my/skip-overdue-tasks]
          ["Show in Calendar" my/show-states-in-calendar t])
         ("Clock"
          ["Clock In" my/clock-in t]

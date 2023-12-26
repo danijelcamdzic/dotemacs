@@ -167,6 +167,21 @@
       (org-agenda-todo)
     (org-todo)))
 
+(defun my/skip-overdue-tasks ()
+  "Mark tasks scheduled for yesterday or earlier as SKIP and update their schedule."
+  (interactive)
+  (dolist (file (directory-files org-directory t "\\.org$"))
+    (with-current-buffer (find-file-noselect file)
+      (save-excursion
+        (goto-char (point-min))
+        (while (re-search-forward org-scheduled-time-regexp nil t)
+          (let ((scheduled-time (org-get-scheduled-time (point))))
+            (when (and scheduled-time
+                       (< (time-to-days scheduled-time)
+                          (time-to-days (current-time))))
+              (org-todo "SKIP")
+              )))))))
+
 ;; Org-mode note functions
 (defun my/add-note ()
   "Add a note to an Org item."
