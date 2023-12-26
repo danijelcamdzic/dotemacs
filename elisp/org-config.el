@@ -5,6 +5,7 @@
 ;; Dependencies
 (require 'package-archive-config)       ; Melpa and use-package setup
 (require 'user-config)                  ; User name and directories
+(require 'time-config)                  ; Calendar and other time related settings
 
 ;; Org-mode configuration
 (use-package org
@@ -168,7 +169,7 @@
     (org-todo)))
 
 (defun my/skip-overdue-tasks ()
-  "Mark tasks scheduled for yesterday or earlier as SKIP and update their schedule."
+  "Mark tasks scheduled for yesterday or earlier as SKIP and log them as changed yesterday."
   (interactive)
   (dolist (file (directory-files org-directory t "\\.org$"))
     (with-current-buffer (find-file-noselect file)
@@ -179,8 +180,16 @@
             (when (and scheduled-time
                        (< (time-to-days scheduled-time)
                           (time-to-days (current-time))))
-              (org-todo "SKIP")
-              )))))))
+              ;; Lock just before time override
+              (unless my/time-override-lock
+                (setq my/time-override-lock t)
+                (my/adjust-time (format-time-string "<%Y-%m-%d %a>"
+                                                    (time-subtract (current-time) (days-to-time 1))))
+                (advice-add 'current-time :override #'my/current-time-override)
+                (org-todo "SKIP")
+                (advice-remove 'current-time #'my/current-time-override)
+                (setq my/adjusted-time nil)
+                (setq my/time-override-lock nil)))))))))
 
 ;; Org-mode note functions
 (defun my/add-note ()
@@ -522,14 +531,6 @@
 (use-package org-download
   :after org
   :ensure t
-  )
-
-;; Calendar configuration
-(use-package calendar
-  :config
-  (progn ;; Appearance configuration
-    ;; Set calendar to start on Monday
-    (setq calendar-week-start-day 1))
   )
 
 ;; Time-stamp configuration
