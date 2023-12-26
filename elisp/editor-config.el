@@ -32,12 +32,6 @@
   ;; Touchscreen keyboard spawn
   (setq touch-screen-display-keyboard t))
 
-;; Auto-saving configuration
-(setq auto-save-default t)
-(setq auto-save-timeout 30)
-(auto-save-visited-mode 1)
-(setq auto-save-visited-interval 30)
-
 ;; Doc-view configuration
 (use-package doc-view
   :config
