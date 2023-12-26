@@ -8,7 +8,7 @@
 
 ;; Time adjustment functions
 (defvar my/adjusted-time nil
-  "Adjusted time for the duration of the my/skip-overdue-tasks function.")
+  "Adjusted time. This time will replace current time.")
 
 (defvar my/time-override-lock nil
   "Lock to prevent concurrent access to the time override.")
