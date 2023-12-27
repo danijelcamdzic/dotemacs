@@ -169,7 +169,7 @@
     (org-todo)))
 
 (defun my/skip-overdue-tasks ()
-  "Mark tasks scheduled for yesterday or earlier as SKIP and log them as changed yesterday."
+  "Mark tasks scheduled for yesterday or earlier as SKIP and log them as changed on their scheduled date."
   (interactive)
   (dolist (file (directory-files org-directory t "\\.org$"))
     (with-current-buffer (find-file-noselect file)
@@ -180,11 +180,9 @@
             (when (and scheduled-time
                        (< (time-to-days scheduled-time)
                           (time-to-days (current-time))))
-              ;; Lock just before time override
               (unless my/time-override-lock
                 (setq my/time-override-lock t)
-                (my/adjust-time (format-time-string "<%Y-%m-%d %a>"
-                                                    (time-subtract (current-time) (days-to-time 1))))
+                (my/adjust-time (format-time-string "<%Y-%m-%d %a>" scheduled-time))
                 (advice-add 'current-time :override #'my/current-time-override)
                 (org-todo "SKIP")
                 (advice-remove 'current-time #'my/current-time-override)
