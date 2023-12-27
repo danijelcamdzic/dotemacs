@@ -50,6 +50,9 @@
     (setq org-log-into-drawer t)
     (setq org-log-note-clock-out t)
 
+    ;; Tags excluded from inheritance
+    (setq org-tags-exclude-from-inheritance '("food" "exercise"))
+
     ;; Define custom faces for different TODO states
     (defface my-mark-DONE '((t :background "#006400")) "")
     (defface my-mark-SKIP '((t :background "#999900")) "")
