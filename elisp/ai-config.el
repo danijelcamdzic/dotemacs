@@ -29,6 +29,28 @@
   (my/set-chatgpt-shell-openai-key)
   (chatgpt-shell))
 
+;; Chatgpt-shell configuration
+(use-package ob-chatgpt-shell
+  :ensure t
+  :after chatgpt-shell
+  :config
+  (progn ;; Setup
+    (ob-chatgpt-shell-setup))
+  )
+
+(defun my/chatgpt-shell-prepend-variables (orig-fun body params)
+  "Preprocess the ChatGPT shell block to prepend variables given before block is
+executed."
+  (let ((var-entry (alist-get :var params)))
+    (when var-entry
+      (when (consp var-entry)
+        (let ((var-name (car var-entry))
+              (var-value (cdr var-entry)))
+          (setq body (concat (format "%s" var-value) "\n" body)))))
+  (funcall orig-fun body params)))
+
+(advice-add 'org-babel-execute:chatgpt-shell :around #'my/chatgpt-shell-prepend-variables)
+
 
 (provide 'ai-config)
 
