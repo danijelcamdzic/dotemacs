@@ -32,6 +32,13 @@
   ;; Touchscreen keyboard spawn
   (setq touch-screen-display-keyboard t))
 
+;; Programming lanuage specific settings
+;; C/C++
+(defun my/c-cpp-mode-setup ()
+  (setq c-basic-offset 4))
+
+(add-hook 'c-mode-common-hook 'my/c-cpp-mode-setup)
+
 ;; Doc-view configuration
 (use-package doc-view
   :config
