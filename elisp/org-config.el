@@ -32,8 +32,7 @@
     (org-babel-do-load-languages
      'org-babel-load-languages
      '((python . t)    ; Enable Python
-       (C . t)         ; Enable C
-       (cpp . t)))     ; Enable C++
+       (C . t)))       ; Enable C
 
     ;; Python configuration
     (setq org-babel-python-command "python3")
