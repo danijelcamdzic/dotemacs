@@ -71,7 +71,7 @@ To install Emacs on Linux/Windows, the process is much more straightforward.
 
 Note that =early-init.el= is not necessary for Linux/Windows cases.
 
-* Synching
+* Syncing
 
 I use the https://syncthing.net/ app to sync folders from my home directory. It is a simple
 and a powerful app available on both Android and Linux/Windows. I use it
