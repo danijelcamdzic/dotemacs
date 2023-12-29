@@ -1,7 +1,17 @@
 #+TITLE: DotEmacs
 #+AUTHOR: Danijel Camdzic
 
-This repository contains my personal Emacs configuration.
+This repository contains my personal Emacs configuration. This configuration is intended to work on both Android port of Emacs and Windows/Linux Emacs.
+The installation process and the explanation of some of the more exciting features which I use in my workflow are presented in this document.
+
+* Installation
+
+You can use this configuration on both Android and Linux/Windows without any modifiations except for the user credentials and folder names.
+
+** Installaion on Android
+
+To install GUI Emacs port on Android, follow the tutorial on https://sourceforge.net/projects/android-ports-for-gnu-emacs/. You will need to download their signed version
+of Termux as well as download their Emacs apk file. Once 
 
 In order to use the init.el file found in this repository, edit your /.emacs.d/init.el file to look like this:
 
