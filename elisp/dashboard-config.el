@@ -20,8 +20,7 @@
           dashboard-set-heading-icons t
           dashboard-agenda-prefix-format "%-10:s %t"
           dashboard-agenda-time-string-format "%Y-%m-%d %H:%M"
-          dashboard-agenda-sort-strategy '(time-up)
-          dashboard-match-agenda-entry "+SCHEDULED<=\"<+1d>\"")
+          dashboard-agenda-sort-strategy '(time-up))
     (add-to-list 'dashboard-items '(agenda) t))
 
   (progn ;; Setup
@@ -55,9 +54,9 @@
            (current-day-num (time-to-days (apply #'encode-time (decode-time (current-time)))))
            (entry-day-num (time-to-days (apply #'encode-time (decode-time time))))
            (day-difference (- current-day-num entry-day-num)))
-      (cond ((eq day-difference 0) "today")
+      (cond ((eq day-difference 0) "today    ")
             ((eq day-difference 1) "yesterday")
-            ((eq day-difference -1) "tomorrow")))))
+            ((eq day-difference -1) "tomorrow ")))))
 
 ;; Add advice to change the date format to 'yesterday', 'today' or 'tomorrow'
 (advice-add 'dashboard-agenda--formatted-time :around #'my/dashboard-agenda--formatted-time-advice-use-relative-days)

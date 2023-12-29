@@ -31,7 +31,7 @@
   )
 
 ;; Bookmarks+ functions
-(defun modify-bookmark-path (orig-fun &rest args)
+(defun my/modify-bookmark-path (orig-fun &rest args)
   "Modify the bookmark filename and directory based on system type before opening."
   (let* ((bookmark (car args))
          (bookmark-data (bookmark-get-bookmark bookmark))
@@ -62,7 +62,7 @@
 
     (apply orig-fun args)))
 
-(advice-add 'bookmark-jump :around #'modify-bookmark-path)
+(advice-add 'bookmark-jump :around #'my/modify-bookmark-path)
 
 
 (provide 'bookmarks-config)
