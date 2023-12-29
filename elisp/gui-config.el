@@ -91,7 +91,12 @@
          ["Add Note" my/add-note t]
          ["Show in Calendar" my/show-notes-in-calendar t])
         ("Bookmarks"
-         ["List Bookmarks" list-bookmarks t])))
+         ["List Bookmarks" list-bookmarks t]
+         ["Show All Bookmarks" bmkp-bmenu-show-all t]
+         ["Show URL Bookmarks" bmkp-bmenu-show-only-url-bookmarks t]
+         ["Filter Bookmarks by Name" bmkp-bmenu-filter-bookmark-name-incrementally t]
+         ["Filter Bookmarks By Tag" bmkp-bmenu-filter-bookmark-tags-incrementally t]
+         ["Filter Bookmarks By Annotation" bmkp-bmenu-filter-annotation-incrementally t])))
 
     ;; Add the command center menu to the toolbar to the left of "Tools" section
     (easy-menu-add-item global-map '("menu-bar") my/command-center-menu "Tools")
