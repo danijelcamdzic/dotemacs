@@ -83,6 +83,8 @@ Here I will elaborate on the configuration files I have and present some
 interesting (to me at least) features I have added to my workflow in order to
 make it more useful.
 
+[[assets/linux-emacs.png]]
+
 ** =user-config.el=
 
 This file contains the user information which includes the user credentials and
