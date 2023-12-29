@@ -45,7 +45,7 @@
   (progn ;; States and logging configuration
     ;; Set the org-todo-keywords and their states
     (setq org-todo-keywords
-          '((sequence "TODO(t)" "|" "DONE(d!)" "SKIP(s!)" "FAIL(f!)")))
+          '((sequence "TODO(t)" "DOING(i!)" "|" "DONE(d!)" "SKIP(s!)" "FAIL(f!)")))
 
     ;; Configure TODO properties to be logged in "LOGBOOK" drawer
     (setq org-log-into-drawer t)
@@ -58,7 +58,8 @@
     (defface my-mark-DONE '((t :background "#006400")) "")
     (defface my-mark-SKIP '((t :background "#999900")) "")
     (defface my-mark-FAIL '((t :background "#8B0000")) "")
-    (defface my-mark-NOTE '((t :background "#008000")) ""))
+    (defface my-mark-DOING '((t :background "#4B0082")) "")
+    (defface my-mark-NOTE '((t :background "#006400")) ""))
 
   (progn ;; Binding configuration
     ;; Bind the mouse click on the date to logbook entry position
@@ -143,6 +144,13 @@
   (if (eq major-mode 'org-agenda-mode)
       (org-agenda-todo "TODO")
     (org-todo "TODO")))
+
+(defun my/todo-log-doing ()
+  "Mark current heading as DOING"
+  (interactive)
+  (if (eq major-mode 'org-agenda-mode)
+      (org-agenda-todo "DOING")
+    (org-todo "DOING")))
 
 (defun my/todo-log-done ()
   "Mark current heading as DONE"
@@ -243,11 +251,21 @@
 (defun my/mark-entries (entries)
   "Mark days in the calendar for each entry in ENTRIES."
   (setq my-marked-entries entries)
-  (dolist (entry entries)
-    (let ((state (car entry))
-          (date (cadr entry)))
-      (when (calendar-date-is-visible-p date)
-        (calendar-mark-visible-date date (intern (concat "my-mark-" state)))))))
+  (let ((last-date (current-time)))
+    (dolist (entry entries)
+      (let* ((state (car entry))
+             (date (cadr entry))
+             (next-entry (cadr (member entry entries)))
+             (end-date (if next-entry (cadr next-entry) last-date)))
+        (when (calendar-date-is-visible-p date)
+          (calendar-mark-visible-date date (intern (concat "my-mark-" state))))
+        (when (string= state "DOING")
+          (let ((current-date date))
+            (while (and (not (equal current-date end-date))
+                        (calendar-date-is-visible-p current-date))
+              (calendar-mark-visible-date current-date 'my-mark-DOING)
+              (setq current-date (calendar-gregorian-from-absolute
+                                  (+ 1 (calendar-absolute-from-gregorian current-date)))))))))))
 
 (defun my/show-states-in-calendar ()
   "Show the state history of the TODO at point in the org-agenda buffer or an
