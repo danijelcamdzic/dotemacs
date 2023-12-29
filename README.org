@@ -1,21 +1,46 @@
 #+TITLE: DotEmacs
 #+AUTHOR: Danijel Camdzic
 
-This repository contains my personal Emacs configuration. This configuration is intended to work on both Android port of Emacs and Windows/Linux Emacs.
-The installation process and the explanation of some of the more exciting features which I use in my workflow are presented in this document.
+This repository contains my personal Emacs configuration. This configuration is
+intended to work on both Android port of Emacs and Windows/Linux Emacs. The
+installation process and the explanation of some of the more exciting features
+which I use in my workflow are presented in this README file.
 
 * Installation
 
-You can use this configuration on both Android and Linux/Windows without any modifiations except for the user credentials and folder names.
+You can use this configuration on both Android and Linux/Windows without any
+modifiations except for the user credentials and folder names.
 
-** Installaion on Android
+** Installation on Android
 
-To install GUI Emacs port on Android, follow the tutorial on https://sourceforge.net/projects/android-ports-for-gnu-emacs/. You will need to download their signed version
-of Termux as well as download their Emacs apk file. Once 
+To install GUI Emacs port on Android, follow the tutorial on
+https://sourceforge.net/projects/android-ports-for-gnu-emacs/. You will need to
+download their signed version of Termux as well as download their Emacs apk
+file. Once you have everything set up according to the tutorial, you can open
+the Emacs folder on your Android device using any file manager you have
+available and you can delete the .emacs file which the program created. If you
+followed the tutorial you will have created the early-init.el file and placed in
+inside the .emacs.d folder. This file is necessary in order for Emacs to use
+Termux packages (like git, gpg etc.). If you haven't created this file you can
+find it in this repo and use it.
 
-In order to use the init.el file found in this repository, edit your /.emacs.d/init.el file to look like this:
+From here:
 
-#+begin_src emacs-lisp
+1. Clone the repository in your desired directory.
+
+   #+begin_src bash
+   git clone https://github.com/danijelcamdzic/dotemacs
+   #+end_src
+
+   I cloned it in my ~/Projects/ folder and it's best to use that one if you do
+   not want to change the directory in the init.el file.
+
+2. Move the early-init.el file to your Android Emacs .emacs.d folder if you
+   didn't create one during the installation tutorial
+
+3. Create a new init.el file and place the following code in it.
+
+  #+begin_src emacs-lisp
   ;; Determine the location of init.el based on the system type
   (setq init-file-location
         (cond
@@ -26,4 +51,247 @@ In order to use the init.el file found in this repository, edit your /.emacs.d/i
   ;; Load the init.el file from the determined location
   (when init-file-location
     (load-file init-file-location))
+  #+end_src
+
+   This will make sure that when Emacs has started, it will load the correct
+   init.el file depending on the system. This way you can have the same
+   configuration files on both Android and Linux/Windows without manual changes anytime
+   you change something in your repo.
+
+4. Start Emacs and wait for all the packages to be downloaded.
+
+** Installation on Linux/Windows
+
+To install Emacs on Linux/Windows, the process is much more straightforward.
+
+1. Download Emacs (Vanilla one, not Doom or Spacemacs) on your machine depending on your operating system.
+2. Delete (if created) the .emacs file
+3. Create the init.el file and move it in the .emacs.d folder. The init.el file
+   is the same as in the Android case.
+
+Note that early-init.el is not necessary for Linux/Windows cases.
+
+* Synching
+
+I use the https://syncthing.net/ app to sync folders from my home directory. It is a simple
+and a powerful app available on both Android and Linux/Windows. I use it
+primarely to sync my ~/Notes/ and my ~/Documents/ folder.
+
+* Configuration Files
+
+Here I will elaborate on the configuration files I have and present some
+interesting (to me at least) features I have added to my workflow in order to
+make it more useful.
+
+** user-config.el
+
+This file contains the user information which includes the user credentials and
+directory information.
+
+I use the same folder on my Linux machine and on my Android phone. The only
+thing that is different is the home folder. In this configuration file, Emacs is
+let known what the user home folder is and what are the names of the folders it
+uses.
+
+For Linux both ~/ and /home/user are used but for Android we use
+/storage/emulated/0 (unrooted phone)
+
+Here you can add more of your information.
+
+** package-archive-config.el
+
+This configuration file sets up MELPA and QUELPA so we can download all the
+packages we need.
+
+** time-config.el
+
+This file contains some time-related functions and calendar
+package configuration.
+
+The purpose of time-related functions is to change the system date in order to
+be able to log some things with a different date. It overrides the system date
+and lets the user pick a date of his own.
+
+** editor-config.el
+
+This file contains various editor related configurations, ranging from the theme
+set up to the sidebar configuration.
+
+I use dired-sidebar and ibuffer-sidebar and have created wrapper functions which
+I use to seamlessly transition to using them.
+
+*** Android Editor
+
+The most important part of this configuration file is the section:
+
+#+begin_src emacs-lisp
+;; Android specific settings
+(when (eq system-type 'android)
+  ;; Buffer display settings
+  (setq display-buffer-alist
+        '((".*" (display-buffer-same-window) (inhibit-same-window . nil))))
+  ;; Touchscreen keyboard spawn
+  (setq touch-screen-display-keyboard t))
 #+end_src
+
+Which makes every buffer open in its own separate window as the screen size of
+Android is not meant to be shared between buffers due to its size. Also, I
+enable the keyboard to display even on read-only buffers.
+
+** completion-config.el
+
+This file contains configuration for packages related to completion.
+
+** dashboard-config.el
+
+I use dashboard package in Emacs. This file contains the configuration for that
+package as well as some custom functions which improve how the dashboard
+looks. This is mainly related to how the agenda items appear in the dashboard.
+
+*** Relative vs Absolute Dates in Dashboard-Agenda
+
+In the original version, the agenda items would appear and be shown with their
+scheduled dates. I didn't like seeing the dates as they are, and preffered to see
+them written in a more personal manner by using the relative date terms like
+today, tomorrow and yesterday as opposed to absolute dates.
+
+[[assets/dashboard-absolute-date.png]]
+[[assets/dashboard-relative-date.png]]
+
+This functionality is added as an advice and can be removed with only one line
+if you don't find this useful.
+
+** gui-config.el
+
+In this file, I configure the GUI options in Emacs. I need GUI because I don't
+like using the keyboard shortcuts on Android Emacs and would like all options to be
+available through the GUI menu.
+
+For Linux/Windows I do not like seeing the GUI and so I automatically hide
+it. You can remove the line which calls the my/hide-gui-bar function if you don't
+want this.
+
+*** Android GUI shortcuts
+
+In Android case, I like to see some options appear in the tool-bar menu and
+those include the zoom-in, zoom-out, org-cycle and org-ctrl-c-ctrl-c
+options. They are cumbersome to search for otherwise.
+
+In the GUI menu bar, I add a bunch of features I have created all over my
+configuration for easy access. Some of then are in the "Commands" menu and some
+are in the "Tools" menu.
+
+** org-config.el
+
+This is the biggest part of my configuration and contains numerous functions.
+
+In this file, the main parts of the configuration concern the org-mode,
+org-roam and org-agenda functionalities.
+
+I will showcase a few here.
+
+*** Calendar Display of States and Notes
+
+I wanted to have a way to visualize how my TODO (or any heading) changed
+throughout its existance. I want to see when I marked it as DONE, when as FAIL
+and when I was DOING it. I wanted to see this visually on my calendar.
+
+For this I created several functions which serve the purpose to parse the
+logbook and display a TODO's history.
+
+The TODO keywords are defined as this:
+
+#+begin_src emacs-lisp
+;; Set the org-todo-keywords and their states
+(setq org-todo-keywords
+   '((sequence "TODO(t)" "DOING(i!)" "|" "DONE(d!)" "SKIP(s!)" "FAIL(f!)")))
+#+end_src
+
+and their respective colors as this:
+
+#+begin_src emacs-lisp
+;; Define custom faces for different TODO states
+(defface my-mark-DONE '((t :background "#006400")) "") ; green
+(defface my-mark-SKIP '((t :background "#999900")) "") ; yellow
+(defface my-mark-FAIL '((t :background "#8B0000")) "") ; red
+(defface my-mark-DOING '((t :background "#4B0082")) "") ; purple
+(defface my-mark-NOTE '((t :background "#006400")) "") ; green (separate calendar)
+#+end_src
+
+To visualize the states on the calendar one must simply call the function
+my/show-states-in-calendar. It can be used to visualize both habit like TODOs
+as well as TODOs which are supposed to be done over a longer period of time.
+
+[[assets/todo-algorithms.png]]
+[[assets/calendar-algorithms.png]]
+[[assets/todo-gym.png]]
+[[assets/calendar-gym.png]]
+
+In the same manner, you can call the my/show-notes-in-calendar and you will see
+with green dates all the dates that you have made a note in.
+
+You can even go to the place where the STATE or NOTE was added by clicking on
+the calendar date.
+
+*** Org roam tag insertion
+
+There is a function called my/insert-org-roam-nodes-by-tag, which enables you to
+insert in the org file all nodes that have certain tags but do not have other
+tags you specify.
+
+In the example below, I have called the function to insert all the nodes that
+have tag fitness in them and in the example below that one I inserted all that have the
+tag fitness but do not have the tag cardio.
+
+[[assets/insert-fitness.png]]
+[[assets/insert-fitness-no-cardio.png]]
+
+There are also in here many functions which serve as a wrapper so they can be
+called in either the org-agenda buffer or the org file.
+
+** bookmarks-config.el
+
+*** Seamless Bookmark Management on Android and Linux
+
+This file contains bookmark related configuration. I use bookmark+ package and have a
+unified bookmark file which works on both Linux and Android. To be able to work
+on both Linux and Android I have created custom function which advises the
+bookmark-jump function to manipulate the bookmark entry and go to the proper
+home directory depending on the system
+
+This way syncthing app can be used to sync the bookmark file and the bookmarks
+will be opened seamlessly on both types of systems.
+
+** authorization-config.el
+
+This file contains two package configurations which include auth-sources and
+epa.
+
+I use GPG for encrypting my files and I use auth-sources on Emacs to store my
+secrets. This is convenient for me as I have my phone and Linux both running the
+same configuration and both synced to have the latest files. I use Emacs as my
+password manager and I use Emacs as my TOTP manager.
+
+This file contains functions for TOTP and password retrieval. TOTP functions are
+taken from the https://github.com/juergenhoetzel/emacs-totp and I followed the
+https://www.masteringemacs.org/article/securely-generating-totp-tokens-emacs
+tutorial to make this work.
+
+** ai-config.el
+
+This file contains the chatgpt-shell package configuration with small custom
+functionality.
+
+The small modificiation is the my/chatgpt-shell-prepend-variables function
+which I have written in order to be able to give parameters to org babel chat
+gpt block.
+
+This way I can have some python org babel script scrape my file and then send
+the results to chatgpt-shell in order for it to provide the answer.
+
+A very simple example is given below:
+
+[[assets/chatgpt-vars.png]]
+
+Make sure to give the API key by calling the  my/set-chatgpt-shell-openai-key function.
+
