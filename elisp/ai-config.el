@@ -3,8 +3,8 @@
 ;;; Code:
 
 ;; Dependencies
-(require 'package-archive-config)       ; Melpa and use-package setup
-(require 'user-config)                  ; User name and directories
+(require 'user-config)                  ; User details and directory configuration
+(require 'package-manager-config)       ; Package manager configuration (melpa and quelpa)
 (require 'authorization-config)         ; GnuPg and auth-sources configuration
 
 ;; Chatgpt-shell configuration
@@ -29,7 +29,7 @@
   (my/set-chatgpt-shell-openai-key)
   (chatgpt-shell))
 
-;; Chatgpt-shell configuration
+;; Ob-chatgpt-shell configuration
 (use-package ob-chatgpt-shell
   :ensure t
   :after chatgpt-shell
@@ -38,6 +38,7 @@
     (ob-chatgpt-shell-setup))
   )
 
+;; Ob-chatgpt-shell functions
 (defun my/chatgpt-shell-prepend-variables (orig-fun body params)
   "Preprocess the ChatGPT shell block to prepend variables given before block is
 executed."

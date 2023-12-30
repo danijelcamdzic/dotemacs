@@ -3,8 +3,9 @@
 ;;; Code:
 
 ;; Dependencies
-(require 'package-archive-config)       ; Melpa and use-package setup
-(require 'user-config)                  ; User name and directories
+(require 'user-config)                  ; User details and directory configuration
+(require 'package-manager-config)       ; Package manager configuration (melpa and quelpa)
+(require 'viewer-config)                ; Viewer packages configuration
 (require 'time-config)                  ; Calendar and other time related settings
 
 ;; Org-mode configuration
@@ -20,12 +21,15 @@
      '(org-scheduled ((t (:foreground "#555555"))))
      '(org-scheduled-today ((t (:foreground "grey")))))
 
-    ;; Visibility
+    ;; Visibility of org items (drawer, code blocks, headings)
     (setq org-startup-indented t)
     (add-hook 'org-mode-hook (lambda () (setq fill-column 80)))
     (add-hook 'org-mode-hook #'turn-on-auto-fill)
     (add-hook 'org-mode-hook 'org-hide-block-all)
-    (add-hook 'org-mode-hook 'org-hide-drawer-all))
+    (add-hook 'org-mode-hook 'org-hide-drawer-all)
+
+    ;; Display inline images on startup
+    (setq org-startup-with-inline-images t))
 
   (progn ;; Org babel configuration
     ;; Languages support
@@ -52,7 +56,7 @@
     (setq org-log-note-clock-out t)
 
     ;; Tags excluded from inheritance
-    (setq org-tags-exclude-from-inheritance '("food" "exercise"))
+    (setq org-tags-exclude-from-inheritance '("goal" "food" "exercise"))
 
     ;; Define custom faces for different TODO states
     (defface my-mark-DONE '((t :background "#006400")) "")
@@ -67,15 +71,7 @@
       ;; for terminal emacs "Enter" clicks
       (define-key calendar-mode-map (kbd "RET") 'my/goto-logbook-entry)
       ;; for gui emacs "Enter" clicks
-      (define-key calendar-mode-map (kbd "<return>") 'my/goto-logbook-entry))
-
-    ;; Map keys to custom org functions
-    (with-eval-after-load 'org-agenda
-      (define-key org-agenda-mode-map (kbd "M-s") #'my/add-schedule)
-      (define-key org-agenda-mode-map (kbd "M-r") #'my/remove-schedule)
-      (define-key org-agenda-mode-map (kbd "M-t") #'my/todo-change-state)
-      (define-key org-agenda-mode-map (kbd "M-n") #'my/add-note)
-      (define-key org-agenda-mode-map (kbd "M-v") #'my/show-todo-in-calendar)))
+      (define-key calendar-mode-map (kbd "<return>") 'my/goto-logbook-entry)))
   )
 
 ;; Org-mode clocking functions
@@ -93,6 +89,7 @@
       (org-agenda-clock-out)
     (org-clock-out)))
 
+;; Org-mode date and time function
 (defun my/insert-current-date-time ()
   "Insert the current date and time along with the three-letter weekday name in
     the format YYYY-MM-DD Day H:M."
@@ -180,6 +177,7 @@
       (org-agenda-todo)
     (org-todo)))
 
+;; Org-mode skip overdue tasks function
 (defun my/skip-overdue-tasks ()
   "Mark tasks scheduled for yesterday or earlier as SKIP and log them as changed on their scheduled date."
   (interactive)
@@ -240,7 +238,6 @@
       (setq line-start-pos (+ line-start-pos (length line) 1)))))
 
 ;; Org-mode logbook calendar view functions
-;; Global flag to determine if the custom calendar view is active
 (defvar my/calendar-todo-view-active nil
   "Flag to indicate if the custom TODO calendar view is active.")
 
@@ -266,6 +263,11 @@
               (calendar-mark-visible-date current-date 'my-mark-DOING)
               (setq current-date (calendar-gregorian-from-absolute
                                   (+ 1 (calendar-absolute-from-gregorian current-date)))))))))))
+
+(defun my/reapply-markings ()
+  "Reapply markings to the calendar."
+  (when my/calendar-todo-view-active
+    (my/mark-entries my-marked-entries)))
 
 (defun my/show-states-in-calendar ()
   "Show the state history of the TODO at point in the org-agenda buffer or an
@@ -342,16 +344,12 @@
           (message "No logbook entry found for this date.")))
     (message "Not supported in this calendar.")))
 
-(defun my/reapply-markings ()
-  "Reapply markings to the calendar."
-  (when my/calendar-todo-view-active
-    (my/mark-entries my-marked-entries)))
+(with-eval-after-load 'calendar
+  ;; Add hook to reapply markings each time the calendar is moved
+  (add-hook 'calendar-move-hook 'my/reapply-markings)
 
-;; Add hook to reapply markings each time the calendar is moved
-(add-hook 'calendar-move-hook 'my/reapply-markings)
-
-;; Add hook to reset the custom calendar view flag when the calendar is closed
-(add-hook 'calendar-exit-hook 'my/reset-calendar-view-flag)
+  ;; Add hook to reset the custom calendar view flag when the calendar is closed
+  (add-hook 'calendar-exit-hook 'my/reset-calendar-view-flag))
 
 ;; Org-agenda configuration
 (use-package org-agenda
@@ -359,6 +357,7 @@
   :config
   (progn ;; Directories configuration
     (setq org-agenda-files (list org-directory)))
+  
   (progn ;; Appearance configuration
     ;; Customize org-agenda view
     (setq org-agenda-prefix-format  '((agenda . "  %t ")
@@ -427,6 +426,7 @@
   :ensure t
   :config
   (progn ;; Setup
+    ;; Enable org-super-agenda mode
     (org-super-agenda-mode))
   )
 
@@ -438,6 +438,7 @@
   (progn ;; Directories configuration
     (setq org-roam-directory org-directory)
     (setq org-roam-dailies-directory (concat org-directory "dailies/"))
+    ;; Exclude gpg encrypted files from being processed by org-roam
     (setq org-roam-file-exclude-regexp "\\(\\.gpg\\)$"))
 
   (progn ;; Appearance configuration
@@ -520,6 +521,11 @@
                                   arrow-chain))))))
   (deactivate-mark))
 
+;; Org-tempo configuration
+(use-package org-tempo
+  :after org
+  )
+
 ;; Org-analyzer configuration
 (use-package org-analyzer
   :after org
@@ -549,23 +555,54 @@
 
 ;; Org-download configuration
 (use-package org-download
-  :after org
   :ensure t
-  )
-
-;; Time-stamp configuration
-(use-package time-stamp
-  :config
-  (progn ;; Setup
-    (setq time-stamp-format "%Y-%m-%d %H:%M"
-          time-stamp-start "# Edited: "
-          time-stamp-end "$")
-    (add-hook 'before-save-hook 'time-stamp))
-  )
-
-;; Org-tempo configuration
-(use-package org-tempo
   :after org
+  :config
+  (progn ;; Directory setup
+    (setq org-download-method 'directory)
+    (setq-default org-download-image-dir (concat my-notes-directory "images"))
+    (setq-default org-download-heading-lvl nil)
+    (setq org-download-image-org-width 600)
+    (setq org-download-link-format "[[file:%s]]\n"
+          org-download-abbreviate-filename-function #'file-relative-name)
+    (setq org-download-link-format-function #'org-download-link-format-function-default))
+  )
+
+;; Org-download functions
+(defun my/org-download-clipboard-prompt-for-name-advice (orig-fun &optional basename)
+  "Advice to prompt for a basename before calling `org-download-clipboard'."
+  (message "Calling advice function")
+  (let ((name (if (called-interactively-p 'any)
+                  (read-string "Enter image name (without extension): ")
+                basename)))
+    (funcall orig-fun (if (string-empty-p name) basename (concat name ".png")))))
+
+(advice-add 'org-download-clipboard :around #'my/org-download-clipboard-prompt-for-name-advice)
+
+;; Org-ref configuration
+(use-package org-ref
+  :ensure t
+  :after org
+  )
+
+;; Org-noter configuration
+(use-package org-noter
+  :ensure t  
+  :after org 
+  :config
+  (progn ;; Directory configuration
+    ;; Set the location of the notes
+    (setq org-noter-notes-search-path '(org-directory)))
+  )
+
+;; Org-media-note configuration
+(use-package org-media-note
+  :quelpa (org-media-note :fetcher github :repo "yuchen-lea/org-media-note")
+  :hook (org-mode .  org-media-note-mode)
+  :bind (("H-v" . org-media-note-hydra/body))
+  :config
+  (progn ;; Directory configuration
+    (setq org-media-note-screenshot-image-dir (concat my-notes-directory "images")))
   )
 
 

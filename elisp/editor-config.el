@@ -2,22 +2,38 @@
 
 ;;; Code:
 
+;; Dependencies
+(require 'package-manager-config)       ; Package manager configuration (melpa and quelpa)
+
+;; Theme
 ;; Set theme
 (load-theme 'deeper-blue t)
 
+;; Text editing
 ;; Indentation
 (setq-default indent-tabs-mode nil
               tab-width 4
               indent-line-function 'insert-tab)
 
-;; Custom faces
+;; Custom faces for text
 (custom-set-faces
  '(bold ((t (:foreground "#008000" :weight bold))))
  '(italic ((t (:foreground "#B0A030" :slant italic))))
  '(strike-through ((t (:foreground "#8B0000" :strike-through t)))))
 
+;; Programming lanuage specific settings
+;; C/C++
+(defun my/c-cpp-mode-setup ()
+  (setq c-basic-offset 4))
+
+(add-hook 'c-mode-common-hook 'my/c-cpp-mode-setup)
+
 ;; Disable line numbers
 (global-display-line-numbers-mode 0)
+
+;; Default Emacs behaviour changes
+;; Remove startup screen
+(setq inhibit-startup-screen t)
 
 ;; Disable backup and lock files
 (setq create-lockfiles nil
@@ -32,19 +48,6 @@
   ;; Touchscreen keyboard spawn
   (setq touch-screen-display-keyboard t))
 
-;; Programming lanuage specific settings
-;; C/C++
-(defun my/c-cpp-mode-setup ()
-  (setq c-basic-offset 4))
-
-(add-hook 'c-mode-common-hook 'my/c-cpp-mode-setup)
-
-;; Doc-view configuration
-(use-package doc-view
-  :config
-  (progn ;; Setup
-    (setq doc-view-resolution 200))
-  )
 
 ;; iBuffer-sidebar configuration
 (use-package ibuffer-sidebar
@@ -71,6 +74,11 @@
   (interactive)
   (dired-sidebar-toggle-sidebar)
   (dired-sidebar-mode))
+
+;; Pretty-hydra configuration
+(use-package pretty-hydra
+  :ensure t
+  )
 
 
 (provide 'editor-config)

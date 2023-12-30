@@ -3,10 +3,10 @@
 ;;; Code:
 
 ;; Dependencies
-(require 'package-archive-config)       ; Melpa and use-package setup
-(require 'user-config)                  ; User name and directories
+(require 'user-config)                  ; User details and directory configuration
+(require 'package-manager-config)       ; Package manager configuration (melpa and quelpa)
 (require 'org-config)                   ; Org and supporting/extending packages configuration
-(require 'bookmarks-config)             ; Eww and regular bookmarks configuration
+(require 'bookmarks-config)             ; Bookmarks configuration
 (require 'authorization-config)         ; GnuPg and auth-sources configuration
 (require 'ai-config)                    ; AI tools configuration
 
@@ -81,16 +81,16 @@
          ["Log as SKIP" my/todo-log-skip t]
          ["Log as FAIL" my/todo-log-fail t]
          ["Change State" my/todo-change-state t]
-         ["Automatically SKIP Overdues" my/skip-overdue-tasks]
-         ["Show in Calendar" my/show-states-in-calendar t])
+         ["Skip all Overdue" my/skip-overdue-tasks]
+         ["Show States in Calendar" my/show-states-in-calendar t])
         ("Clock"
          ["Clock In" my/clock-in t]
          ["Clock Out" my/clock-out t]
          ["Display Clocks" org-clock-display]
          ["Show Clock Analysis" org-analyzer-start t])
-        ("Note"
+        ("Notes"
          ["Add Note" my/add-note t]
-         ["Show in Calendar" my/show-notes-in-calendar t])))
+         ["Show Notes in Calendar" my/show-notes-in-calendar t])))
 
     ;; Add the command center menu to the toolbar to the left of "Tools" section
     (easy-menu-add-item global-map '("menu-bar") my/command-center-menu "Tools")

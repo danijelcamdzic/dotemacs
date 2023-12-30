@@ -3,8 +3,8 @@
 ;;; Code:
 
 ;; Dependencies
-(require 'package-archive-config)       ; Melpa and use-package setup
-(require 'user-config)                  ; User name and directories
+(require 'user-config)                  ; User details and directory configuration
+(require 'package-manager-config)       ; Package manager configuration (melpa and quelpa)
 
 ;; Epa configuration
 (use-package epa

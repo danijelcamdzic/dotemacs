@@ -1,10 +1,10 @@
-;;; completion-config.el -- Autocomplete and ordering packages configuration
+;;; completion-config.el -- Completion packages configuration
 
 ;;; Code:
 
 ;; Dependencies
-(require 'package-archive-config)       ; Melpa and use-package setup
-(require 'user-config)                  ; User name and directories
+(require 'user-config)                  ; User details and directory configuration
+(require 'package-manager-config)       ; Package manager configuration (melpa and quelpa)
 
 ;; Company configuration
 (use-package company
@@ -26,6 +26,7 @@
   :ensure t
   :config
   (progn ;; Setup
+    ;; Enable vertico
     (vertico-mode 1)
 
     ;; Set completion style
@@ -33,6 +34,7 @@
           completion-category-defaults nil
           completion-category-overrides '((file (styles . (partial-completion))))))
   )
+
 
 (provide 'completion-config)
 

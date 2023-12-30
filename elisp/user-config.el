@@ -17,6 +17,8 @@
        ((eq system-type 'gnu/linux) my-gnu-linux-home)
        ((eq system-type 'android) my-android-home)
        (t my-gnu-linux-home)))
+
+;; Set the home folders (reused across platforms)
 (setq my-books-directory (concat my-home-directory "Books/"))
 (setq my-notes-directory (concat my-home-directory "Notes/"))
 (setq my-documents-directory (concat my-home-directory "Documents/"))

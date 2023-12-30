@@ -1,10 +1,10 @@
-;;; dashboard-config.el -- Dashboard package configuration
+;;; dashboard-config.el -- Dashboard configuration
 
 ;;; Code:
 
 ;; Dependencies
-(require 'package-archive-config)       ; Melpa and use-package setup
-(require 'user-config)                  ; User name and directories
+(require 'user-config)                  ; User details and directory configuration
+(require 'package-manager-config)       ; Package manager configuration (melpa and quelpa)
 
 ;; Dashboard configuration
 (use-package dashboard
@@ -58,7 +58,7 @@
             ((eq day-difference 1) "yesterday")
             ((eq day-difference -1) "tomorrow ")))))
 
-;; Add advice to change the date format to 'yesterday', 'today' or 'tomorrow'
+;; Add advice to change the date format of agenda items to 'yesterday', 'today' or 'tomorrow'
 (advice-add 'dashboard-agenda--formatted-time :around #'my/dashboard-agenda--formatted-time-advice-use-relative-days)
 
 

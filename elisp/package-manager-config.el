@@ -1,4 +1,4 @@
-;;; package-archive-config.el -- Melpa, Quelpa and use-package setup
+;;; package-manager-config.el -- Package manager configuration (melpa and quelpa)
 
 ;;; Code:
 
@@ -20,6 +20,7 @@
 (use-package quelpa
   :ensure t
   :init
+  ;; Disable self upgrades to reduce startup time
   (setq quelpa-self-upgrade-p nil)
   (setq quelpa-update-melpa-p nil)
   )
@@ -29,10 +30,11 @@
   :ensure t
   :after (quelpa)
   :config
+  ;; Activate quelpa-use-package
   (quelpa-use-package-activate-advice)
   )
 
 
-(provide 'package-archive-config)
+(provide 'package-manager-config)
 
-;;; package-archive-config.el ends here
+;;; package-manager-config.el ends here

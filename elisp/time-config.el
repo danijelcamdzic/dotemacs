@@ -3,8 +3,8 @@
 ;;; Code:
 
 ;; Dependencies
-(require 'package-archive-config)       ; Melpa and use-package setup
-(require 'user-config)                  ; User name and directories
+(require 'user-config)                  ; User details and directory configuration
+(require 'package-manager-config)       ; Package manager configuration (melpa and quelpa)
 
 ;; Time adjustment functions
 (defvar my/adjusted-time nil
@@ -20,6 +20,16 @@
 (defun my/current-time-override ()
   "Override for `current-time' using `my/adjusted-time'."
   (or my/adjusted-time (current-time)))
+
+;; Time-stamp configuration
+(use-package time-stamp
+  :config
+  (progn ;; Setup
+    (setq time-stamp-format "%Y-%m-%d %H:%M"
+          time-stamp-start "# Edited: "
+          time-stamp-end "$")
+    (add-hook 'before-save-hook 'time-stamp))
+  )
 
 ;; Calendar configuration
 (use-package calendar
