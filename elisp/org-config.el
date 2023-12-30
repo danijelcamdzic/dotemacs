@@ -416,22 +416,10 @@
   )
 
 ;; Org-super-agenda functions
-;; Add new grouping - by file title
-(defun my/org-super-agenda-get-file-title (item)
-  "Get the title of the Org file for the given agenda ITEM."
-  (org-super-agenda--when-with-marker-buffer (org-super-agenda--get-marker item)
-    (let ((keywords (org-collect-keywords '("TITLE"))))
-      (if keywords
-          (car (cdr (assoc "TITLE" keywords)))  ; Extract the first element of the list
-        (file-name-nondirectory (buffer-file-name))))))
-
-(org-super-agenda--def-auto-group file-title "their file title"
-  :key-form (my/org-super-agenda-get-file-title item))
-
 (defun my/org-agenda-inventory ()
   "Open Org Agenda in the todos view mode with super agenda. Use file title as groups"
   (interactive)
-  (let ((org-super-agenda-groups '((:auto-file-title t))) ; :(auto-parent t) for parent heading grouping
+  (let ((org-super-agenda-groups '((:auto-parent t)))
         (org-agenda-sorting-strategy '((todo priority-down category-keep))))
     (org-agenda nil "t")
     (setq org-super-agenda-groups '())))
