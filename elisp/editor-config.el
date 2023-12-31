@@ -6,8 +6,13 @@
 (require 'package-manager-config)       ; Package manager configuration (melpa and quelpa)
 
 ;; Theme
+
+(use-package gruvbox-theme
+  :ensure t
+  )
+
 ;; Set theme
-(load-theme 'manoj-dark t)
+(load-theme 'gruvbox-dark-hard t)
 
 ;; Remove fringes
 (set-fringe-mode 0)
