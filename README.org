@@ -101,20 +101,6 @@ For Linux both =~/= and =/home/user= are used but for Android we use
 
 Here you can add more of your information.
 
-** =package-archive-config.el=
-
-This configuration file sets up MELPA and QUELPA so we can download all the
-packages we need.
-
-** =time-config.el=
-
-This file contains some time-related functions and calendar
-package configuration.
-
-The purpose of time-related functions is to change the system date in order to
-be able to log some things with a different date. It overrides the system date
-and lets the user pick a date of his own.
-
 ** =editor-config.el=
 
 This file contains various editor related configurations, ranging from the theme
@@ -140,10 +126,6 @@ The most important part of this configuration file is the section:
 Which makes every buffer open in its own separate window as the screen size of
 Android is not meant to be shared between buffers due to its size. Also, I
 enable the keyboard to display even on read-only buffers.
-
-** =completion-config.el=
-
-This file contains configuration for packages related to completion.
 
 ** =dashboard-config.el=
 
@@ -279,22 +261,4 @@ This file contains functions for TOTP and password retrieval. TOTP functions are
 taken from the https://github.com/juergenhoetzel/emacs-totp and I followed the
 https://www.masteringemacs.org/article/securely-generating-totp-tokens-emacs
 tutorial to make this work.
-
-** =ai-config.el=
-
-This file contains the chatgpt-shell package configuration with small custom
-functionality.
-
-The small modificiation is the =my/chatgpt-shell-prepend-variables= function
-which I have written in order to be able to give parameters to org babel chat
-gpt block.
-
-This way I can have some python org babel script scrape my file and then send
-the results to chatgpt-shell in order for it to provide the answer.
-
-A very simple example is given below:
-
-[[assets/chatgpt-vars.png]]
-
-Make sure to give the API key by calling the  =my/set-chatgpt-shell-openai-key= function.
 
