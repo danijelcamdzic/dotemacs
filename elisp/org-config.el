@@ -416,6 +416,19 @@
   )
 
 ;; Org-super-agenda functions
+(defun my/org-super-agenda-get-file-title-or-parent (item)
+  "Get the parent heading of ITEM, or if none, the file title."
+  (org-super-agenda--when-with-marker-buffer (org-super-agenda--get-marker item)
+    (if (org-up-heading-safe)
+        (org-entry-get nil "ITEM")  ; If there is a parent heading, use it
+      (let ((keywords (org-collect-keywords '("TITLE"))))
+        (if keywords
+            (car (cdr (assoc "TITLE" keywords)))  ; If there is a file title, use it
+          (file-name-nondirectory (buffer-file-name)))))))  ; Otherwise, use the file name
+
+(org-super-agenda--def-auto-group parent "their parent heading or file title"
+  :key-form (my/org-super-agenda-get-file-title-or-parent item))
+
 (defun my/org-agenda-inventory ()
   "Open Org Agenda in the todos view mode with super agenda. Use file title as groups"
   (interactive)
