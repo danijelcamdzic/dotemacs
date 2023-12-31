@@ -90,18 +90,12 @@
          ["Show Clock Analysis" org-analyzer-start t])
         ("Notes"
          ["Add Note" my/add-note t]
-         ["Show Notes in Calendar" my/show-notes-in-calendar t])))
+         ["Show Notes in Calendar" my/show-notes-in-calendar t])
+        ("Bookmarks"
+         ["List Bookmarks" list-bookmarks t])))
 
     ;; Add the command center menu to the toolbar to the left of "Tools" section
     (easy-menu-add-item global-map '("menu-bar") my/command-center-menu "Tools")
-
-    ;; Define "Bookmark" menu
-    (easy-menu-define my-bookmarks-menu nil "My Bookmark Menu"
-      '("Bookmarks"
-        ["List Bookmarks" list-bookmarks t]))
-
-    ;; Add the "Bookmarks" menu to the "Tools" menu
-    (easy-menu-add-item nil '("tools") my-bookmarks-menu "Browse the Web...")
 
     ;; Define "Authentication" menu
     (easy-menu-define my-auth-menu nil "My Authentication Menu"

@@ -7,7 +7,10 @@
 
 ;; Theme
 ;; Set theme
-(load-theme 'deeper-blue t)
+(load-theme 'manoj-dark t)
+
+;; Remove fringes
+(set-fringe-mode 0)
 
 ;; Text editing
 ;; Indentation
@@ -47,7 +50,6 @@
         '((".*" (display-buffer-same-window) (inhibit-same-window . nil))))
   ;; Touchscreen keyboard spawn
   (setq touch-screen-display-keyboard t))
-
 
 ;; iBuffer-sidebar configuration
 (use-package ibuffer-sidebar
