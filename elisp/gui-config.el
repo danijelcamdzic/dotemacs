@@ -107,21 +107,12 @@
     (easy-menu-define my-auth-menu nil "My Authentication Menu"
       '("Authentication"
         ("TOTP"
-         ["Generate TOTP token" my/totp-display t])
+         ["Generate TOTP Token" my/totp-display t])
         ("Passwords" 
          ["Reveal Password" my/pass-display t])))
 
     ;; Add the "Authentication" menu to the "Tools" menu
     (easy-menu-add-item nil '("tools") my-auth-menu "Games")
-
-    ;; Define "AI" menu
-    (easy-menu-define my-ai-menu nil "My AI Menu"
-      '("AI"
-        ("OpenAI"
-         ["Open ChatGPT Shell" my/open-chatgpt-shell t])))
-
-    ;; Add the "AI" menu to the "Tools" menu
-    (easy-menu-add-item nil '("tools") my-ai-menu "Games")
 
     ;; Remove "Games" from the "Tools" menu
     (define-key global-map [menu-bar tools games] nil))
