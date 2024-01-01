@@ -59,38 +59,39 @@
     ;; Define "Command" menu
     (easy-menu-define my/command-center-menu nil "My Commands Menu"
       '("Command"
-        ("Agenda"
+        ("Org-Mode"
+         ("Schedule"
+          ["Add" my/add-schedule t]
+          ["Remove" my/remove-schedule t])
+         ("States"
+          ["Log as TODO" my/todo-log-todo t]
+          ["Log as DOING" my/todo-log-doing t]
+          ["Log as DONE" my/todo-log-done t]
+          ["Log as SKIP" my/todo-log-skip t]
+          ["Log as FAIL" my/todo-log-fail t]
+          ["Change State" my/todo-change-state t]
+          ["Skip all Overdue" my/skip-overdue-tasks]
+          ["Show States in Calendar" my/show-states-in-calendar t])
+         ("Clock"
+          ["Clock In" my/clock-in t]
+          ["Clock Out" my/clock-out t]
+          ["Display Clocks" org-clock-display]
+          ["Show Clock Analysis" org-analyzer-start t])
+         ("Notes"
+          ["Add Note" my/add-note t]
+          ["Show Notes in Calendar" my/show-notes-in-calendar t]))
+        ("Org-Agenda"
          ["Day View" my/org-agenda-day-view t]
          ["Week View" my/org-agenda-week-view t]
          ["Year View" my/org-agenda-year-view t]
          ["Inventory View" my/org-agenda-inventory t])
-        ("Roam"
+        ("Org-Roam"
          ("Dailies"
           ["Go to Today" org-roam-dailies-goto-today t]
           ["Find Date" org-roam-dailies-find-date t])
          ("Nodes"
           ["Find Node" org-roam-node-find t]
           ["Open Graph" org-roam-ui-open t]))
-        ("Schedule"
-         ["Add" my/add-schedule t]
-         ["Remove" my/remove-schedule t])
-        ("States"
-         ["Log as TODO" my/todo-log-todo t]
-         ["Log as DOING" my/todo-log-doing t]
-         ["Log as DONE" my/todo-log-done t]
-         ["Log as SKIP" my/todo-log-skip t]
-         ["Log as FAIL" my/todo-log-fail t]
-         ["Change State" my/todo-change-state t]
-         ["Skip all Overdue" my/skip-overdue-tasks]
-         ["Show States in Calendar" my/show-states-in-calendar t])
-        ("Clock"
-         ["Clock In" my/clock-in t]
-         ["Clock Out" my/clock-out t]
-         ["Display Clocks" org-clock-display]
-         ["Show Clock Analysis" org-analyzer-start t])
-        ("Notes"
-         ["Add Note" my/add-note t]
-         ["Show Notes in Calendar" my/show-notes-in-calendar t])
         ("Bookmarks"
          ["List Bookmarks" list-bookmarks t])))
 
@@ -99,8 +100,8 @@
 
     ;; Define "Authentication" menu
     (easy-menu-define my-auth-menu nil "My Authentication Menu"
-      '("Authentication"
-        ["Get TOTP Token" my/totp-display t]
+      '("Auth-Sources"
+        ["Get TOTP" my/totp-display t]
         ["Get Password" my/pass-display t]))
 
     ;; Add the "Authentication" menu to the "Tools" menu
