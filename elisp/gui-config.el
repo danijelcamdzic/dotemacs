@@ -56,7 +56,7 @@
 (use-package easymenu
   :config
   (progn ;; Menu configuration
-    ;; Define "Commands" menu
+    ;; Define "Command" menu
     (easy-menu-define my/command-center-menu nil "My Commands Menu"
       '("Command"
         ("Agenda"
@@ -100,16 +100,11 @@
     ;; Define "Authentication" menu
     (easy-menu-define my-auth-menu nil "My Authentication Menu"
       '("Authentication"
-        ("TOTP"
-         ["Generate TOTP Token" my/totp-display t])
-        ("Passwords" 
-         ["Reveal Password" my/pass-display t])))
+        ["Get TOTP Token" my/totp-display t]
+        ["Get Password" my/pass-display t]))
 
     ;; Add the "Authentication" menu to the "Tools" menu
-    (easy-menu-add-item nil '("tools") my-auth-menu "Games")
-
-    ;; Remove "Games" from the "Tools" menu
-    (define-key global-map [menu-bar tools games] nil))
+    (easy-menu-add-item nil '("tools") my-auth-menu "Games"))
   )
 
 
