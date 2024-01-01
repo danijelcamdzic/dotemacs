@@ -612,6 +612,20 @@
     (setq org-media-note-screenshot-image-dir (concat my-notes-directory "images")))
   )
 
+;; Org-media-note configuration
+(defun my/remove-invalid-characters-from-filename (filename)
+  "Remove invalid characters from FILENAME in order for it to sync to Android folders using syncthing."
+  (replace-regexp-in-string "[/*\":<>?|]" "" filename))
+
+(defun my/org-media-note-insert-screenshot-check-filename-advice (orig-func &rest args)
+  "Advice to sanitize screenshot filename in `org-media-note-insert-screenshot'."
+  (let* ((old-func (symbol-function 'org-media-note--format-picture-file-name))
+         (new-func (lambda (orig-name)
+                     (my/remove-invalid-characters-from-filename (funcall old-func orig-name)))))
+    (cl-letf (((symbol-function 'org-media-note--format-picture-file-name) new-func))
+      (apply orig-func args))))
+
+(advice-add 'org-media-note-insert-screenshot :around #'my/org-media-note-insert-screenshot-check-filename-advice)
 
 (provide 'org-config)
 
