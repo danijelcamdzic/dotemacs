@@ -2,9 +2,13 @@
 
 ;;; Code:
 
-;; Melpa configuration
-;; Add melpa package archives
 (require 'package)
+
+;; Temporarily disable signature checks
+(setq package-check-signature nil)
+
+;; Melpa configurarion
+;; Add melpa package archives
 (add-to-list 'package-archives
              '("melpa" . "http://melpa.org/packages/") t)
 (package-initialize)
