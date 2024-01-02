@@ -8,7 +8,6 @@
 (require 'org-config)                   ; Org and supporting/extending packages configuration
 (require 'bookmarks-config)             ; Bookmarks configuration
 (require 'authorization-config)         ; GnuPg and auth-sources configuration
-(require 'gpt-config)                   ; GPT tools configuration
 
 ;; GUI mode functions
 (defun my/hide-gui-bar ()
@@ -108,15 +107,7 @@
     (easy-menu-add-item nil '("tools") my-auth-menu "Games")
 
     ;; Add a menu separator after the "Authentication" menu
-    (easy-menu-add-item nil '("tools") "--" "Games")
-
-    ;; Define "GPT" menu
-    (easy-menu-define my-gpt-menu nil "My GPT Menu"
-      '("GPT"
-        ["Set API Key" my/set-gptel-openai-api-key t]))
-
-    ;; Add the "GPT" menu to the "Tools" menu
-    (easy-menu-add-item nil '("tools") my-gpt-menu "Games"))
+    (easy-menu-add-item nil '("tools") "--" "Games"))
   )
 
 

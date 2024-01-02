@@ -17,6 +17,5 @@
 (require 'org-config)                   ; Org and supporting/extending packages configuration
 (require 'bookmarks-config)             ; Bookmarks configuration
 (require 'authorization-config)         ; GnuPg and auth-sources configuration
-(require 'gpt-config)                   ; GPT tools configuration
 
 ;;; init.el ends here
