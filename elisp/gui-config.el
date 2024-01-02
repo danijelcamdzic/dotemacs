@@ -113,7 +113,7 @@
         ["Set API Key" my/set-gptel-openai-api-key t]))
 
     ;; Add the "GPT" menu to the "Tools" menu
-    (easy-menu-add-item nil '("tools") my-auth-menu "Games"))
+    (easy-menu-add-item nil '("tools") my-gpt-menu "Games"))
   )
 
 
