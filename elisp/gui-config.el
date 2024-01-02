@@ -107,6 +107,9 @@
     ;; Add the "Authentication" menu to the "Tools" menu
     (easy-menu-add-item nil '("tools") my-auth-menu "Games")
 
+    ;; Add a menu separator after the "Authentication" menu
+    (easy-menu-add-item nil '("tools") "--" "Games")
+
     ;; Define "GPT" menu
     (easy-menu-define my-gpt-menu nil "My GPT Menu"
       '("GPT"
