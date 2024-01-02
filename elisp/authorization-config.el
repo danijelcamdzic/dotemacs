@@ -45,8 +45,7 @@
     ;; Set auth-sources files
     (setq auth-sources
           `((:source ,(concat my-documents-directory ".secrets/.authinfo-api.gpg"))
-            (:source ,(concat my-documents-directory ".secrets/.authinfo-totp.gpg"))
-            (:source ,(concat my-documents-directory ".secrets/.authinfo-pass.gpg"))))
+            (:source ,(concat my-documents-directory ".secrets/.authinfo-totp.gpg"))))
 
     ;; Enable authinfo-mode for auth-source files
     (add-to-list 'auto-mode-alist '("\\.authinfo.*\\.gpg\\'" . authinfo-mode)))
