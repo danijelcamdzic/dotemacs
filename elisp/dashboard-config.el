@@ -3,7 +3,6 @@
 ;;; Code:
 
 ;; Dependencies
-(require 'user-config)                  ; User details and directory configuration
 (require 'package-manager-config)       ; Package manager configuration (melpa and quelpa)
 
 ;; Dashboard configuration
@@ -60,7 +59,6 @@
 
 ;; Add advice to change the date format of agenda items to 'yesterday', 'today' or 'tomorrow'
 (advice-add 'dashboard-agenda--formatted-time :around #'my/dashboard-agenda--formatted-time-advice-use-relative-days)
-
 
 (provide 'dashboard-config)
 

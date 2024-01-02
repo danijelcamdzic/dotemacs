@@ -1,4 +1,4 @@
-;;; viewer-config.el --- Viewer packages configuration
+;;; viewer-config.el -- Viewer packages configuration
 
 ;;; Code:
 
@@ -16,7 +16,6 @@
 (use-package mpv
   :ensure t
   )
-
 
 (provide 'viewer-config)
 

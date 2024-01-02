@@ -1,11 +1,9 @@
-;;; ai-config.el -- AI tools configuration
+;;; gpt-config.el -- GPT tools configuration
 
 ;;; Code:
 
 ;; Dependencies
-(require 'user-config)                  ; User details and directory configuration
 (require 'package-manager-config)       ; Package manager configuration (melpa and quelpa)
-(require 'authorization-config)         ; GnuPg and auth-sources configuration
 
 ;; Gptel configuration
 (use-package gptel
@@ -23,7 +21,6 @@
   (setq gptel-api-key
         (auth-source-pick-first-password :host "API:openai.com")))
 
+(provide 'gpt-config)
 
-(provide 'ai-config)
-
-;;; ai-config.el ends here
+;;; gpt-config.el ends here

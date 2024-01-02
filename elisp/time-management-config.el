@@ -1,9 +1,8 @@
-;;; time-config.el -- Calendar and other time related settings
+;;; time-management-config.el -- Calendar and other time related configuration
 
 ;;; Code:
 
 ;; Dependencies
-(require 'user-config)                  ; User details and directory configuration
 (require 'package-manager-config)       ; Package manager configuration (melpa and quelpa)
 
 ;; Time adjustment functions
@@ -39,7 +38,6 @@
     (setq calendar-week-start-day 1))
   )
 
+(provide 'time-management-config)
 
-(provide 'time-config)
-
-;;; time-config.el ends here
+;;; time-management-config.el ends here

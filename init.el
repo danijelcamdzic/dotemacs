@@ -1,4 +1,4 @@
-;;; init.el --- Personal configuration file for Emacs
+;;; init.el -- Personal configuration file for Emacs
 
 ;;; Code:
 
@@ -17,6 +17,6 @@
 (require 'org-config)                   ; Org and supporting/extending packages configuration
 (require 'bookmarks-config)             ; Bookmarks configuration
 (require 'authorization-config)         ; GnuPg and auth-sources configuration
-(require 'ai-config)                    ; AI tools configuration
+(require 'gpt-config)                   ; GPT tools configuration
 
 ;;; init.el ends here

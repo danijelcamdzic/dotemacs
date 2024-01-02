@@ -23,7 +23,6 @@
 (setq my-notes-directory (concat my-home-directory "Notes/"))
 (setq my-documents-directory (concat my-home-directory "Documents/"))
 
-
 (provide 'user-config)
 
 ;;; user-config.el ends here

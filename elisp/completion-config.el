@@ -3,7 +3,6 @@
 ;;; Code:
 
 ;; Dependencies
-(require 'user-config)                  ; User details and directory configuration
 (require 'package-manager-config)       ; Package manager configuration (melpa and quelpa)
 
 ;; Company configuration
@@ -34,7 +33,6 @@
           completion-category-defaults nil
           completion-category-overrides '((file (styles . (partial-completion))))))
   )
-
 
 (provide 'completion-config)
 

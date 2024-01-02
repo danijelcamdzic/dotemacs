@@ -64,7 +64,6 @@
 
 (advice-add 'bookmark-jump :around #'my/modify-bookmark-path)
 
-
 (provide 'bookmarks-config)
 
 ;;; bookmarks-config.el ends here

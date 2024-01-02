@@ -38,7 +38,6 @@
   (quelpa-use-package-activate-advice)
   )
 
-
 (provide 'package-manager-config)
 
 ;;; package-manager-config.el ends here

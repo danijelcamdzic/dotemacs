@@ -87,7 +87,6 @@
   :ensure t
   )
 
-
 (provide 'editor-config)
 
 ;;; editor-config.el ends here
