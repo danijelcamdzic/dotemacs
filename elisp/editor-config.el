@@ -6,7 +6,6 @@
 (require 'package-manager-config)       ; Package manager configuration (melpa and quelpa)
 
 ;; Theme
-
 (use-package gruvbox-theme
   :ensure t
   )
