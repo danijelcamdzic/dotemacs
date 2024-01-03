@@ -234,6 +234,89 @@ tag =fitness= but do not have the tag =cardio=.
 There are also in here many functions which serve as a wrapper so they can be
 called in either the =org-agenda= buffer or the =org= file.
 
+*** Org-Alert Notification on both Android and Linux
+
+I use =org-alert= package for notifications. My usual configuration is rather
+simple:
+
+#+begin_src emacs-lisp
+(use-package org-alert
+  :ensure t
+  :after org
+  :custom (alert-default-style 'libnotify)
+  :config
+  (progn ;; Setup
+    (setq org-alert-interval 300
+          org-alert-notification-title "Org Alert Reminder")
+    (org-alert-enable)
+    )
+  )
+#+end_src
+
+But since I use Emacs on my Android as well I needed to have notifications on
+Android too. I found it cumbersome to install =termux-notifications= since I
+would need to sign and repackage the =apk= for =Termux API= so I decided to look
+around and found a neat way to send notifications to Android using
+=android-notifications-notify=.
+
+To have this implemented seamlessly, I have expanded the =alert.el= package by
+adding another option to it, =android-notifications=. Now my config looks like
+this:
+
+#+begin_src emacs-lisp
+(require 'alert)
+
+(defun alert-android-notifications-notify (info)
+  (unless (eq system-type 'android)
+    (error "Android notifications are only supported on Android systems"))
+  
+  "Send INFO using android-notifications-notify."
+  (let ((title (or (plist-get info :title) "Org Alert Reminder"))
+        (body (or (plist-get info :message) ""))
+        (urgency (let ((severity (plist-get info :severity)))
+                   (cond ((eq severity 'urgent) 'critical)
+                         ((eq severity 'high) 'critical)
+                         ((eq severity 'moderate) 'normal)
+                         ((eq severity 'low) 'low)
+                         ((eq severity 'trivial) 'low)
+                         (t 'normal))))
+        (icon (or (plist-get info :icon) alert-default-icon)))
+    (android-notifications-notify
+     :title title
+     :body body
+     :urgency urgency
+     :icon icon
+     )))
+
+(alert-define-style 'android-notifications :title "Android Notifications"
+                    :notifier #'alert-android-notifications-notify
+                    )
+
+;; Org-alert configuration
+(use-package org-alert
+  :ensure t
+  :after org
+  :custom
+  ;; Use different backends depending on the platform
+  (alert-default-style (if (eq system-type 'android)
+                           'android-notifications
+                         'libnotify))
+  :config
+  (progn ;; Setup
+    (setq org-alert-interval 300
+          org-alert-notification-title "Org Alert Reminder")
+    (org-alert-enable)
+    )
+  )
+#+end_src
+
+Whether on Android or Linux, I will now get my notifications using the same
+packages =org-alert= and =alert= and the backend will change depending on my
+running system.
+
+Here is an example of how it will look like on Android:
+
+[[assets/android-org-alert.png]]
 ** =bookmarks-config.el=
 
 *** Seamless Bookmark Management on Android and Linux
