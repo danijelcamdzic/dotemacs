@@ -528,6 +528,19 @@
                                   arrow-chain))))))
   (deactivate-mark))
 
+;; Org-alert configuration
+(use-package org-alert
+  :ensure t
+  :after org
+  :custom (alert-default-style 'libnotify)
+  :config
+  (progn ;; Setup
+    (setq org-alert-interval 300
+          org-alert-notification-title "Org Alert Reminder")
+    (org-alert-enable)
+    )
+  )
+
 ;; Org-tempo configuration
 (use-package org-tempo
   :after org
