@@ -536,12 +536,12 @@
     (let ((title (or (plist-get info :title) "Emacs Notification"))
           (body (or (plist-get info :message) ""))
           (urgency (let ((severity (plist-get info :severity)))
-                     (cond ((eq severity 'urgent) "critical")
-                           ((eq severity 'high) "high")
-                           ((eq severity 'moderate) "normal")
-                           ((eq severity 'low) "low")
-                           ((eq severity 'trivial) "low")
-                           (t "normal"))))
+                     (cond ((eq severity 'urgent) 'critical)
+                           ((eq severity 'high) 'critical)
+                           ((eq severity 'moderate) 'normal)
+                           ((eq severity 'low) 'low)
+                           ((eq severity 'trivial) 'low)
+                           (t 'normal))))
           (icon (or (plist-get info :icon) alert-default-icon)))
       (android-notifications-notify
        :title title
