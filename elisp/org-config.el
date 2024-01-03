@@ -528,28 +528,30 @@
                                   arrow-chain))))))
   (deactivate-mark))
 
+;; Org-alert functions
 (require 'alert)
 
-(when (eq system-type 'android)
-  (defun alert-android-notifications-notify (info)
-    "Send INFO using android-notifications-notify."
-    (let ((title (or (plist-get info :title) "Emacs Notification"))
-          (body (or (plist-get info :message) ""))
-          (urgency (let ((severity (plist-get info :severity)))
-                     (cond ((eq severity 'urgent) 'critical)
-                           ((eq severity 'high) 'critical)
-                           ((eq severity 'moderate) 'normal)
-                           ((eq severity 'low) 'low)
-                           ((eq severity 'trivial) 'low)
-                           (t 'normal))))
-          (icon (or (plist-get info :icon) alert-default-icon)))
-      (android-notifications-notify
-       :title title
-       :body body
-       :urgency urgency
-       :icon icon
-       )))
-  )
+(defun alert-android-notifications-notify (info)
+  (unless (eq system-type 'android)
+    (error "Android notifications are only supported on Android systems"))
+  
+  "Send INFO using android-notifications-notify."
+  (let ((title (or (plist-get info :title) "Org Alert Reminder"))
+        (body (or (plist-get info :message) ""))
+        (urgency (let ((severity (plist-get info :severity)))
+                   (cond ((eq severity 'urgent) 'critical)
+                         ((eq severity 'high) 'critical)
+                         ((eq severity 'moderate) 'normal)
+                         ((eq severity 'low) 'low)
+                         ((eq severity 'trivial) 'low)
+                         (t 'normal))))
+        (icon (or (plist-get info :icon) alert-default-icon)))
+    (android-notifications-notify
+     :title title
+     :body body
+     :urgency urgency
+     :icon icon
+     )))
 
 (alert-define-style 'android-notifications :title "Android Notifications"
                     :notifier #'alert-android-notifications-notify
@@ -559,7 +561,8 @@
 (use-package org-alert
   :ensure t
   :after org
-  :custom 
+  :custom
+  ;; Use different backends depending on the platform
   (alert-default-style (if (eq system-type 'android)
                            'android-notifications
                          'libnotify))
