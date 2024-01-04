@@ -317,6 +317,86 @@ running system.
 Here is an example of how it will look like on Android:
 
 [[assets/android-org-alert.png]]
+
+*** Org-Alert Notification Titles
+
+I really like how =org-super-agenda= package is able to group TODOs together
+based on the =auto-parent= property. This groups the TODOs based on their
+immediate parent heading. Just a sidenote, I have expanded on this in my
+configuration so the file title is taken if the TODO is the first-level heading.
+
+The =org-alert= package allows for the creation of custom titles to be sent in
+notifications. This means you can define your own titles and have them appear
+instead of the default one. The default one is "*org*".
+
+Here is an example of how it looks configured with the custom title "Org Alert
+Reminder":
+
+#+begin_src emacs-lisp
+(use-package org-alert
+  :ensure t
+  :after org
+  :custom
+  ;; Use different backends depending on the platform
+  (alert-default-style (if (eq system-type 'android)
+                           'android-notifications
+                         'libnotify))
+  :config
+  (progn ;; Setup
+    ;; Setup timing
+    (setq org-alert-interval 300
+          org-alert-notify-cutoff 10
+          org-alert-notify-after-event-cutoff 100)
+    (setq org-alert-notification-title "Org Alert Reminder")
+    (setq org-alert-time-match-string
+          "\\(?:SCHEDULED\\|DEADLINE\\):.*?<.*?\\([0-9]\\{2\\}:[0-9]\\{2\\}\\).*>")
+    (org-alert-enable)
+    )
+  )
+#+end_src
+
+[[assets/org-alert-title-default.png]]
+
+You can see the title appear in the notification.
+
+I wanted to create something which will give me =org-super-agenda= powers and
+allow me to have different titles based on the parents of my TODO which I am
+getting notified about.
+
+I have created an example TODO which you can see on the image above. It is a
+subheading to the "Rome" heading and with the custom configuration I creates we
+should be able to see the notification title as "Rome" now.
+
+The important bit of the configuration is this:
+
+#+begin_src emacs-lisp
+(defvar my-org-alert-title-type 'custom
+  "Control the title type for org-alert notifications.
+   Possible values are:
+      - 'custom: The usual workings of org-alert package. Uses org-alert-notification-title
+                 as the title of notifications sent.
+      - 'parent: Uses the immediate parent heading of the TODO as the title of the notification.
+                 If the TODO does not have a parent, it uses the file title instead. If the file
+                 does not have a title, it uses the filename as the title for notifications.")
+#+end_src
+
+and by changing that to either ='custom= or ='function= you are able to change
+the notification title type.
+
+#+begin_src emacs-lisp
+;; Set up `parent mode
+(setq my-org-alert-title-type 'parent)
+;; Update to set up or remove advices based on my-org-alert-title-type
+(update-org-alert-advice)
+#+end_src
+
+We have now set the parent mode and we can see the result:
+
+[[assets/org-alert-title-heading.png]]
+
+And when there is no parent heading we can see the filename as the title:
+
+[[assets/org-alert-title-file.png]]
 ** =bookmarks-config.el=
 
 *** Seamless Bookmark Management on Android and Linux
