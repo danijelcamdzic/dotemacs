@@ -531,6 +531,12 @@
 ;; Alert configuration
 (use-package alert
   :ensure t
+  :config
+  (progn ;; Icon setup
+    ;; Setup default icon for Android notifications
+    (when (eq system-type 'android)
+      ;; android.R.drawable icons must be used
+      (setq alert-default-icon "ic_popup_reminder")))
   )
 
 ;; Alert functions
