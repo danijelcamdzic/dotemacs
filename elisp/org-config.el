@@ -416,18 +416,18 @@
   )
 
 ;; Org-super-agenda functions
-(defun my/org-super-agenda-get-file-title-or-parent (item)
-  "Get the parent heading of ITEM, or if none, the file title."
+(defun my/org-super-agenda-get-todo-parent (item)
+  "Get the parent heading of ITEM, or if none, the file title or filename."
   (org-super-agenda--when-with-marker-buffer (org-super-agenda--get-marker item)
     (if (org-up-heading-safe)
-        (org-entry-get nil "ITEM")  ; If there is a parent heading, use it
+        (org-entry-get nil "ITEM") 
       (let ((keywords (org-collect-keywords '("TITLE"))))
         (if keywords
-            (car (cdr (assoc "TITLE" keywords)))  ; If there is a file title, use it
-          (file-name-nondirectory (buffer-file-name)))))))  ; Otherwise, use the file name
+            (car (cdr (assoc "TITLE" keywords))) 
+          (file-name-nondirectory (buffer-file-name))))))) 
 
-(org-super-agenda--def-auto-group parent "their parent heading or file title"
-  :key-form (my/org-super-agenda-get-file-title-or-parent item))
+(org-super-agenda--def-auto-group parent "their parent heading or file title/filename"
+  :key-form (my/org-super-agenda-get-todo-parent item))
 
 (defun my/org-agenda-inventory ()
   "Open Org Agenda in the todos view mode with super agenda. Use file title as groups"
@@ -528,12 +528,12 @@
                                   arrow-chain))))))
   (deactivate-mark))
 
-;; Org-alert configuration
-(use-package org-alert
+;; Alert configuration
+(use-package alert
   :ensure t
   )
 
-;; Org-alert functions
+;; Alert functions
 (defun alert-android-notifications-notify (info)
   (unless (eq system-type 'android)
     (error "Android notifications are only supported on Android systems"))
@@ -571,13 +571,74 @@
                          'libnotify))
   :config
   (progn ;; Setup
-    (setq org-alert-interval 300)
+    ;; Setup timing
+    (setq org-alert-interval 300
+          org-alert-notify-cutoff 10
+          org-alert-notify-after-event-cutoff 100)
+    ;; Setup notification title (if using 'custom)
     (setq org-alert-notification-title "Org Alert Reminder")
+    ;; Use github-suggested non-greedy regular expression
+    ;; This solves that time (eg. 11;00-11:15) will be notified for 11:00
+    ;; and not 11:15
     (setq org-alert-time-match-string
           "\\(?:SCHEDULED\\|DEADLINE\\):.*?<.*?\\([0-9]\\{2\\}:[0-9]\\{2\\}\\).*>")
+    ;; Enable org-alert
     (org-alert-enable)
     )
   )
+
+(defvar my-org-alert-title-type 'custom
+  "Control the title type for org-alert notifications.
+   Possible values are:
+      - 'custom: The usual workings of org-alert package. Uses org-alert-notification-title
+                 as the title of notifications sent.
+      - 'parent: Uses the immediate parent heading of the TODO as the title of the notification.
+                 If the TODO does not have a parent, it uses the file title instead. If the file
+                 does not have a title, it uses the filename as the title for notifications.")
+
+(defun my/org-alert--get-todo-parent ()
+  "Get the immediate parent heading of a TODO. If no parents, use file title. If no file title
+use filename."
+  (if (org-up-heading-safe)
+      (org-get-heading t t t t)
+    (let ((title (cdr (assoc "TITLE" (org-collect-keywords '("TITLE"))))))
+      (if (and title (listp title))
+          (car title)
+        title))))
+
+(defun org-alert--parse-entry-advice (orig-fun &rest args)
+  "Advice for org-alert--parse-entry function. It adapts it to accept parameters from the
+my/org-alert--get-todo-parent function which retrieves the parent heading or file title/name."
+  (let ((head (org-alert--strip-text-properties (org-get-heading t t t t)))
+        (parent-or-file-head (my/org-alert--get-todo-parent)))
+    (cl-destructuring-bind (body cutoff) (org-alert--grab-subtree)
+      (if (string-match org-alert-time-match-string body)
+          (list head parent-or-file-head (match-string 1 body) cutoff)
+        nil))))
+
+(defun org-alert--dispatch-advice (orig-fun &rest args)
+  "Advice for org-alert--dispatch function."
+  (let ((entry (org-alert--parse-entry)))
+    (when entry
+      (cl-destructuring-bind (head parent-or-file-head time cutoff) entry
+        (if time
+            (when (org-alert--check-time time cutoff)
+              (alert (concat time ": " head) :title parent-or-file-head))
+          (alert head :title parent-or-file-head))))))
+
+(defun update-org-alert-advice ()
+  "Add or remove advice based on the value of org-alert-title-type."
+  (cond ((eq my-org-alert-title-type 'parent)
+         (advice-add 'org-alert--parse-entry :around #'org-alert--parse-entry-advice)
+         (advice-add 'org-alert--dispatch :around #'org-alert--dispatch-advice))
+        ((eq my-org-alert-title-type 'custom)
+         (advice-remove 'org-alert--parse-entry #'org-alert--parse-entry-advice)
+         (advice-remove 'org-alert--dispatch #'org-alert--dispatch-advice))))
+
+;; Set up `parent mode
+(setq my-org-alert-title-type 'parent)
+;; Update to set up or remove advices based on my-org-alert-title-type
+(update-org-alert-advice)
 
 ;; Org-tempo configuration
 (use-package org-tempo
