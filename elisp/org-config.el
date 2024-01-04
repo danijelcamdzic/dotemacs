@@ -528,9 +528,12 @@
                                   arrow-chain))))))
   (deactivate-mark))
 
-;; Org-alert functions
-(require 'alert)
+;; Org-alert configuration
+(use-package org-alert
+  :ensure t
+  )
 
+;; Org-alert functions
 (defun alert-android-notifications-notify (info)
   (unless (eq system-type 'android)
     (error "Android notifications are only supported on Android systems"))
@@ -568,8 +571,10 @@
                          'libnotify))
   :config
   (progn ;; Setup
-    (setq org-alert-interval 300
-          org-alert-notification-title "Org Alert Reminder")
+    (setq org-alert-interval 300)
+    (setq org-alert-notification-title "Org Alert Reminder")
+    (setq org-alert-time-match-string
+          "\\(?:SCHEDULED\\|DEADLINE\\):.*?<.*?\\([0-9]\\{2\\}:[0-9]\\{2\\}\\).*>")
     (org-alert-enable)
     )
   )
