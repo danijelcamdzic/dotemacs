@@ -574,7 +574,7 @@
     ;; Setup timing
     (setq org-alert-interval 300
           org-alert-notify-cutoff 10
-          org-alert-notify-after-event-cutoff 100)
+          org-alert-notify-after-event-cutoff 10)
     ;; Setup notification title (if using 'custom)
     (setq org-alert-notification-title "Org Alert Reminder")
     ;; Use github-suggested non-greedy regular expression
