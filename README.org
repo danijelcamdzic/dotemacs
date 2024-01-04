@@ -355,7 +355,7 @@ Reminder":
   )
 #+end_src
 
-[[assets/org-alert-title-default.png]]
+[[assets/org-alert-title-default.gif]]
 
 You can see the title appear in the notification.
 
@@ -392,11 +392,11 @@ the notification title type.
 
 We have now set the parent mode and we can see the result:
 
-[[assets/org-alert-title-heading.png]]
+[[assets/org-alert-title-heading.gif]]
 
 And when there is no parent heading we can see the filename as the title:
 
-[[assets/org-alert-title-file.png]]
+[[assets/org-alert-title-file.gif]]
 
 And this works on Android btw! Without any changes from your side, it will
 detect that you are running Android and give you the notification!
