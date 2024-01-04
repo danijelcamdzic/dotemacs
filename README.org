@@ -397,6 +397,11 @@ We have now set the parent mode and we can see the result:
 And when there is no parent heading we can see the filename as the title:
 
 [[assets/org-alert-title-file.png]]
+
+And this works on Android btw! Without any changes from your side, it will
+detect that you are running Android and give you the notification!
+
+[[assets/org-alert-title-android.png]]
 ** =bookmarks-config.el=
 
 *** Seamless Bookmark Management on Android and Linux
