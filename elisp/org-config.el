@@ -29,7 +29,10 @@
     (add-hook 'org-mode-hook 'org-hide-drawer-all)
 
     ;; Display inline images on startup
-    (setq org-startup-with-inline-images t))
+    (setq org-startup-with-inline-images t)
+
+    ;; Set path type to relative so it works on all platforms
+    (setq org-link-file-path-type 'relative))
 
   (progn ;; Org babel configuration
     ;; Languages support
@@ -730,20 +733,24 @@ my/org-alert--get-todo-parent function which retrieves the parent heading or fil
     (setq org-media-note-screenshot-image-dir (concat my-notes-directory "images")))
   )
 
-;; Org-media-note configuration
+;; Org-media-note functions
+(defun my/org-media-note-prepend-timestamp-advice (orig-func &rest args)
+  "Advice to prepend the current timestamp to the filename created by `org-media-note--format-picture-file-name'."
+  (let ((original-filename (apply orig-func args))
+        (timestamp (format-time-string "%Y-%m-%d_%H-%M-%S")))
+    (concat timestamp "_" original-filename)))
+
+(advice-add 'org-media-note--format-picture-file-name :around #'my/org-media-note-prepend-timestamp-advice)
+
 (defun my/remove-invalid-characters-from-filename (filename)
-  "Remove invalid characters from FILENAME in order for it to sync to Android folders using syncthing."
+  "Remove invalid characters from filename in order for it to sync to Android using syncthing."
   (replace-regexp-in-string "[/*\":<>?|]" "" filename))
 
-(defun my/org-media-note-insert-screenshot-check-filename-advice (orig-func &rest args)
-  "Advice to sanitize screenshot filename in `org-media-note-insert-screenshot'."
-  (let* ((old-func (symbol-function 'org-media-note--format-picture-file-name))
-         (new-func (lambda (orig-name)
-                     (my/remove-invalid-characters-from-filename (funcall old-func orig-name)))))
-    (cl-letf (((symbol-function 'org-media-note--format-picture-file-name) new-func))
-      (apply orig-func args))))
+(defun my/org-media-note-remove-invalid-characters-from-filename-advice (orig-func &rest args)
+  "Advice to remove invalid characters from filename in `org-media-note--format-picture-file-name'."
+  (my/remove-invalid-characters-from-filename (apply orig-func args)))
 
-(advice-add 'org-media-note-insert-screenshot :around #'my/org-media-note-insert-screenshot-check-filename-advice)
+(advice-add 'org-media-note--format-picture-file-name :around #'my/org-media-note-remove-invalid-characters-from-filename-advice)
 
 (provide 'org-config)
 
