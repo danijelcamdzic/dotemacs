@@ -544,11 +544,10 @@
 
 ;; Alert functions
 (defun alert-android-notifications-notify (info)
-  (unless (eq system-type 'android)
-    (error "Android notifications are only supported on Android systems"))
-  
-  "Send INFO using android-notifications-notify."
-  (let ((title (or (plist-get info :title) "Org Alert Reminder"))
+  "Send INFO using android-notifications-notify.
+android-notifications-notify is a built-in function in the native Emacs
+Android port."
+  (let ((title (or (plist-get info :title) "Emacs Alert Reminder"))
         (body (or (plist-get info :message) ""))
         (urgency (let ((severity (plist-get info :severity)))
                    (cond ((eq severity 'urgent) 'critical)
