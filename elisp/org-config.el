@@ -652,7 +652,7 @@ use filename."
          (advice-remove 'org-alert--parse-entry #'org-alert--parse-entry-advice)
          (advice-remove 'org-alert--dispatch #'org-alert--dispatch-advice))))
 
-;; Set up `parent mode
+;; Set up 'parent mode
 (setq my-org-alert-title-type 'parent)
 ;; Update to set up or remove advices based on my-org-alert-title-type
 (update-org-alert-advice)
@@ -695,6 +695,7 @@ use filename."
   :after org
   :config
   (progn ;; Directory setup
+    ;; Use attachments and not file links
     (setq org-download-method 'attach)
     (setq-default org-download-heading-lvl nil))
   )
