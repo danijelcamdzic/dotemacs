@@ -544,29 +544,24 @@
 
 ;; Alert functions
 (defun alert-android-notifications-notify (info)
-  "Send INFO using android-notifications-notify.
+  "Send notifications using android-notifications-notify.
 android-notifications-notify is a built-in function in the native Emacs
 Android port."
-  (let ((title (or (plist-get info :title) "Emacs Alert Reminder"))
+  (let ((title (or (plist-get info :title) "Android Notifications Alert"))
         (body (or (plist-get info :message) ""))
-        (urgency (let ((severity (plist-get info :severity)))
-                   (cond ((eq severity 'urgent) 'critical)
-                         ((eq severity 'high) 'critical)
-                         ((eq severity 'moderate) 'normal)
-                         ((eq severity 'low) 'low)
-                         ((eq severity 'trivial) 'low)
-                         (t 'normal))))
-        (icon (or (plist-get info :icon) alert-default-icon)))
+        (urgency (cdr (assq (plist-get info :severity)
+                            alert-notifications-priorities)))
+        (icon (or (plist-get info :icon) alert-default-icon))
+        (replaces-id (gethash (plist-get info :id) alert-notifications-ids)))
     (android-notifications-notify
      :title title
      :body body
      :urgency urgency
      :icon icon
-     )))
+     :replaces-id replaces-id)))
 
 (alert-define-style 'android-notifications :title "Android Notifications"
-                    :notifier #'alert-android-notifications-notify
-                    )
+                    :notifier #'alert-android-notifications-notify)
 
 ;; Org-alert configuration
 (use-package org-alert
