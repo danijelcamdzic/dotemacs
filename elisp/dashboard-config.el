@@ -26,7 +26,7 @@
     (dashboard-setup-startup-hook))
   )
 
-;; Dashboard functions
+;; Dashboard agenda date mofiying functions
 (defun my/dashboard-agenda--formatted-time-advice-use-relative-days (orig-fun &rest args)
   "Modifies the display of time in the dashboard agenda.
     If the time corresponds to 'today', 'yesterday', or 'tomorrow', it replaces the date with these words.

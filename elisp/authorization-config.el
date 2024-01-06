@@ -55,7 +55,7 @@
     (add-hook 'buffer-list-update-hook 'auth-source-forget-all-cached))
   )
 
-;; TOTP functions
+;; Auth-sources TOTP functions
 (defun totp--base32-char-to-n (char)
   "Return 5 bit integer value matching base32 CHAR."
   (cond ((<= ?A char ?Z) (- char ?A))
@@ -127,7 +127,7 @@
                time-remaining))
     code))
 
-;; Password functions
+;; Auth-sources password functions
 (defun my/pass-display (auth)
   "Select a password entry (PASS) from `auth-sources', and briefly display its password."
   (interactive

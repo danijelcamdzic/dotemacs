@@ -9,7 +9,7 @@
 (require 'bookmarks-config)             ; Bookmarks configuration
 (require 'authorization-config)         ; GnuPg and auth-sources configuration
 
-;; GUI mode functions
+;; GUI display functions
 (defun my/hide-gui-bar ()
   "Disable scroll bar, menu bar, and tool bar."
   (interactive)

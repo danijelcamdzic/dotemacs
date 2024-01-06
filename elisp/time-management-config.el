@@ -5,7 +5,7 @@
 ;; Dependencies
 (require 'package-manager-config)       ; Package manager configuration (melpa and quelpa)
 
-;; Time adjustment functions
+;; Time and date overriding functions
 (defvar my/adjusted-time nil
   "Adjusted time. This time will replace current time.")
 

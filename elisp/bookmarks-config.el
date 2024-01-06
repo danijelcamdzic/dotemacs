@@ -30,7 +30,7 @@
     )
   )
 
-;; Bookmarks+ functions
+;; Bookmarks+ override home directory functions
 (defun my/modify-bookmark-path (orig-fun &rest args)
   "Modify the bookmark filename and directory based on system type before opening."
   (let* ((bookmark (car args))
