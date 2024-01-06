@@ -543,6 +543,9 @@
     (setq org-attach-use-inheritance t)
     ;; Remove default tag for attachments
     (setq org-attach-auto-tag nil))
+
+  (progn ;; Directory
+    (setq org-attach-id-dir (concat org-directory "data/")))
   )
 
 ;; Alert configuration
