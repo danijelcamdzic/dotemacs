@@ -531,6 +531,20 @@
                                   arrow-chain))))))
   (deactivate-mark))
 
+(use-package org-attach
+  :after org
+  :config
+  (progn ;; Setup
+    ;; Use relative directories
+    (setq org-attach-dir-relative t)
+    ;; Store links in place where file is attached
+    (setq org-attach-store-link-p 'attached)
+    ;; Use inheritance
+    (setq org-attach-use-inheritance t)
+    ;; Remove default tag for attachments
+    (setq org-attach-auto-tag nil))
+  )
+
 ;; Alert configuration
 (use-package alert
   :ensure t
@@ -544,8 +558,8 @@
 
 ;; Alert functions
 (defun alert-android-notifications-notify (info)
-  "Send notifications using android-notifications-notify.
-android-notifications-notify is a built-in function in the native Emacs
+  "Send notifications using `android-notifications-notify'.
+`android-notifications-notify' is a built-in function in the native Emacs
 Android port."
   (let ((title (or (plist-get info :title) "Android Notifications Alert"))
         (body (or (plist-get info :message) ""))
@@ -580,20 +594,17 @@ Android port."
           org-alert-notify-after-event-cutoff 10)
     ;; Setup notification title (if using 'custom)
     (setq org-alert-notification-title "Org Alert Reminder")
-    ;; Use github-suggested non-greedy regular expression
-    ;; This solves that time (eg. 11;00-11:15) will be notified for 11:00
-    ;; and not 11:15
+    ;; Use non-greedy regular expression
     (setq org-alert-time-match-string
           "\\(?:SCHEDULED\\|DEADLINE\\):.*?<.*?\\([0-9]\\{2\\}:[0-9]\\{2\\}\\).*>")
     ;; Enable org-alert
-    (org-alert-enable)
-    )
+    (org-alert-enable))
   )
 
 (defvar my-org-alert-title-type 'custom
-  "Control the title type for org-alert notifications.
+  "Control the title type for `org-alert' notifications.
    Possible values are:
-      - 'custom: The usual workings of org-alert package. Uses org-alert-notification-title
+      - 'custom: The usual workings of org-alert package. Uses `org-alert-notification-title'
                  as the title of notifications sent.
       - 'parent: Uses the immediate parent heading of the TODO as the title of the notification.
                  If the TODO does not have a parent, it uses the file title instead. If the file
@@ -610,8 +621,8 @@ use filename."
         title))))
 
 (defun org-alert--parse-entry-advice (orig-fun &rest args)
-  "Advice for org-alert--parse-entry function. It adapts it to accept parameters from the
-my/org-alert--get-todo-parent function which retrieves the parent heading or file title/name."
+  "Advice for `org-alert--parse-entry' function. It adapts it to accept parameters from the
+`my/org-alert--get-todo-parent' function which retrieves the parent heading or file title/name."
   (let ((head (org-alert--strip-text-properties (org-get-heading t t t t)))
         (parent-or-file-head (my/org-alert--get-todo-parent)))
     (cl-destructuring-bind (body cutoff) (org-alert--grab-subtree)
@@ -620,7 +631,7 @@ my/org-alert--get-todo-parent function which retrieves the parent heading or fil
         nil))))
 
 (defun org-alert--dispatch-advice (orig-fun &rest args)
-  "Advice for org-alert--dispatch function."
+  "Advice for `org-alert--dispatch' function."
   (let ((entry (org-alert--parse-entry)))
     (when entry
       (cl-destructuring-bind (head parent-or-file-head time cutoff) entry
@@ -630,7 +641,7 @@ my/org-alert--get-todo-parent function which retrieves the parent heading or fil
           (alert head :title parent-or-file-head))))))
 
 (defun update-org-alert-advice ()
-  "Add or remove advice based on the value of org-alert-title-type."
+  "Add or remove advice based on the value of `org-alert-title-type'."
   (cond ((eq my-org-alert-title-type 'parent)
          (advice-add 'org-alert--parse-entry :around #'org-alert--parse-entry-advice)
          (advice-add 'org-alert--dispatch :around #'org-alert--dispatch-advice))
@@ -681,13 +692,8 @@ my/org-alert--get-todo-parent function which retrieves the parent heading or fil
   :after org
   :config
   (progn ;; Directory setup
-    (setq org-download-method 'directory)
-    (setq-default org-download-image-dir (concat my-notes-directory "images"))
-    (setq-default org-download-heading-lvl nil)
-    (setq org-download-image-org-width 600)
-    (setq org-download-link-format "[[file:%s]]\n"
-          org-download-abbreviate-filename-function #'file-relative-name)
-    (setq org-download-link-format-function #'org-download-link-format-function-default))
+    (setq org-download-method 'attach)
+    (setq-default org-download-heading-lvl nil))
   )
 
 ;; Org-download functions
@@ -723,8 +729,10 @@ my/org-alert--get-todo-parent function which retrieves the parent heading or fil
   :hook (org-mode .  org-media-note-mode)
   :bind (("H-v" . org-media-note-hydra/body))
   :config
-  (progn ;; Directory configuration
-    (setq org-media-note-screenshot-image-dir (concat my-notes-directory "images")))
+  (progn ;; Save method configuration
+    (setq org-media-note-screenshot-save-method 'attach)
+    (setq org-media-note-screenshot-link-type-when-save-in-attach-dir 'attach)
+   )
   )
 
 ;; Org-media-note functions
