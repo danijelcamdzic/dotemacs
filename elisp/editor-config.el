@@ -86,6 +86,14 @@
   :ensure t
   )
 
+;; Which-key configuration
+(use-package which-key
+  :ensure t
+  :config
+  (progn ;; Setup
+    (which-key-mode))
+  )
+
 (provide 'editor-config)
 
 ;;; editor-config.el ends here
