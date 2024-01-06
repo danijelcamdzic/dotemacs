@@ -418,7 +418,7 @@
     (org-super-agenda-mode))
   )
 
-;; Org-super-agenda functions
+;; Org-super-agenda grouping functions
 (defun my/org-super-agenda-get-todo-parent (item)
   "Get the parent heading of ITEM, or if none, the file title or filename."
   (org-super-agenda--when-with-marker-buffer (org-super-agenda--get-marker item)
@@ -461,7 +461,7 @@
     (org-roam-setup))
   )
 
-;; Org-roam insert functions
+;; Org-roam insertion functions
 (defun my/get-org-roam-node-hierarchy (node)
   "Get the hierarchy of NODE as a list of titles.
     The hierarchy includes the NODE title, its ancestor titles, and the parent node title."
@@ -531,6 +531,7 @@
                                   arrow-chain))))))
   (deactivate-mark))
 
+;; Org-attach configuration
 (use-package org-attach
   :after org
   :config
@@ -559,7 +560,7 @@
       (setq alert-default-icon "ic_popup_reminder")))
   )
 
-;; Alert functions
+;; Alert notifier functions
 (defun alert-android-notifications-notify (info)
   "Send notifications using `android-notifications-notify'.
 `android-notifications-notify' is a built-in function in the native Emacs
@@ -604,6 +605,7 @@ Android port."
     (org-alert-enable))
   )
 
+;; Org-alert title-changing functions
 (defvar my-org-alert-title-type 'custom
   "Control the title type for `org-alert' notifications.
    Possible values are:
@@ -700,7 +702,7 @@ use filename."
     (setq-default org-download-heading-lvl nil))
   )
 
-;; Org-download functions
+;; Org-download screenshot name functions
 (defun my/org-download-clipboard-prompt-for-name-advice (orig-fun &optional basename)
   "Advice to prompt for a basename before calling `org-download-clipboard'."
   (message "Calling advice function")
@@ -739,7 +741,7 @@ use filename."
    )
   )
 
-;; Org-media-note functions
+;; Org-media-note screenshot naming functions
 (defun my/org-media-note-prepend-timestamp-advice (orig-func &rest args)
   "Advice to prepend the current timestamp to the filename created by `org-media-note--format-picture-file-name'."
   (let ((original-filename (apply orig-func args))
