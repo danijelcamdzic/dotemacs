@@ -1,22 +1,23 @@
 ;;; viewer-config.el -- Viewer packages configuration
 
 ;;; Code:
+(provide 'viewer-config)
 
-;; Dependencies
-(require 'package-manager-config)       ; Package manager configuration (melpa and quelpa)
+;;; Dependencies
+(require 'package-manager-config)
 
-;; Doc-view configuration
+;;; Doc-view
+;;;; Configuration
 (use-package doc-view
   :config
-  (progn ;; Setup
-    (setq doc-view-resolution 200))
+  ;; Increase document resolution from default 100
+  (setq doc-view-resolution 200)
   )
 
-;; Mpv configuration
+;;; Mpv
+;;;; Configuration
 (use-package mpv
   :ensure t
   )
-
-(provide 'viewer-config)
 
 ;;; viewer-config.el ends here
