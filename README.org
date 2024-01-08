@@ -77,22 +77,31 @@ I use the https://syncthing.net/ app to sync folders from my home directory. It 
 and a powerful app available on both Android and Linux/Windows. I use it
 primarely to sync my =~/Notes/= and my =~/Documents/= folder.
 
-* Configuration Files
+* My init.el
 
-Here I will elaborate on the configuration files I have and present some
+I have decided to use one large =init.el= file. There are options to split this
+file into smaller =.el= files and manage the configuration that way but I find
+it cumbersome to find stuff that way. I also don't like literate configs because
+I don't think an org file is meant to store configuration but instead take notes
+on stuff.
+
+I use =use-package= to pack my config and =outline-minor-mode= and
+=outline-minor-faces= to view it.
+
+Here I will elaborate on my =init.el= file and present some
 interesting (to me at least) features I have added to my workflow in order to
 make it more useful.
 
 [[assets/linux-emacs.png]]
 [[assets/android-emacs.png]]
 
-** =user-config.el=
+** User
 
-This file contains the user information which includes the user credentials and
+This section contains the user information which includes the user credentials and
 directory information.
 
-I use the same folder on my Linux machine and on my Android phone. The only
-thing that is different is the home folder. In this configuration file, Emacs is
+I use the same folder names on my Linux machine and on my Android phone. The only
+thing that is different is the home folder. In this configuration section, Emacs is
 let known what the user home folder is and what are the names of the folders it
 uses.
 
@@ -101,9 +110,9 @@ For Linux both =~/= and =/home/user= are used but for Android we use
 
 Here you can add more of your information.
 
-** =editor-config.el=
+** Editor
 
-This file contains various editor related configurations, ranging from the theme
+This section contains various editor related configurations, ranging from the theme
 set up to the sidebar configuration.
 
 I use =dired-sidebar= and =ibuffer-sidebar= and have created wrapper functions which
@@ -111,7 +120,7 @@ I use to seamlessly transition to using them.
 
 *** Android Editor
 
-The most important part of this configuration file is the section:
+The most important part of this configuration section is the following:
 
 #+begin_src emacs-lisp
 ;; Android specific settings
@@ -127,9 +136,9 @@ Which makes every buffer open in its own separate window as the screen size of
 Android is not meant to be shared between buffers due to its size. Also, I
 enable the keyboard to display even on read-only buffers.
 
-** =dashboard-config.el=
+** Dashboard
 
-I use dashboard package in Emacs. This file contains the configuration for that
+I use dashboard package in Emacs. This section contains the configuration for that
 package as well as some custom functions which improve how the dashboard
 looks. This is mainly related to how the agenda items appear in the dashboard.
 
@@ -146,9 +155,9 @@ today, tomorrow and yesterday as opposed to absolute dates.
 This functionality is added as an advice and can be removed with only one line
 if you don't find this useful.
 
-** =gui-config.el=
+** GUI
 
-In this file, I configure the GUI options in Emacs. I need GUI because I don't
+In this section, I configure the GUI options in Emacs. I need GUI because I don't
 like using the keyboard shortcuts on Android Emacs and would like all options to be
 available through the GUI menu.
 
@@ -166,11 +175,11 @@ In the GUI menu bar, I add a bunch of features I have created all over my
 configuration for easy access. Some of then are in the ="Commands"= menu and some
 are in the ="Tools"= menu.
 
-** =org-config.el=
+** Org-mode
 
 This is the biggest part of my configuration and contains numerous functions.
 
-In this file, the main parts of the configuration concern the =org-mode=,
+In this section, the main parts of the configuration concern the general =org-mode=,
 =org-roam= and =org-agenda= functionalities.
 
 I will showcase a few here.
@@ -396,11 +405,11 @@ And this works on Android btw! Without any changes from your side, it will
 detect that you are running Android and give you the notification!
 
 [[assets/org-alert-title-android.png]]
-** =bookmarks-config.el=
+** Bookmarks
 
 *** Seamless Bookmark Management on Android and Linux
 
-This file contains bookmark related configuration. I use =bookmark+= package and have a
+This section contains bookmark related configuration. I use =bookmark+= package and have a
 unified bookmark file which works on both Linux and Android. To be able to work
 on both Linux and Android I have created custom function which advises the
 =bookmark-jump= function to manipulate the bookmark entry and go to the proper
@@ -409,9 +418,9 @@ home directory depending on the system
 This way syncthing app can be used to sync the bookmark file and the bookmarks
 will be opened seamlessly on both types of systems.
 
-** =authorization-config.el=
+** TOTP and Password Manager
 
-This file contains two package configurations which include =auth-sources= and
+This section contains two package configurations which include =auth-sources= and
 =epa=.
 
 I use GPG for encrypting my files and I use =auth-sources= on Emacs to store my
@@ -419,7 +428,7 @@ secrets. This is convenient for me as I have my phone and Linux both running the
 same configuration and both synced to have the latest files. I use Emacs as my
 password manager and I use Emacs as my TOTP manager.
 
-This file contains functions for TOTP and password retrieval. TOTP functions are
+This section contains functions for TOTP and password retrieval. TOTP functions are
 taken from the https://github.com/juergenhoetzel/emacs-totp and I followed the
 https://www.masteringemacs.org/article/securely-generating-totp-tokens-emacs
 tutorial to make this work.
