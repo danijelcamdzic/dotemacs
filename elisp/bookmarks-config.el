@@ -1,37 +1,42 @@
 ;;; bookmarks-config.el -- Bookmarks configuration
 
 ;;; Code:
+(provide 'bookmarks-config)
 
-;; Dependencies
-(require 'user-config)                  ; User details and directory configuration
-(require 'package-manager-config)       ; Package manager configuration (melpa and quelpa)
+;;; Dependencies
+(require 'user-config)
+(require 'package-manager-config)
 
-;; Bookmarks configuration
-(use-package bookmark
-  :config
-  (progn ;; Directories configuration
-    (setq bookmark-default-file (concat my-documents-directory "Bookmarks/bookmarks")))
-  )
-
-;; Eww configuration
+;;; Eww
+;;;; Configuration
 (use-package eww
   :config
-  (progn ;; Directories configurations
-    (setq eww-bookmarks-directory (concat my-documents-directory "Bookmarks/")))
+  ;; Set default eww-bookmarks directory
+  (setq eww-bookmarks-directory (concat my-documents-directory "Bookmarks/"))
   )
 
-;; Bookmark+ configuration
+;;; Bookmarks
+;;;; Configuration
+(use-package bookmark
+  :config
+  ;; Set default bookmark file
+  (setq bookmark-default-file (concat my-documents-directory "Bookmarks/bookmarks"))
+  )
+
+;;; Bookmark+
+;;;; Configuration
 (use-package bookmark+
   :quelpa (bookmark+ :fetcher github :repo "emacsmirror/bookmark-plus")
   :config
-  (progn ;; Default files configuration for state and commands
-    (setq bmkp-bmenu-state-file (expand-file-name ".emacs-bmk-bmenu-state.el" user-emacs-directory))
-    (setq bmkp-bmenu-commands-file (expand-file-name ".emacs-bmk-bmenu-commands.el" user-emacs-directory))
-    )
+  ;; Set default .emacs-bmk-bmenu-state.el file path
+  (setq bmkp-bmenu-state-file (expand-file-name ".emacs-bmk-bmenu-state.el" user-emacs-directory))
+  
+  ;; Set default .emacs-bmk-bmenu-commands.el file path
+  (setq bmkp-bmenu-commands-file (expand-file-name ".emacs-bmk-bmenu-commands.el" user-emacs-directory))
   )
 
-;; Bookmarks+ override home directory functions
-(defun my/modify-bookmark-path (orig-fun &rest args)
+;;;; Functions - Bookmark Paths on Different Platforms
+(defun my/bookmark-jump--modify-bookmark-path-advice (orig-fun &rest args)
   "Modify the bookmark filename and directory based on system type before opening."
   (let* ((bookmark (car args))
          (bookmark-data (bookmark-get-bookmark bookmark))
@@ -62,8 +67,7 @@
 
     (apply orig-fun args)))
 
-(advice-add 'bookmark-jump :around #'my/modify-bookmark-path)
-
-(provide 'bookmarks-config)
+;; Add advice so bookmarks will be properly opened
+(advice-add 'bookmark-jump :around #'my/bookmark-jump--modify-bookmark-path-advice)
 
 ;;; bookmarks-config.el ends here

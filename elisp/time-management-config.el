@@ -1,43 +1,61 @@
-;;; time-management-config.el -- Calendar and other time related configuration
+;;; time-management-config.el -- Calendar and time configuration
 
 ;;; Code:
+(provide 'time-management-config)
 
-;; Dependencies
-(require 'package-manager-config)       ; Package manager configuration (melpa and quelpa)
+;;; Dependencies
+(require 'package-manager-config)
 
-;; Time and date overriding functions
-(defvar my/adjusted-time nil
+;;; Functions - Relative Dates
+(defun my/time-relative-date (time)
+  "Determines if the given TIME is 'today', 'yesterday', or 'tomorrow'.
+Returns the corresponding string or nil if the time doesn't match any of these.
+TIME is expected to be in Emacs internal time format."
+  (when time
+    (let* ((current-time (current-time))
+           (current-date (decode-time current-time))
+           (entry-date (decode-time time))
+           (current-day-num (time-to-days (apply #'encode-time (decode-time (current-time)))))
+           (entry-day-num (time-to-days (apply #'encode-time (decode-time time))))
+           (day-difference (- current-day-num entry-day-num)))
+      (cond ((eq day-difference 0) "today    ")
+            ((eq day-difference 1) "yesterday")
+            ((eq day-difference -1) "tomorrow ")))))
+
+;;; Functions - Time Adjustment
+(defvar my-adjusted-time nil
   "Adjusted time. This time will replace current time.")
 
-(defvar my/time-override-lock nil
+(defvar my-time-override-lock nil
   "Lock to prevent concurrent access to the time override.")
 
-(defun my/adjust-time (time)
+(defun my/time-adjust-time (time)
   "Temporarily adjust `current-time' to the given TIME."
-  (setq my/adjusted-time (append (org-read-date nil t time) '(0 0))))
+  (setq my-adjusted-time (append (org-read-date nil t time) '(0 0))))
 
-(defun my/current-time-override ()
-  "Override for `current-time' using `my/adjusted-time'."
-  (or my/adjusted-time (current-time)))
+(defun my/time-override-current-time ()
+  "Override for `current-time' using `my/time-adjust-time'."
+  (or my/time-adjust-time (current-time)))
 
-;; Time-stamp configuration
+;;; Time-stamp
+;;;; Configuration
 (use-package time-stamp
   :config
-  (progn ;; Setup
-    (setq time-stamp-format "%Y-%m-%d %H:%M"
-          time-stamp-start "# Edited: "
-          time-stamp-end "$")
-    (add-hook 'before-save-hook 'time-stamp))
+  ;; Set up time-stamp format
+  (setq time-stamp-format "%Y-%m-%d %H:%M"
+        time-stamp-start "# Edited: "
+        time-stamp-end "$")
+
+  ;; Add hook to save time-stamp string on every file save
+  (add-hook 'before-save-hook 'time-stamp)
   )
 
-;; Calendar configuration
+;;; Calendar
+;;;; Configuration
 (use-package calendar
   :config
-  (progn ;; Appearance configuration
-    ;; Set calendar to start on Monday
-    (setq calendar-week-start-day 1))
+  ;; Set calendar to start on Monday
+  (setq calendar-week-start-day 1)
   )
-
-(provide 'time-management-config)
 
 ;;; time-management-config.el ends here

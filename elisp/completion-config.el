@@ -1,39 +1,42 @@
 ;;; completion-config.el -- Completion packages configuration
 
 ;;; Code:
+(provide 'completion-config)
 
-;; Dependencies
-(require 'package-manager-config)       ; Package manager configuration (melpa and quelpa)
+;;; Dependencies
+(require 'package-manager-config)
 
-;; Company configuration
+;;; Company
+;;;; Configuration
 (use-package company
   :ensure t
   :config
-  (progn ;; Setup
-    (company-mode 1)
-    (add-hook 'after-init-hook 'global-company-mode))
+  ;; Enable company mode
+  (company-mode 1)
+
+  ;; Add hook to enable company mode globally
+  (add-hook 'after-init-hook 'global-company-mode)
   )
 
-;; Orderless configuration
+;;; Orderless
+;;;; Configuration
 (use-package orderless
   :ensure t
   )
 
-;; Vertico configuration
+;;; Vertico
+;;;; Configuration
 (use-package vertico
   :after orderless
   :ensure t
   :config
-  (progn ;; Setup
-    ;; Enable vertico
-    (vertico-mode 1)
+  ;; Enable vertico
+  (vertico-mode 1)
 
-    ;; Set completion style
-    (setq completion-styles '(orderless)
-          completion-category-defaults nil
-          completion-category-overrides '((file (styles . (partial-completion))))))
+  ;; Set completion style and categories
+  (setq completion-styles '(orderless)
+        completion-category-defaults nil
+        completion-category-overrides '((file (styles . (partial-completion)))))
   )
-
-(provide 'completion-config)
 
 ;;; completion-config.el ends here

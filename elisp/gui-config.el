@@ -1,23 +1,23 @@
 ;;; gui-config.el -- GUI configuration
 
 ;;; Code:
+(provide 'gui-config)
 
-;; Dependencies
-(require 'user-config)                  ; User details and directory configuration
-(require 'package-manager-config)       ; Package manager configuration (melpa and quelpa)
-(require 'org-config)                   ; Org and supporting/extending packages configuration
-(require 'bookmarks-config)             ; Bookmarks configuration
-(require 'authorization-config)         ; GnuPg and auth-sources configuration
+;;; Dependencies
+(require 'package-manager-config)
+(require 'org-config)
+(require 'bookmarks-config)
+(require 'authorization-config)
 
-;; GUI display functions
-(defun my/hide-gui-bar ()
+;;; Functions: GUI Display Show/Hide
+(defun my/gui-hide-bars ()
   "Disable scroll bar, menu bar, and tool bar."
   (interactive)
   (scroll-bar-mode -1)
   (menu-bar-mode -1)
   (tool-bar-mode -1))
 
-(defun my/show-gui-bar ()
+(defun my/gui-show-bars ()
   "Enable scroll bar, menu bar, and tool bar."
   (interactive)
   (scroll-bar-mode 1)
@@ -26,8 +26,9 @@
 
 ;; Hide GUI on startup if in LINUX mode
 (when (eq system-type 'gnu/linux)
-  (my/hide-gui-bar))
+  (my/gui-hide-bars))
 
+;;; GUI ToolBar Items
 ;; Add additional GUI options when Android system is detected
 (when (eq system-type 'android)
   ;; Add tool-bar options for zooming in
@@ -51,34 +52,34 @@
                      :help "Execute Org Ctrl-C Ctrl-C")
   )
 
-;; Easymenu configuration
+;;; Easymenu
+;;;; Configuration
 (use-package easymenu
   :config
-  (progn ;; Menu configuration
-    ;; Define "Command" menu
-    (easy-menu-define my/command-center-menu nil "My Commands Menu"
-      '("Command"
-        ("Org-Mode"
+    ;; Define "Commands" menu
+    (easy-menu-define my/commands-center-menu nil "My Commands Menu"
+      '("Commands"
+        ("Org"
          ("Schedule"
-          ["Add" my/add-schedule t]
-          ["Remove" my/remove-schedule t])
+          ["Add" my/org-add-schedule t]
+          ["Remove" my/org-remove-schedule t])
          ("States"
-          ["Log as TODO" my/todo-log-todo t]
-          ["Log as DOING" my/todo-log-doing t]
-          ["Log as DONE" my/todo-log-done t]
-          ["Log as SKIP" my/todo-log-skip t]
-          ["Log as FAIL" my/todo-log-fail t]
-          ["Change State" my/todo-change-state t]
-          ["Skip all Overdue" my/skip-overdue-tasks]
-          ["Show States in Calendar" my/show-states-in-calendar t])
+          ["Log as TODO" my/org-log-todo t]
+          ["Log as DOING" my/org-log-doing t]
+          ["Log as DONE" my/org-log-done t]
+          ["Log as SKIP" my/org-log-skip t]
+          ["Log as FAIL" my/log-log-fail t]
+          ["Change State" my/org-change-state t]
+          ["Skip all Overdue" my/org-skip-all-overdue-tasks t]
+          ["Show States in Calendar" my/org-logbook-display-states-on-calendar t])
          ("Clock"
-          ["Clock In" my/clock-in t]
-          ["Clock Out" my/clock-out t]
+          ["Clock In" my/org-clock-in t]
+          ["Clock Out" my/org-clock-out t]
           ["Display Clocks" org-clock-display]
           ["Show Clock Analysis" org-analyzer-start t])
          ("Notes"
-          ["Add Note" my/add-note t]
-          ["Show Notes in Calendar" my/show-notes-in-calendar t]))
+          ["Add Note" my/org-add-note t]
+          ["Show Notes in Calendar" my/org-logbook-display-notes-on-calendar t]))
         ("Org-Agenda"
          ["Day View" my/org-agenda-day-view t]
          ["Week View" my/org-agenda-week-view t]
@@ -94,8 +95,8 @@
         ("Bookmarks"
          ["List Bookmarks" list-bookmarks t])))
 
-    ;; Add the command center menu to the toolbar to the left of "Tools" section
-    (easy-menu-add-item global-map '("menu-bar") my/command-center-menu "Tools")
+    ;; Add the commands center menu to the toolbar to the left of "Tools" section
+    (easy-menu-add-item global-map '("menu-bar") my/commands-center-menu "Tools")
 
     ;; Define "Authentication" menu
     (easy-menu-define my-auth-menu nil "My Authentication Menu"
@@ -106,11 +107,8 @@
     ;; Add the "Authentication" menu to the "Tools" menu
     (easy-menu-add-item nil '("tools") my-auth-menu "Games")
 
-    ;; Add a menu separator after the "Authentication" menu
-    (easy-menu-add-item nil '("tools") "--" "Games"))
+    ;; Add a line separator after the "Authentication" menu
+    (easy-menu-add-item nil '("tools") "--" "Games")
   )
-
-
-(provide 'gui-config)
 
 ;;; gui-config.el ends here

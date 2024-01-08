@@ -1,108 +1,94 @@
-;;; org-config.el -- Org and supporting/extending packages configuration
+;;; org-config.el -- Org-mode and org packages configuration
 
 ;;; Code:
+(provide 'org-config)
 
-;; Dependencies
-(require 'user-config)                  ; User details and directory configuration
-(require 'package-manager-config)       ; Package manager configuration (melpa and quelpa)
-(require 'viewer-config)                ; Viewer packages configuration
-(require 'time-management-config)       ; Calendar and other time related configuration
+;;; Dependencies
+(require 'user-config)
+(require 'package-manager-config)
+(require 'viewer-config)
+(require 'time-management-config)
+(require 'notifications-config)
+(require 'networking-config)
 
-;; Org-mode configuration
+;;; Org
+;;;; Configuration
 (use-package org
   :ensure t
   :config
-  (progn ;; Directories configuration
-    (setq org-directory my-notes-directory))
+  ;; Set org directory
+  (setq org-directory my-notes-directory)
 
-  (progn ;; Appearance configuration
-    ;; Custom faces
-    (custom-set-faces
-     '(org-scheduled ((t (:foreground "#555555"))))
-     '(org-scheduled-today ((t (:foreground "grey")))))
+  ;; Set org-mode preferences for buffer display
+  (setq org-startup-indented t)
+  (add-hook 'org-mode-hook (lambda () (setq fill-column 80)))
+  (add-hook 'org-mode-hook #'turn-on-auto-fill)
+  (add-hook 'org-mode-hook 'org-hide-block-all)
+  (add-hook 'org-mode-hook 'org-hide-drawer-all)
 
-    ;; Visibility of org items (drawer, code blocks, headings)
-    (setq org-startup-indented t)
-    (add-hook 'org-mode-hook (lambda () (setq fill-column 80)))
-    (add-hook 'org-mode-hook #'turn-on-auto-fill)
-    (add-hook 'org-mode-hook 'org-hide-block-all)
-    (add-hook 'org-mode-hook 'org-hide-drawer-all)
+  ;; Set custom faces for scheduled headings
+  (custom-set-faces
+   '(org-scheduled ((t (:foreground "#555555"))))
+   '(org-scheduled-today ((t (:foreground "grey")))))
 
-    ;; Display inline images on startup
-    (setq org-startup-with-inline-images t)
+  ;; Configure heading logs to be logged in "LOGBOOK" drawer
+  (setq org-log-into-drawer t)
+  (setq org-log-note-clock-out t)
 
-    ;; Set path type to relative so it works on all platforms
-    (setq org-link-file-path-type 'relative))
+  ;; Tags excluded from inheritance
+  (setq org-tags-exclude-from-inheritance '("goal" "food" "exercise"))
 
-  (progn ;; Org babel configuration
-    ;; Languages support
-    (org-babel-do-load-languages
-     'org-babel-load-languages
-     '((python . t)    ; Enable Python
-       (C . t)))       ; Enable C
+  ;; Display inline images on startup
+  (setq org-startup-with-inline-images t)
 
-    ;; Python configuration
-    (setq org-babel-python-command "python3")
-    (setq python-indent-offset 4)
-    (setq org-edit-src-content-indentation 0)
+  ;; Set path type to relative so it works on all platforms
+  (setq org-link-file-path-type 'relative)
 
-    ;; Don't ask for confirmation during org babel execution
-    (setq org-confirm-babel-evaluate nil))
+  ;; Languages support
+  (org-babel-do-load-languages
+   'org-babel-load-languages
+   '((python . t)    ; Enable Python
+     (C . t)))       ; Enable C
 
-  (progn ;; States and logging configuration
-    ;; Set the org-todo-keywords and their states
-    (setq org-todo-keywords
-          '((sequence "TODO(t)" "DOING(i!)" "|" "DONE(d!)" "SKIP(s!)" "FAIL(f!)")))
+  ;; Python configuration
+  (setq org-babel-python-command "python3")
+  (setq python-indent-offset 4)
+  (setq org-edit-src-content-indentation 0)
 
-    ;; Configure TODO properties to be logged in "LOGBOOK" drawer
-    (setq org-log-into-drawer t)
-    (setq org-log-note-clock-out t)
+  ;; Don't ask for confirmation during org babel execution
+  (setq org-confirm-babel-evaluate nil)
 
-    ;; Tags excluded from inheritance
-    (setq org-tags-exclude-from-inheritance '("goal" "food" "exercise"))
-
-    ;; Define custom faces for different TODO states
-    (defface my-mark-DONE '((t :background "#006400")) "")
-    (defface my-mark-SKIP '((t :background "#999900")) "")
-    (defface my-mark-FAIL '((t :background "#8B0000")) "")
-    (defface my-mark-DOING '((t :background "#4B0082")) "")
-    (defface my-mark-NOTE '((t :background "#006400")) ""))
-
-  (progn ;; Binding configuration
-    ;; Bind the mouse click on the date to logbook entry position
-    (with-eval-after-load 'calendar
-      ;; for terminal emacs "Enter" clicks
-      (define-key calendar-mode-map (kbd "RET") 'my/goto-logbook-entry)
-      ;; for gui emacs "Enter" clicks
-      (define-key calendar-mode-map (kbd "<return>") 'my/goto-logbook-entry)))
+  ;; Set the org-todo-keywords and their states
+  (setq org-todo-keywords
+        '((sequence "TODO(t)" "DOING(i!)" "|" "DONE(d!)" "SKIP(s!)" "FAIL(f!)")))
   )
 
-;; Org-mode clocking functions
-(defun my/clock-in ()
+;;;; Functions - Clocking
+(defun my/org-clock-in ()
   "Clock in the current org heading."
   (interactive)
   (if (eq major-mode 'org-agenda-mode)
       (org-agenda-clock-in)
     (org-clock-in)))
 
-(defun my/clock-out ()
+(defun my/org-clock-out ()
   "Clock out of the current org heading."
   (interactive)
   (if (eq major-mode 'org-agenda-mode)
       (org-agenda-clock-out)
     (org-clock-out)))
 
-;; Org-mode date and time function
-(defun my/insert-current-date-time ()
+;;;; Functions - Datetime Insertion
+(defun my/org-insert-current-date-time ()
   "Insert the current date and time along with the three-letter weekday name in
-    the format YYYY-MM-DD Day H:M."
+the format YYYY-MM-DD Day H:M."
   (interactive)
   (insert (format-time-string "%Y-%m-%d %a %H:%M")))
 
-;; Org-mode scheduling functions
-(defun my/add-schedule ()
+;;;; Functions - Scheduling
+(defun my/org-add-schedule ()
   "Add a scheduling timestamp to the current item in the Org Agenda or in
-    an org-mode file."
+an org file."
   (interactive)
   (if (eq major-mode 'org-agenda-mode)
       (let* ((marker (or (org-get-at-bol 'org-marker)
@@ -117,9 +103,9 @@
             (call-interactively 'org-schedule))))
     (call-interactively 'org-schedule)))
 
-(defun my/remove-schedule ()
+(defun my/org-remove-schedule ()
   "Remove the scheduling timestamp from the current item in the Org Agenda
-    or in an org-mode file."
+    or in an org file."
   (interactive)
   (if (eq major-mode 'org-agenda-mode)
       (let* ((marker (or (org-get-at-bol 'org-marker)
@@ -137,52 +123,52 @@
         (org-back-to-heading t)
         (org-schedule '(4))))))
 
-;; Org-mode state-change functions
-(defun my/todo-log-todo ()
+;;;; Functions - State Change
+(defun my/org-log-todo ()
   "Mark current heading as TODO"
   (interactive)
   (if (eq major-mode 'org-agenda-mode)
       (org-agenda-todo "TODO")
     (org-todo "TODO")))
 
-(defun my/todo-log-doing ()
+(defun my/org-log-doing ()
   "Mark current heading as DOING"
   (interactive)
   (if (eq major-mode 'org-agenda-mode)
       (org-agenda-todo "DOING")
     (org-todo "DOING")))
 
-(defun my/todo-log-done ()
+(defun my/org-log-done ()
   "Mark current heading as DONE"
   (interactive)
   (if (eq major-mode 'org-agenda-mode)
       (org-agenda-todo "DONE")
     (org-todo "DONE")))
 
-(defun my/todo-log-skip ()
+(defun my/org-log-skip ()
   "Mark current heading as SKIP"
   (interactive)
   (if (eq major-mode 'org-agenda-mode)
       (org-agenda-todo "SKIP")
     (org-todo "SKIP")))
 
-(defun my/todo-log-fail ()
+(defun my/org-log-fail ()
   "Mark current heading as FAIL"
   (interactive)
   (if (eq major-mode 'org-agenda-mode)
       (org-agenda-todo "FAIL")
     (org-todo "FAIL")))
 
-(defun my/todo-change-state ()
-  "Change state of a TODO item."
+(defun my/org-change-state ()
+  "Change state of a current heading."
   (interactive)
   (if (eq major-mode 'org-agenda-mode)
       (org-agenda-todo)
     (org-todo)))
 
-;; Org-mode skip overdue tasks function
-(defun my/skip-overdue-tasks ()
-  "Mark tasks scheduled for yesterday or earlier as SKIP and log them as changed on their scheduled date."
+(defun my/org-skip-all-overdue-tasks ()
+  "Mark tasks scheduled for yesterday or earlier as SKIP and
+log them as changed on their scheduled date."
   (interactive)
   (dolist (file (directory-files org-directory t "\\.org$"))
     (with-current-buffer (find-file-noselect file)
@@ -193,26 +179,26 @@
             (when (and scheduled-time
                        (< (time-to-days scheduled-time)
                           (time-to-days (current-time))))
-              (unless my/time-override-lock
-                (setq my/time-override-lock t)
-                (my/adjust-time (format-time-string "<%Y-%m-%d %a>" scheduled-time))
-                (advice-add 'current-time :override #'my/current-time-override)
+              (unless my-time-override-lock
+                (setq my-time-override-lock t)
+                (my/time-adjust-time (format-time-string "<%Y-%m-%d %a>" scheduled-time))
+                (advice-add 'current-time :override #'my/time-override-current-time)
                 (org-todo "SKIP")
-                (advice-remove 'current-time #'my/current-time-override)
-                (setq my/adjusted-time nil)
-                (setq my/time-override-lock nil)))))))))
+                (advice-remove 'current-time #'my/time-override-current-time)
+                (setq my-adjusted-time nil)
+                (setq my-time-override-lock nil)))))))))
 
-;; Org-mode note functions
-(defun my/add-note ()
-  "Add a note to an Org item."
+;;;; Functions - Notes
+(defun my/org-add-note ()
+  "Add a note to an org heading."
   (interactive)
   (if (eq major-mode 'org-agenda-mode)
       (org-agenda-add-note)
     (org-add-note)))
 
-;; Org-mode logbook parsing functions
-(defun my/parse-logbook-states (logbook beg buffer)
-  "Parse a logbook string and return a list of entries."
+;;;; Functions - Logbook Calendar Display
+(defun my/org-logbook--parse-logbook-states (logbook beg buffer)
+  "Parse a logbook string and return a list of entries with states."
   (let ((lines (split-string logbook "\n" t))
         (line-start-pos beg)
         entries)
@@ -226,7 +212,7 @@
           (push (list state date entry-begin-pos buffer) entries)))
       (setq line-start-pos (+ line-start-pos (length line) 1)))))
 
-(defun my/parse-logbook-notes (logbook beg buffer)
+(defun my/org-logbook--parse-logbook-notes (logbook beg buffer)
   "Parse a logbook string and return a list of entries with notes."
   (let ((lines (split-string logbook "\n" t))
         (line-start-pos beg)
@@ -240,17 +226,23 @@
           (push (list "NOTE" date entry-begin-pos buffer) entries)))
       (setq line-start-pos (+ line-start-pos (length line) 1)))))
 
-;; Org-mode logbook calendar view functions
-(defvar my/calendar-todo-view-active nil
+(defvar my-logbook-calendar-view-active nil
   "Flag to indicate if the custom TODO calendar view is active.")
 
-(defun my/reset-calendar-view-flag ()
-  "Reset the custom calendar view flag."
-  (setq my/calendar-todo-view-active nil))
+(defun my/org-logbook--reset-calendar-view-flag ()
+  "Reset the  calendar view flag."
+  (setq my-logbook-calendar-view-active nil))
 
-(defun my/mark-entries (entries)
+;; Define custom faces for different TODO states
+(defface my-mark-DONE '((t :background "#006400")) "")
+(defface my-mark-SKIP '((t :background "#999900")) "")
+(defface my-mark-FAIL '((t :background "#8B0000")) "")
+(defface my-mark-DOING '((t :background "#4B0082")) "")
+(defface my-mark-NOTE '((t :background "#006400")) "")
+
+(defun my/org-logbook--mark-calendar-dates (entries)
   "Mark days in the calendar for each entry in ENTRIES."
-  (setq my-marked-entries entries)
+  (setq my-logbook-marked-entries entries)
   (let ((last-date (current-time)))
     (dolist (entry entries)
       (let* ((state (car entry))
@@ -267,17 +259,17 @@
               (setq current-date (calendar-gregorian-from-absolute
                                   (+ 1 (calendar-absolute-from-gregorian current-date)))))))))))
 
-(defun my/reapply-markings ()
+(defun my/org-logbook--mark-calendar-date-reapply ()
   "Reapply markings to the calendar."
-  (when my/calendar-todo-view-active
-    (my/mark-entries my-marked-entries)))
+  (when my-logbook-calendar-view-active
+    (my/org-logbook--mark-calendar-dates my-logbook-marked-entries)))
 
-(defun my/show-states-in-calendar ()
-  "Show the state history of the TODO at point in the org-agenda buffer or an
-    org file on the year calendar."
+(defun my/org-logbook-display-states-on-calendar ()
+  "Show the state history of the heading at point in the org-agenda buffer or an
+org file on the year calendar."
   (interactive)
-  (setq my/calendar-todo-view-active t)
-  (setq my-marked-entries '())
+  (setq my-logbook-calendar-view-active t)
+  (setq my-logbook-marked-entries '())
   (let* ((marker (if (eq major-mode 'org-agenda-mode)
                      (or (org-get-at-bol 'org-marker)
                          (org-agenda-error))
@@ -298,16 +290,16 @@
                    (setq end (line-beginning-position)))
               (progn
                 (setq logbook (buffer-substring-no-properties beg end))
-                (setq entries (my/parse-logbook-states logbook beg buffer))
+                (setq entries (my/org-logbook--parse-logbook-states logbook beg buffer))
                 (calendar)
-                (my/mark-entries entries))
+                (my/org-logbook--mark-calendar-dates entries))
             (error "No LOGBOOK found for this TODO.")))))))
 
-(defun my/show-notes-in-calendar ()
-  "Show the notes of the TODO at point in the org-agenda buffer or an org file on the year calendar."
+(defun my/org-logbook-display-notes-on-calendar ()
+  "Show the notes of the heading at point in the org-agenda buffer or an org file on the year calendar."
   (interactive)
-  (setq my/calendar-todo-view-active t)
-  (setq my-marked-entries '())
+  (setq my-logbook-calendar-view-active t)
+  (setq my-logbook-marked-entries '())
   (let* ((marker (if (eq major-mode 'org-agenda-mode)
                      (or (org-get-at-bol 'org-marker)
                          (org-agenda-error))
@@ -328,16 +320,16 @@
                    (setq end (line-beginning-position)))
               (progn
                 (setq logbook (buffer-substring-no-properties beg end))
-                (setq entries (my/parse-logbook-notes logbook beg buffer))
+                (setq entries (my/org-logbook--parse-logbook-notes logbook beg buffer))
                 (calendar)
-                (my/mark-entries entries))
+                (my/org-logbook--mark-calendar-dates entries))
             (error "No LOGBOOK found for this TODO.")))))))
 
-(defun my/goto-logbook-entry (date)
+(defun my/org-logbook--goto-entry (date)
   "Navigate to the logbook entry corresponding to DATE."
   (interactive (list (calendar-cursor-to-date t)))
-  (if my/calendar-todo-view-active
-      (let ((entry (cl-find-if (lambda (entry) (equal date (cadr entry))) my-marked-entries)))
+  (if my-logbook-calendar-view-active
+      (let ((entry (cl-find-if (lambda (entry) (equal date (cadr entry))) my-logbook-marked-entries)))
         (if entry
             (progn
               (switch-to-buffer-other-window (nth 3 entry))
@@ -349,40 +341,46 @@
 
 (with-eval-after-load 'calendar
   ;; Add hook to reapply markings each time the calendar is moved
-  (add-hook 'calendar-move-hook 'my/reapply-markings)
+  (add-hook 'calendar-move-hook 'my/org-logbook--mark-calendar-date-reapply)
 
   ;; Add hook to reset the custom calendar view flag when the calendar is closed
-  (add-hook 'calendar-exit-hook 'my/reset-calendar-view-flag))
+  (add-hook 'calendar-exit-hook 'my/org-logbook--reset-calendar-view-flag)
+  
+  ;; Bind terminal emacs "Enter" clicks
+  (define-key calendar-mode-map (kbd "RET") 'my/org-logbook--goto-entry)
+  
+  ;; Bind GUI emacs "Enter" clicks
+  (define-key calendar-mode-map (kbd "<return>") 'my/org-logbook--goto-entry))
 
-;; Org-agenda configuration
+;;; Org-agenda
+;;;; Configuration
 (use-package org-agenda
   :after org
   :config
-  (progn ;; Directories configuration
-    (setq org-agenda-files (list org-directory)))
+  ;; Set org-agenda-files to org-directory
+  (setq org-agenda-files (list org-directory))
   
-  (progn ;; Appearance configuration
-    ;; Customize org-agenda view
-    (setq org-agenda-prefix-format  '((agenda . "  %t ")
-                                      (todo . "%t ")
-                                      (tags . "")
-                                      (search . "%i")))
-    (setq org-agenda-sorting-strategy '((agenda time-up priority-up category-keep)
-                                        (todo priority-up time-up category-keep)
-                                        (tags time-up priority-up category-keep)
-                                        (search time-up priority-up category-keep)))
-    (setq org-agenda-scheduled-leaders '("" ""))
-    (setq org-agenda-span 7)
-    (setq org-agenda-show-future-repeats 'next)
-    (setq org-agenda-use-time-grid t)
-    (setq org-agenda-time-grid
-          '((daily weekly today require-timed)
-            (0000 0200 0400 0600 0800 1000 1200 1400 1600 1800 2000 2200 2359)
-            "......" "----------------")))
+  ;; Customize org-agenda view
+  (setq org-agenda-prefix-format  '((agenda . "  %t ")
+                                    (todo . "%t ")
+                                    (tags . "")
+                                    (search . "%i")))
+  (setq org-agenda-sorting-strategy '((agenda time-up priority-up category-keep)
+                                      (todo priority-up time-up category-keep)
+                                      (tags time-up priority-up category-keep)
+                                      (search time-up priority-up category-keep)))
+  (setq org-agenda-scheduled-leaders '("" ""))
+  (setq org-agenda-span 7)
+  (setq org-agenda-show-future-repeats 'next)
+  (setq org-agenda-use-time-grid t)
+  (setq org-agenda-time-grid
+        '((daily weekly today require-timed)
+          (0000 0200 0400 0600 0800 1000 1200 1400 1600 1800 2000 2200 2359)
+          "......" "----------------"))
   )
 
-;; Org-agenda buffer view functions
-(defun my/org-agenda-switch-to-view (view-fn)
+;;;; Functions - Agenda Views
+(defun my/org-agenda--switch-to-view (view-fn)
   "Switch to the given Org Agenda view function VIEW-FN."
   (if (eq major-mode 'org-agenda-mode)
       (progn
@@ -396,29 +394,29 @@
 (defun my/org-agenda-day-view ()
   "Switch to the Org Agenda daily view from anywhere in Emacs."
   (interactive)
-  (my/org-agenda-switch-to-view 'org-agenda-day-view))
+  (my/org-agenda--switch-to-view 'org-agenda-day-view))
 
 (defun my/org-agenda-week-view ()
   "Switch to the Org Agenda weekly view from anywhere in Emacs."
   (interactive)
-  (my/org-agenda-switch-to-view 'org-agenda-week-view))
+  (my/org-agenda--switch-to-view 'org-agenda-week-view))
 
 (defun my/org-agenda-year-view ()
   "Switch to the Org Agenda yearly view from anywhere in Emacs."
   (interactive)
-  (my/org-agenda-switch-to-view 'org-agenda-year-view))
+  (my/org-agenda--switch-to-view 'org-agenda-year-view))
 
-;; Org-super-agenda configuration
+;;; Org-super-agenda
+;;;; Configuration
 (use-package org-super-agenda
   :after org-agenda
   :ensure t
   :config
-  (progn ;; Setup
-    ;; Enable org-super-agenda mode
-    (org-super-agenda-mode))
+  ;; Enable org-super-agenda mode
+  (org-super-agenda-mode)
   )
 
-;; Org-super-agenda grouping functions
+;;;; Functions - Auto-Parents
 (defun my/org-super-agenda-get-todo-parent (item)
   "Get the parent heading of ITEM, or if none, the file title or filename."
   (org-super-agenda--when-with-marker-buffer (org-super-agenda--get-marker item)
@@ -432,6 +430,7 @@
 (org-super-agenda--def-auto-group parent "their parent heading or file title/filename"
   :key-form (my/org-super-agenda-get-todo-parent item))
 
+;;;; Functions - Inventory
 (defun my/org-agenda-inventory ()
   "Open Org Agenda in the todos view mode with super agenda. Use file title as groups"
   (interactive)
@@ -440,31 +439,31 @@
     (org-agenda nil "t")
     (setq org-super-agenda-groups '())))
 
-;; Org-roam configuration
+;;; Org-roam
+;;;; Configuration
 (use-package org-roam
   :after org
   :ensure t
   :config
-  (progn ;; Directories configuration
-    (setq org-roam-directory org-directory)
-    (setq org-roam-dailies-directory (concat org-directory "dailies/"))
-    ;; Exclude gpg encrypted files from being processed by org-roam
-    (setq org-roam-file-exclude-regexp "\\(\\.gpg\\)$"))
+  ;; Set directories
+  (setq org-roam-directory org-directory)
+  (setq org-roam-dailies-directory (concat org-directory "dailies/"))
+  
+  ;; Exclude gpg encrypted files from being processed by org-roam
+  (setq org-roam-file-exclude-regexp "\\(\\.gpg\\)$")
 
-  (progn ;; Appearance configuration
-    ;; Setup preview of org-roam nodes
-    (setq org-roam-node-display-template
-          (concat "${title:*} "
-                  (propertize "${tags:30}" 'face 'org-tag))))
+  ;; Setup preview of org-roam nodes
+  (setq org-roam-node-display-template
+        (concat "${title:*} "
+                (propertize "${tags:30}" 'face 'org-tag)))
 
-  (progn ;; Setup
-    (org-roam-setup))
+  (org-roam-setup)
   )
 
-;; Org-roam insertion functions
-(defun my/get-org-roam-node-hierarchy (node)
+;;; Functions - Inserting Nodes by Tags
+(defun my/org-roam-insert-nodes-by-tag--get-node-heirarchy (node)
   "Get the hierarchy of NODE as a list of titles.
-    The hierarchy includes the NODE title, its ancestor titles, and the parent node title."
+The hierarchy includes the NODE title, its ancestor titles, and the parent node title."
   (let ((titles '())
         (title (org-roam-node-title node))
         (file-path (org-roam-node-file node))
@@ -479,12 +478,12 @@
       (setq titles (append titles (list title))))
     titles))
 
-(defun my/insert-org-roam-nodes-by-tag(keywords exclude-keywords &optional filter-fn)
+(defun my/org-roam-insert-nodes-by-tag(keywords exclude-keywords &optional filter-fn)
   "Inserts all Org-roam nodes connected to the provided keywords and not connected to the exclude keywords.
-    KEYWORDS is a space-separated list of keywords to find the connected nodes.
-    EXCLUDE-KEYWORDS is a space-separated list of keywords to exclude nodes.
-    FILTER-FN is a function to filter out nodes: it takes an `org-roam-node',
-    and when nil is returned the node will be filtered out."
+KEYWORDS is a space-separated list of keywords to find the connected nodes.
+EXCLUDE-KEYWORDS is a space-separated list of keywords to exclude nodes.
+FILTER-FN is a function to filter out nodes: it takes an `org-roam-node',
+and when nil is returned the node will be filtered out."
   (interactive "sKeywords: \nsExclude Keywords: ")
   (unwind-protect
       ;; Group functions together to avoid inconsistent state on quit
@@ -514,12 +513,12 @@
                                 all-nodes))
                (sorted-nodes (sort filtered-nodes
                                    (lambda (a b)
-                                     (let ((hierarchy-a (mapconcat #'identity (my/get-org-roam-node-hierarchy a) "->"))
-                                           (hierarchy-b (mapconcat #'identity (my/get-org-roam-node-hierarchy b) "->")))
+                                     (let ((hierarchy-a (mapconcat #'identity (my/org-roam-insert-nodes-by-tag--get-node-heirarchy a) "->"))
+                                           (hierarchy-b (mapconcat #'identity (my/org-roam-insert-nodes-by-tag--get-node-heirarchy b) "->")))
                                        (string< hierarchy-a hierarchy-b))))))
           (dolist (node sorted-nodes)
             (let* ((id (org-roam-node-id node))
-                   (hierarchy (my/get-org-roam-node-hierarchy node))
+                   (hierarchy (my/org-roam-insert-nodes-by-tag--get-node-heirarchy node))
                    (arrow-chain (if (> (length hierarchy) 1)
                                     (mapconcat #'identity hierarchy "->")
                                   (org-roam-node-title node)))
@@ -531,57 +530,29 @@
                                   arrow-chain))))))
   (deactivate-mark))
 
-;; Org-attach configuration
+;;; Org-attach
+;;;; Configuration
 (use-package org-attach
   :after org
   :config
-  (progn ;; Setup
-    ;; Use relative directories
-    (setq org-attach-dir-relative t)
-    ;; Store links in place where file is attached
-    (setq org-attach-store-link-p 'attached)
-    ;; Use inheritance
-    (setq org-attach-use-inheritance t)
-    ;; Remove default tag for attachments
-    (setq org-attach-auto-tag nil))
-
-  (progn ;; Directory
-    (setq org-attach-id-dir (concat org-directory "data/")))
+  ;; Set attach directory
+  (setq org-attach-id-dir (concat org-directory "data/"))
+  
+  ;; Use relative directories
+  (setq org-attach-dir-relative t)
+  
+  ;; Store links in place where file is attached
+  (setq org-attach-store-link-p 'attached)
+  
+  ;; Use inheritance
+  (setq org-attach-use-inheritance t)
+  
+  ;; Remove default tag for attachments
+  (setq org-attach-auto-tag nil)
   )
 
-;; Alert configuration
-(use-package alert
-  :ensure t
-  :config
-  (progn ;; Icon setup
-    ;; Setup default icon for Android notifications
-    (when (eq system-type 'android)
-      ;; android.R.drawable icons must be used
-      (setq alert-default-icon "ic_popup_reminder")))
-  )
-
-;; Alert notifier functions
-(defun alert-android-notifications-notify (info)
-  "Send notifications using `android-notifications-notify'.
-`android-notifications-notify' is a built-in function in the native Emacs
-Android port."
-  (let ((title (or (plist-get info :title) "Android Notifications Alert"))
-        (body (or (plist-get info :message) ""))
-        (urgency (cdr (assq (plist-get info :severity)
-                            alert-notifications-priorities)))
-        (icon (or (plist-get info :icon) alert-default-icon))
-        (replaces-id (gethash (plist-get info :id) alert-notifications-ids)))
-    (android-notifications-notify
-     :title title
-     :body body
-     :urgency urgency
-     :icon icon
-     :replaces-id replaces-id)))
-
-(alert-define-style 'android-notifications :title "Android Notifications"
-                    :notifier #'alert-android-notifications-notify)
-
-;; Org-alert configuration
+;;; Org-alert
+;;;; Configuration
 (use-package org-alert
   :ensure t
   :after org
@@ -591,21 +562,23 @@ Android port."
                            'android-notifications
                          'libnotify))
   :config
-  (progn ;; Setup
-    ;; Setup timing
-    (setq org-alert-interval 300
-          org-alert-notify-cutoff 10
-          org-alert-notify-after-event-cutoff 10)
-    ;; Setup notification title (if using 'custom)
-    (setq org-alert-notification-title "Org Alert Reminder")
-    ;; Use non-greedy regular expression
-    (setq org-alert-time-match-string
-          "\\(?:SCHEDULED\\|DEADLINE\\):.*?<.*?\\([0-9]\\{2\\}:[0-9]\\{2\\}\\).*>")
-    ;; Enable org-alert
-    (org-alert-enable))
+  ;; Setup timing
+  (setq org-alert-interval 300
+        org-alert-notify-cutoff 10
+        org-alert-notify-after-event-cutoff 10)
+  
+  ;; Setup notification title (if using 'custom)
+  (setq org-alert-notification-title "Org Alert Reminder")
+  
+  ;; Use non-greedy regular expression
+  (setq org-alert-time-match-string
+        "\\(?:SCHEDULED\\|DEADLINE\\):.*?<.*?\\([0-9]\\{2\\}:[0-9]\\{2\\}\\).*>")
+  
+  ;; Enable org-alert
+  (org-alert-enable)
   )
 
-;; Org-alert title-changing functions
+;;;; Functions - Notification Titles
 (defvar my-org-alert-title-type 'custom
   "Control the title type for `org-alert' notifications.
    Possible values are:
@@ -625,7 +598,7 @@ use filename."
           (car title)
         title))))
 
-(defun org-alert--parse-entry-advice (orig-fun &rest args)
+(defun org-alert--parse-entry--use-parent-as-title-advice (orig-fun &rest args)
   "Advice for `org-alert--parse-entry' function. It adapts it to accept parameters from the
 `my/org-alert--get-todo-parent' function which retrieves the parent heading or file title/name."
   (let ((head (org-alert--strip-text-properties (org-get-heading t t t t)))
@@ -635,7 +608,7 @@ use filename."
           (list head parent-or-file-head (match-string 1 body) cutoff)
         nil))))
 
-(defun org-alert--dispatch-advice (orig-fun &rest args)
+(defun org-alert--dispatch--use-parent-as-title-advice (orig-fun &rest args)
   "Advice for `org-alert--dispatch' function."
   (let ((entry (org-alert--parse-entry)))
     (when entry
@@ -645,65 +618,65 @@ use filename."
               (alert (concat time ": " head) :title parent-or-file-head))
           (alert head :title parent-or-file-head))))))
 
-(defun update-org-alert-advice ()
+(defun my/org-alert-update-advices ()
   "Add or remove advice based on the value of `org-alert-title-type'."
   (cond ((eq my-org-alert-title-type 'parent)
-         (advice-add 'org-alert--parse-entry :around #'org-alert--parse-entry-advice)
-         (advice-add 'org-alert--dispatch :around #'org-alert--dispatch-advice))
+         (advice-add 'org-alert--parse-entry :around #'org-alert--parse-entry--use-parent-as-title-advice)
+         (advice-add 'org-alert--dispatch :around #'org-alert--dispatch--use-parent-as-title-advice))
         ((eq my-org-alert-title-type 'custom)
-         (advice-remove 'org-alert--parse-entry #'org-alert--parse-entry-advice)
-         (advice-remove 'org-alert--dispatch #'org-alert--dispatch-advice))))
+         (advice-remove 'org-alert--parse-entry #'org-alert--parse-entry--use-parent-as-title-advice)
+         (advice-remove 'org-alert--dispatch #'org-alert--dispatch--use-parent-as-title-advice))))
 
 ;; Set up 'parent mode
 (setq my-org-alert-title-type 'parent)
 ;; Update to set up or remove advices based on my-org-alert-title-type
-(update-org-alert-advice)
+(my/org-alert-update-advices)
 
-;; Org-tempo configuration
+;;; Org-tempo
+;;;; Configuration
 (use-package org-tempo
   :after org
   )
 
-;; Org-analyzer configuration
+;;; Org-analyzer
+;;;; Configuration
 (use-package org-analyzer
   :after org
   :ensure t
   :config
-  (progn ;; Directories configuration
-    (setq org-analyzer-org-directory org-directory))
+  ;; Set up directory
+  (setq org-analyzer-org-directory org-directory)
   )
 
-;; Websocket configuration
-(use-package websocket
-  :after org-roam
-  :ensure t
-  )
-
-;; Org-roam-ui configuration
+;;; Org-roam-ui
+;;;; Configuration
 (use-package org-roam-ui
   :after org-roam
   :ensure t
   )
 
-;; Org-transclusion configuration
+;;; Org-transclusion
+;;;; Configuration
 (use-package org-transclusion
   :after org
   :ensure t
   )
 
-;; Org-download configuration
+;;; Org-download
+;;;; Configuration
 (use-package org-download
   :ensure t
   :after org
   :config
-  (progn ;; Directory setup
-    ;; Use attachments and not file links
-    (setq org-download-method 'attach)
-    (setq-default org-download-heading-lvl nil))
+  ;; Use attachments and not file links
+  (setq org-download-method 'attach)
+  
+  ;; Don't create folders based on heading levels
+  (setq-default org-download-heading-lvl nil)
   )
 
-;; Org-download screenshot name functions
-(defun my/org-download-clipboard-prompt-for-name-advice (orig-fun &optional basename)
+;;;; Functions - Screenshot Filename
+(defun my/org-download-clipboard--prompt-for-name-advice (orig-fun &optional basename)
   "Advice to prompt for a basename before calling `org-download-clipboard'."
   (message "Calling advice function")
   (let ((name (if (called-interactively-p 'any)
@@ -711,55 +684,55 @@ use filename."
                 basename)))
     (funcall orig-fun (if (string-empty-p name) basename (concat name ".png")))))
 
-(advice-add 'org-download-clipboard :around #'my/org-download-clipboard-prompt-for-name-advice)
+(advice-add 'org-download-clipboard :around #'my/org-download-clipboard--prompt-for-name-advice)
 
-;; Org-ref configuration
+;;; Org-ref
+;;;; Configuration
 (use-package org-ref
   :ensure t
   :after org
   )
 
-;; Org-noter configuration
+;;; Org-noter
+;;;; Configuration
 (use-package org-noter
   :ensure t  
   :after org 
   :config
-  (progn ;; Directory configuration
-    ;; Set the location of the notes
-    (setq org-noter-notes-search-path '(org-directory)))
+  ;; Set the location of the notes
+  (setq org-noter-notes-search-path '(org-directory))
   )
 
-;; Org-media-note configuration
+;;; Org-media-note
+;;;; Configuration
 (use-package org-media-note
   :quelpa (org-media-note :fetcher github :repo "yuchen-lea/org-media-note")
   :hook (org-mode .  org-media-note-mode)
   :bind (("H-v" . org-media-note-hydra/body))
   :config
-  (progn ;; Save method configuration
-    (setq org-media-note-screenshot-save-method 'attach)
-    (setq org-media-note-screenshot-link-type-when-save-in-attach-dir 'attach)
-   )
+  ;; Set up save method
+  (setq org-media-note-screenshot-save-method 'attach)
+  (setq org-media-note-screenshot-link-type-when-save-in-attach-dir 'attach)
   )
 
-;; Org-media-note screenshot naming functions
-(defun my/org-media-note-prepend-timestamp-advice (orig-func &rest args)
+;;;; Functions - Filename
+(defun my/org-media-note--format-picture-file-name--prepend-timestamp-advice (orig-func &rest args)
   "Advice to prepend the current timestamp to the filename created by `org-media-note--format-picture-file-name'."
   (let ((original-filename (apply orig-func args))
         (timestamp (format-time-string "%Y-%m-%d_%H-%M-%S")))
     (concat timestamp "_" original-filename)))
 
-(advice-add 'org-media-note--format-picture-file-name :around #'my/org-media-note-prepend-timestamp-advice)
+(advice-add 'org-media-note--format-picture-file-name :around #'my/org-media-note--format-picture-file-name--prepend-timestamp-advice)
 
+;;;; Functions - Invalid Characters
 (defun my/remove-invalid-characters-from-filename (filename)
   "Remove invalid characters from filename in order for it to sync to Android using syncthing."
   (replace-regexp-in-string "[/*\":<>?|]" "" filename))
 
-(defun my/org-media-note-remove-invalid-characters-from-filename-advice (orig-func &rest args)
+(defun my/org-media-note--format-picture-file-name--remove-invalid-characters-from-filename-advice (orig-func &rest args)
   "Advice to remove invalid characters from filename in `org-media-note--format-picture-file-name'."
   (my/remove-invalid-characters-from-filename (apply orig-func args)))
 
-(advice-add 'org-media-note--format-picture-file-name :around #'my/org-media-note-remove-invalid-characters-from-filename-advice)
-
-(provide 'org-config)
+(advice-add 'org-media-note--format-picture-file-name :around #'my/org-media-note--format-picture-file-name--remove-invalid-characters-from-filename-advice)
 
 ;;; org-config.el ends here
