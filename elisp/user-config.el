@@ -1,4 +1,4 @@
-;;; user-config.el -- User details and directory configuration
+;;; user-config.el -- User credentials and directories configuration
 
 ;;; Code:
 (provide 'user-config)
@@ -21,7 +21,7 @@
        ((eq system-type 'android) my-android-home)
        (t my-gnu-linux-home)))
 
-;; Set the user folders (reused across platforms)
+;; Set the user folders
 (setq my-books-directory (concat my-home-directory "Books/"))
 (setq my-notes-directory (concat my-home-directory "Notes/"))
 (setq my-documents-directory (concat my-home-directory "Documents/"))

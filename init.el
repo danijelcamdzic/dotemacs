@@ -15,6 +15,8 @@
 (require 'completion-config)
 (require 'gui-config)
 (require 'dashboard-config)
+(require 'notifications-config)
+(require 'networking-config)
 (require 'org-config)
 (require 'bookmarks-config)
 (require 'authorization-config)

@@ -1,4 +1,4 @@
-;;; viewer-config.el -- Viewer packages configuration
+;;; viewer-config.el -- Viewing and media packages configuration
 
 ;;; Code:
 (provide 'viewer-config)

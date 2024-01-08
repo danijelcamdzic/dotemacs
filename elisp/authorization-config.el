@@ -64,9 +64,9 @@
 
 (defun totp--base32-to-number (string)
   "Base32-decode STRING and return the result as number.
-    Handles interleaved whitespaces and missing padding charachters
-    gracefuly (The number of padding chars can be deduced from input
-    length)."
+Handles interleaved whitespaces and missing padding charachters
+gracefuly (The number of padding chars can be deduced from input
+length)."
   (let* ((s (replace-regexp-in-string "\\([[:space:]]\\|=*$\\)" "" string))
          (ntrail (mod (* 5  (length s)) 8)))
     (ash (seq-reduce (lambda (acc char)
@@ -81,8 +81,8 @@
 
 (defun totp (string &optional time digits)
   "Return a TOTP token using the secret STRING and current time.
-    TIME is used as counter value instead of current time, if non-nil.
-    DIGITS is tre  number of pin digits and defaults to 6."
+TIME is used as counter value instead of current time, if non-nil.
+DIGITS is tre  number of pin digits and defaults to 6."
   (let* ((hex-string (if (string-match-p "^[0-9a-fA-F]\\{2\\}+$" string)
                          string		;already in hex format
                        (format "%X" (totp--base32-to-number string))))
@@ -126,7 +126,7 @@
     code))
 
 ;;;; Functions - Passwords
-(defun my/pass-display (auth)
+(defun my/password-display (auth)
   "Select a password entry (PASS) from `auth-sources', and briefly display its password."
   (interactive
    (list

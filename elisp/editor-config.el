@@ -1,4 +1,4 @@
-;;; editor-config.el -- Text editing and buffer display configuration
+;;; editor-config.el -- Editor configuration
 
 ;;; Code:
 (provide 'editor-config)
@@ -6,15 +6,13 @@
 ;;; Dependencies
 (require 'package-manager-config)
 
-;;; Files and Buffers
-;; Remove startup screen
-(setq inhibit-startup-screen t)
-
+;;; Files
 ;; Disable backup and lock files
 (setq create-lockfiles nil
       auto-save-default nil
       make-backup-files nil)
 
+;;; Buffers
 ;; Change buffer behavior on Android
 (when (eq system-type 'android)
   ;; Buffer display settings
@@ -34,6 +32,9 @@
 
 ;; Remove fringes
 (set-fringe-mode 0)
+
+;; Remove startup screen
+(setq inhibit-startup-screen t)
 
 ;;; Text editing
 ;;;; Indentation

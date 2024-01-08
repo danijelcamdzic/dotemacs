@@ -1,4 +1,4 @@
-;;; time-management-config.el -- Calendar and other time related configuration
+;;; time-management-config.el -- Calendar and time configuration
 
 ;;; Code:
 (provide 'time-management-config)
@@ -6,7 +6,7 @@
 ;;; Dependencies
 (require 'package-manager-config)
 
-;;; Functions - Relative Date
+;;; Functions - Relative Dates
 (defun my/time-relative-date (time)
   "Determines if the given TIME is 'today', 'yesterday', or 'tomorrow'.
 Returns the corresponding string or nil if the time doesn't match any of these.
@@ -26,7 +26,7 @@ TIME is expected to be in Emacs internal time format."
 (defvar my-adjusted-time nil
   "Adjusted time. This time will replace current time.")
 
-(defvar my-override-lock nil
+(defvar my-time-override-lock nil
   "Lock to prevent concurrent access to the time override.")
 
 (defun my/time-adjust-time (time)
