@@ -106,7 +106,7 @@ Here you can add more of your information.
 This file contains various editor related configurations, ranging from the theme
 set up to the sidebar configuration.
 
-I use dired-sidebar and ibuffer-sidebar and have created wrapper functions which
+I use =dired-sidebar= and =ibuffer-sidebar= and have created wrapper functions which
 I use to seamlessly transition to using them.
 
 *** Android Editor
@@ -153,7 +153,7 @@ like using the keyboard shortcuts on Android Emacs and would like all options to
 available through the GUI menu.
 
 For Linux/Windows I do not like seeing the GUI and so I automatically hide
-it. You can remove the line which calls the my/hide-gui-bar function if you don't
+it. You can remove the line which calls the =my/gui-hide-bars= function if you don't
 want this.
 
 *** Android GUI shortcuts
@@ -204,15 +204,16 @@ and their respective colors as this:
 #+end_src
 
 To visualize the states on the calendar one must simply call the function
-=my/show-states-in-calendar=. It can be used to visualize both habit like =TODOs=
-as well as =TODOs= which are supposed to be done over a longer period of time.
+=my/org-logbook-display-states-on-calendar=. It can be used to visualize both
+habit like =TODOs= as well as =TODOs= which are supposed to be done over a
+longer period of time.
 
 [[assets/todo-algorithms.png]]
 [[assets/calendar-algorithms.png]]
 [[assets/todo-gym.png]]
 [[assets/calendar-gym.png]]
 
-In the same manner, you can call the =my/show-notes-in-calendar= and you will see
+In the same manner, you can call the =my/org-logbook-display-notes-on-calendar= and you will see
 with green dates all the dates that you have made a note in.
 
 You can even go to the place where the =STATE= or =NOTE= was added by clicking on
@@ -220,7 +221,7 @@ the calendar date.
 
 *** Org Roam Nodes with Tag Insertion
 
-There is a function called =my/insert-org-roam-nodes-by-tag=, which enables you to
+There is a function called =my/org-roam-insert-nodes-by-tags=, which enables you to
 insert in the org file all nodes that have certain tags but do not have other
 tags you specify.
 
@@ -243,13 +244,26 @@ simple:
 (use-package org-alert
   :ensure t
   :after org
-  :custom (alert-default-style 'libnotify)
+  :custom
+  ;; Use different backends depending on the platform
+  (alert-default-style (if (eq system-type 'android)
+                           'android-notifications
+                         'libnotify))
   :config
-  (progn ;; Setup
-    (setq org-alert-interval 300
-          org-alert-notification-title "Org Alert Reminder")
-    (org-alert-enable)
-    )
+  ;; Setup timing
+  (setq org-alert-interval 300
+        org-alert-notify-cutoff 10
+        org-alert-notify-after-event-cutoff 10)
+  
+  ;; Setup notification title (if using 'custom)
+  (setq org-alert-notification-title "Org Alert Reminder")
+  
+  ;; Use non-greedy regular expression
+  (setq org-alert-time-match-string
+        "\\(?:SCHEDULED\\|DEADLINE\\):.*?<.*?\\([0-9]\\{2\\}:[0-9]\\{2\\}\\).*>")
+  
+  ;; Enable org-alert
+  (org-alert-enable)
   )
 #+end_src
 
@@ -266,48 +280,25 @@ this:
 #+begin_src emacs-lisp
 (require 'alert)
 
-(defun alert-android-notifications-notify (info)
-  (unless (eq system-type 'android)
-    (error "Android notifications are only supported on Android systems"))
-  
-  "Send INFO using android-notifications-notify."
-  (let ((title (or (plist-get info :title) "Org Alert Reminder"))
+(defun my/alert-android-notifications-notify (info)
+  "Send notifications using `android-notifications-notify'.
+`android-notifications-notify' is a built-in function in the native Emacs
+Android port."
+  (let ((title (or (plist-get info :title) "Android Notifications Alert"))
         (body (or (plist-get info :message) ""))
-        (urgency (let ((severity (plist-get info :severity)))
-                   (cond ((eq severity 'urgent) 'critical)
-                         ((eq severity 'high) 'critical)
-                         ((eq severity 'moderate) 'normal)
-                         ((eq severity 'low) 'low)
-                         ((eq severity 'trivial) 'low)
-                         (t 'normal))))
-        (icon (or (plist-get info :icon) alert-default-icon)))
+        (urgency (cdr (assq (plist-get info :severity)
+                            alert-notifications-priorities)))
+        (icon (or (plist-get info :icon) alert-default-icon))
+        (replaces-id (gethash (plist-get info :id) alert-notifications-ids)))
     (android-notifications-notify
      :title title
      :body body
      :urgency urgency
      :icon icon
-     )))
+     :replaces-id replaces-id)))
 
 (alert-define-style 'android-notifications :title "Android Notifications"
-                    :notifier #'alert-android-notifications-notify
-                    )
-
-;; Org-alert configuration
-(use-package org-alert
-  :ensure t
-  :after org
-  :custom
-  ;; Use different backends depending on the platform
-  (alert-default-style (if (eq system-type 'android)
-                           'android-notifications
-                         'libnotify))
-  :config
-  (progn ;; Setup
-    (setq org-alert-interval 300
-          org-alert-notification-title "Org Alert Reminder")
-    (org-alert-enable)
-    )
-  )
+                    :notifier #'my/alert-android-notifications-notify)
 #+end_src
 
 Whether on Android or Linux, I will now get my notifications using the same
@@ -342,16 +333,20 @@ Reminder":
                            'android-notifications
                          'libnotify))
   :config
-  (progn ;; Setup
-    ;; Setup timing
-    (setq org-alert-interval 300
-          org-alert-notify-cutoff 10
-          org-alert-notify-after-event-cutoff 10)
-    (setq org-alert-notification-title "Org Alert Reminder")
-    (setq org-alert-time-match-string
-          "\\(?:SCHEDULED\\|DEADLINE\\):.*?<.*?\\([0-9]\\{2\\}:[0-9]\\{2\\}\\).*>")
-    (org-alert-enable)
-    )
+  ;; Setup timing
+  (setq org-alert-interval 300
+        org-alert-notify-cutoff 10
+        org-alert-notify-after-event-cutoff 10)
+  
+  ;; Setup notification title (if using 'custom)
+  (setq org-alert-notification-title "Org Alert Reminder")
+  
+  ;; Use non-greedy regular expression
+  (setq org-alert-time-match-string
+        "\\(?:SCHEDULED\\|DEADLINE\\):.*?<.*?\\([0-9]\\{2\\}:[0-9]\\{2\\}\\).*>")
+  
+  ;; Enable org-alert
+  (org-alert-enable)
   )
 #+end_src
 
@@ -371,9 +366,9 @@ The important bit of the configuration is this:
 
 #+begin_src emacs-lisp
 (defvar my-org-alert-title-type 'custom
-  "Control the title type for org-alert notifications.
+  "Control the title type for `org-alert' notifications.
    Possible values are:
-      - 'custom: The usual workings of org-alert package. Uses org-alert-notification-title
+      - 'custom: The usual workings of org-alert package. Uses `org-alert-notification-title'
                  as the title of notifications sent.
       - 'parent: Uses the immediate parent heading of the TODO as the title of the notification.
                  If the TODO does not have a parent, it uses the file title instead. If the file
@@ -384,10 +379,9 @@ and by changing that to either ='custom= or ='function= you are able to change
 the notification title type.
 
 #+begin_src emacs-lisp
-;; Set up `parent mode
 (setq my-org-alert-title-type 'parent)
 ;; Update to set up or remove advices based on my-org-alert-title-type
-(update-org-alert-advice)
+(my/org-alert-update-advices)
 #+end_src
 
 We have now set the parent mode and we can see the result:

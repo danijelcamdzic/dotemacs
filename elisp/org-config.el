@@ -461,7 +461,7 @@ org file on the year calendar."
   )
 
 ;;; Functions - Inserting Nodes by Tags
-(defun my/org-roam-insert-nodes-by-tag--get-node-heirarchy (node)
+(defun my/org-roam-insert-nodes-by-tags--get-node-heirarchy (node)
   "Get the hierarchy of NODE as a list of titles.
 The hierarchy includes the NODE title, its ancestor titles, and the parent node title."
   (let ((titles '())
@@ -478,7 +478,7 @@ The hierarchy includes the NODE title, its ancestor titles, and the parent node 
       (setq titles (append titles (list title))))
     titles))
 
-(defun my/org-roam-insert-nodes-by-tag(keywords exclude-keywords &optional filter-fn)
+(defun my/org-roam-insert-nodes-by-tags(keywords exclude-keywords &optional filter-fn)
   "Inserts all Org-roam nodes connected to the provided keywords and not connected to the exclude keywords.
 KEYWORDS is a space-separated list of keywords to find the connected nodes.
 EXCLUDE-KEYWORDS is a space-separated list of keywords to exclude nodes.
@@ -513,12 +513,12 @@ and when nil is returned the node will be filtered out."
                                 all-nodes))
                (sorted-nodes (sort filtered-nodes
                                    (lambda (a b)
-                                     (let ((hierarchy-a (mapconcat #'identity (my/org-roam-insert-nodes-by-tag--get-node-heirarchy a) "->"))
-                                           (hierarchy-b (mapconcat #'identity (my/org-roam-insert-nodes-by-tag--get-node-heirarchy b) "->")))
+                                     (let ((hierarchy-a (mapconcat #'identity (my/org-roam-insert-nodes-by-tags--get-node-heirarchy a) "->"))
+                                           (hierarchy-b (mapconcat #'identity (my/org-roam-insert-nodes-by-tags--get-node-heirarchy b) "->")))
                                        (string< hierarchy-a hierarchy-b))))))
           (dolist (node sorted-nodes)
             (let* ((id (org-roam-node-id node))
-                   (hierarchy (my/org-roam-insert-nodes-by-tag--get-node-heirarchy node))
+                   (hierarchy (my/org-roam-insert-nodes-by-tags--get-node-heirarchy node))
                    (arrow-chain (if (> (length hierarchy) 1)
                                     (mapconcat #'identity hierarchy "->")
                                   (org-roam-node-title node)))
