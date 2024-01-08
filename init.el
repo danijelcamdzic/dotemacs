@@ -261,9 +261,9 @@
 ;;;;; Configuration
 (use-package easymenu
   :config
-    ;; Define "Commands" menu
-    (easy-menu-define my/commands-center-menu nil "My Commands Menu"
-      '("Commands"
+    ;; Define "Packages" menu
+    (easy-menu-define my/packages-center-menu nil "My Packages Menu"
+      '("Packages"
         ("Org"
          ("Schedule"
           ["Add" my/org-add-schedule t]
@@ -300,8 +300,8 @@
         ("Bookmarks"
          ["List Bookmarks" list-bookmarks t])))
 
-    ;; Add the commands center menu to the toolbar to the left of "Tools" section
-    (easy-menu-add-item global-map '("menu-bar") my/commands-center-menu "Tools")
+    ;; Add the packages center menu to the toolbar to the left of "Tools" section
+    (easy-menu-add-item global-map '("menu-bar") my/packages-center-menu "Tools")
 
     ;; Define "Authentication" menu
     (easy-menu-define my-auth-menu nil "My Authentication Menu"
