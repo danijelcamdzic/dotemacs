@@ -17,7 +17,7 @@
 ;; Set the home directory based on system type
 (setq my-home-directory
       (cond
-       ((eq system-type 'gnu/linux) my-gnu-linux-home)
+       ((eq system-type 'gnu/linux) my-gnu-linux-home-extended)
        ((eq system-type 'android) my-android-home)
        (t my-gnu-linux-home)))
 
@@ -799,31 +799,75 @@ org file on the year calendar."
   ;; Exclude gpg encrypted files from being processed by org-roam
   (setq org-roam-file-exclude-regexp "\\(\\.gpg\\)$")
 
-  ;; Setup preview of org-roam nodes
-  (setq org-roam-node-display-template
-        (concat "${title:*} "
-                (propertize "${tags:30}" 'face 'org-tag)))
-
+  ;; Setup org-roam
   (org-roam-setup)
   )
 
-;;;; Functions - Inserting Nodes by Tags
-(defun my/org-roam-insert-nodes-by-tags--get-node-heirarchy (node)
-  "Get the hierarchy of NODE as a list of titles.
-The hierarchy includes the NODE title, its ancestor titles, and the parent node title."
+;;;; Functions - Node Hierarchy
+(defun my/org-roam--get-node-heirarchy (node)
+  "Get the hierarchy of NODE as a list of titles, excluding non-node headings.
+The hierarchy includes the NODE title and its ancestor node titles."
   (let ((titles '())
         (title (org-roam-node-title node))
         (file-path (org-roam-node-file node))
         (file-title)
         (olp (org-roam-node-olp node)))
     (setq file-title (caar (org-roam-db-query [:select title :from nodes :where (= file $s1)] file-path)))
-    (when (and file-title (not (equal file-title title)) (not (equal file-title (car olp))))
-      (setq titles (append titles (list file-title))))
-    (when olp
-      (setq titles (append titles (nreverse olp))))
-    (when title
-      (setq titles (append titles (list title))))
-    titles))
+    (when (and file-title (not (equal file-title title)))
+      (push file-title titles))
+    (dolist (heading olp)
+      (let ((heading-title (car (last (split-string heading "/"))))) ;; Extract the heading title
+        (when (caar (org-roam-db-query [:select id :from nodes :where (= title $s1)] heading-title))
+          (push heading-title titles))))
+    (push title titles)
+    (nreverse titles)))
+
+;;;; Functions - Node Display Formatting
+(defvar my-org-roam-hierarchy-display-separator
+  (propertize "->" 'face '(shadow))
+  "Separator for org-roam hierarchy displaying.")
+
+(defun my/org-roam--create-node-hierarchy-chain (node)
+  "Return the hierarchy of NODE as a string with a predefine separator."
+  (let ((hierarchy (my/org-roam--get-node-heirarchy node)))
+    (if (cdr hierarchy)
+        (let* ((last-element (car (last hierarchy)))
+               (non-last-elements (butlast hierarchy))
+               (shadow-italicized-elements (mapcar (lambda (element)
+                                                     (propertize element 'face '(shadow italic)))
+                                                   non-last-elements)))
+          (concat (mapconcat 'identity shadow-italicized-elements my-org-roam-hierarchy-display-separator) my-org-roam-hierarchy-display-separator last-element))
+      (mapconcat 'identity hierarchy my-org-roam-hierarchy-display-separator))))
+
+(cl-defmethod org-roam-node-hierarchy ((node org-roam-node))
+  "Method for obtaining hierarchy display for org-roam nodes."
+  (my/org-roam--create-node-hierarchy-chain node))
+
+(cl-defmethod org-roam-node-colon-tags ((node org-roam-node))
+  "Tag formatting for org-roam nodes."
+  (let ((tags (org-roam-node-tags node)))
+    (if tags
+        (concat " :" (mapconcat 'identity tags ":") ":")
+      "")))
+
+(cl-defmethod org-roam-node-node-type ((node org-roam-node))
+  "Return a string which indicates whether a node is a `@note' or a `@daily'."
+  (let ((file-path (org-roam-node-file node)))
+    (cond
+      ((string-prefix-p (file-name-as-directory org-roam-directory) (file-name-directory file-path))
+       " @note")
+      ((string-prefix-p (file-name-as-directory org-roam-dailies-directory) (file-name-directory file-path))
+       " @daily")
+      (t ""))))
+
+;; Set the hierarchy display formatting
+(setq org-roam-node-display-template
+      (concat "${hierarchy}" "${node-type}" (propertize "${colon-tags}" 'face 'org-tag)))
+
+;;;; Functions - Inserting Nodes by Tags
+(defvar my-org-roam-hierarchy-insert-separator
+  (propertize "->" 'face '(shadow))
+  "Separator for org-roam hierarchy insertion.")
 
 (defun my/org-roam-insert-nodes-by-tags(keywords exclude-keywords &optional filter-fn)
   "Inserts all Org-roam nodes connected to the provided keywords and not connected to the exclude keywords.
@@ -860,14 +904,14 @@ and when nil is returned the node will be filtered out."
                                 all-nodes))
                (sorted-nodes (sort filtered-nodes
                                    (lambda (a b)
-                                     (let ((hierarchy-a (mapconcat #'identity (my/org-roam-insert-nodes-by-tags--get-node-heirarchy a) "->"))
-                                           (hierarchy-b (mapconcat #'identity (my/org-roam-insert-nodes-by-tags--get-node-heirarchy b) "->")))
+                                     (let ((hierarchy-a (mapconcat #'identity (my/org-roam--get-node-heirarchy a) my-org-roam-hierarchy-insert-separator))
+                                           (hierarchy-b (mapconcat #'identity (my/org-roam--get-node-heirarchy b) my-org-roam-hierarchy-insert-separator)))
                                        (string< hierarchy-a hierarchy-b))))))
           (dolist (node sorted-nodes)
             (let* ((id (org-roam-node-id node))
-                   (hierarchy (my/org-roam-insert-nodes-by-tags--get-node-heirarchy node))
+                   (hierarchy (my/org-roam--get-node-heirarchy node))
                    (arrow-chain (if (> (length hierarchy) 1)
-                                    (mapconcat #'identity hierarchy "->")
+                                    (mapconcat #'identity hierarchy my-org-roam-hierarchy-insert-separator)
                                   (org-roam-node-title node)))
                    (link (org-link-make-string (concat "id:" id) arrow-chain)))
               (insert link)
