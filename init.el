@@ -1423,4 +1423,5 @@ DIGITS is tre  number of pin digits and defaults to 6."
       (message "Your password for '%s' is: %s"
                (propertize (plist-get auth :host) 'face 'font-lock-keyword-face)
                (propertize password 'face 'font-lock-string-face)))))
+
 ;;; init.el ends here
