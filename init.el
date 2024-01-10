@@ -309,7 +309,7 @@
     (easy-menu-define my-auth-menu nil "My Authentication Menu"
       '("Auth-Sources"
         ["Get TOTP" my/totp-display t]
-        ["Get Password" my/pass-display t]))
+        ["Get Password" my/password-display t]))
 
     ;; Add the "Authentication" menu to the "Tools" menu
     (easy-menu-add-item nil '("tools") my-auth-menu "Games")
