@@ -155,6 +155,8 @@
 (use-package dired-sidebar
   :ensure t
   :config
+  ;; Make the window not fixed
+  (setq dired-sidebar-window-fixed nil)
   )
 
 ;;;;; Functions - Dired-sidebar Toggle
