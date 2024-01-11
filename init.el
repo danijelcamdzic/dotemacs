@@ -515,6 +515,23 @@ an org file."
       (org-agenda-todo)
     (org-todo)))
 
+(defun my/org-change-state-with-date ()
+  "Change state of the current heading and log with a chosen date."
+  (interactive)
+  (let ((selected-date (org-read-date nil t nil "Select Date:")))
+    (if selected-date
+        (progn
+          (setq my-time-override-lock t)
+          (my/time-adjust-time (format-time-string "<%Y-%m-%d %a>" selected-date))
+          (advice-add 'current-time :override #'my/time-override-current-time)
+          (if (eq major-mode 'org-agenda-mode)
+              (org-agenda-todo)
+            (org-todo))
+          (advice-remove 'current-time #'my/time-override-current-time)
+          (setq my-adjusted-time nil)
+          (setq my-time-override-lock nil))
+      (message "No date selected"))))
+
 (defun my/org-skip-all-overdue-tasks ()
   "Mark tasks scheduled for yesterday or earlier as SKIP and
 log them as changed on their scheduled date."
@@ -1261,7 +1278,7 @@ TIME is expected to be in Emacs internal time format."
 
 (defun my/time-override-current-time ()
   "Override for `current-time' using `my/time-adjust-time'."
-  (or my/time-adjust-time (current-time)))
+  (or my-adjusted-time (current-time)))
 
 ;;;; Time-stamp
 ;;;;; Configuration
