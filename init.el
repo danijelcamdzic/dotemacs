@@ -390,6 +390,9 @@ Keeps the time part unless it's exactly 00:00, in which case only the relative d
   ;; Display inline images on startup
   (setq org-startup-with-inline-images t)
 
+  ;; Set the width of the inline images to be the actual size
+  (setq org-image-actual-width t)
+  
   ;; Set path type to relative so it works on all platforms
   (setq org-link-file-path-type 'relative)
 
