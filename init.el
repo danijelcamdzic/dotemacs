@@ -825,7 +825,7 @@ org file on the year calendar."
   (org-roam-setup)
   )
 
-;;;; Functions - Node Hierarchy
+;;;;; Functions - Node Hierarchy
 (defun my/org-roam--get-node-heirarchy (node)
   "Get the hierarchy of NODE as a list of titles, excluding non-node headings.
 The hierarchy includes the NODE title and its ancestor node titles."
@@ -844,7 +844,7 @@ The hierarchy includes the NODE title and its ancestor node titles."
     (push title titles)
     (nreverse titles)))
 
-;;;; Functions - Node Display Formatting
+;;;;; Functions - Node Display Formatting
 (defvar my-org-roam-hierarchy-display-separator
   (propertize "->" 'face '(shadow))
   "Separator for org-roam hierarchy displaying.")
@@ -886,7 +886,7 @@ The hierarchy includes the NODE title and its ancestor node titles."
 (setq org-roam-node-display-template
       (concat "${hierarchy}" "${node-type}" (propertize "${colon-tags}" 'face 'org-tag)))
 
-;;;; Functions - Inserting Nodes by Tags
+;;;;; Functions - Inserting Nodes by Tags
 (defvar my-org-roam-hierarchy-insert-separator
   (propertize "->" 'face '(shadow))
   "Separator for org-roam hierarchy insertion.")
@@ -1251,7 +1251,7 @@ use filename."
 ;; Add advice so bookmarks will be properly opened
 (advice-add 'bookmark-jump :around #'my/bookmark-jump--modify-bookmark-path-advice)
 
-;;; Date and Time
+;;; Datetime
 ;;;; Functions - Relative Dates
 (defun my/time-relative-date (time)
   "Determines if the given TIME is 'today', 'yesterday', or 'tomorrow'.
