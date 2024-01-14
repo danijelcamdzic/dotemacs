@@ -266,7 +266,7 @@
     ;; Define "Packages" menu
     (easy-menu-define my/packages-center-menu nil "My Packages Menu"
       '("Packages"
-        ("Org"
+        ("Org-Mode"
          ("Schedule"
           ["Add" my/org-add-schedule t]
           ["Remove" my/org-remove-schedule t])
