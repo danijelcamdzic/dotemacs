@@ -511,6 +511,46 @@ an org file."
       (org-agenda-todo "FAIL")
     (org-todo "FAIL")))
 
+(defun my/org-log-done-and-add-schedule ()
+  "Mark current heading as DONE in the logbook but leave it as TODO
+and add a new schedule to it."
+  (interactive)
+  (if (eq major-mode 'org-agenda-mode)
+      (org-agenda-todo "DONE")
+    (org-todo "DONE"))
+  (my/org-log-todo)
+  (run-with-timer 0.1 nil 'my/org-add-schedule))
+
+(defun my/org-log-skip-and-add-schedule ()
+  "Mark current heading as SKIP in the logbook but leave it as TODO
+and add a new schedule to it."
+  (interactive)
+  (if (eq major-mode 'org-agenda-mode)
+      (org-agenda-todo "SKIP")
+    (org-todo "SKIP"))
+  (my/org-log-todo)
+  (run-with-timer 0.1 nil 'my/org-add-schedule))
+
+(defun my/org-log-fail-and-add-schedule ()
+  "Mark current heading as FAIL in the logbook but leave it as TODO
+and add a new schedule to it."
+  (interactive)
+  (if (eq major-mode 'org-agenda-mode)
+      (org-agenda-todo "FAIL")
+    (org-todo "FAIL"))
+  (my/org-log-todo)
+  (run-with-timer 0.1 nil 'my/org-add-schedule))
+
+(defun my/org-log-state-and-add-schedule ()
+  "Log state of a current heading in the logbook but leave it as TODO
+and add a new schedule to it."
+  (interactive)
+  (if (eq major-mode 'org-agenda-mode)
+      (org-agenda-todo)
+    (org-todo))
+  (my/org-log-todo)
+  (run-with-timer 0.1 nil 'my/org-add-schedule))
+
 (defun my/org-change-state ()
   "Change state of a current heading."
   (interactive)
