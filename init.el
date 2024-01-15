@@ -247,7 +247,7 @@
         dashboard-set-footer nil
         dashboard-set-init-info t
         dashboard-set-heading-icons t
-        dashboard-agenda-prefix-format "%-10:s %t"
+        dashboard-agenda-prefix-format "%s %t"
         dashboard-agenda-time-string-format "%Y-%m-%d %H:%M"
         dashboard-agenda-sort-strategy '(time-up))
   (add-to-list 'dashboard-items '(agenda) t)
@@ -392,52 +392,23 @@ an org file."
         (org-schedule '(4))))))
 
 ;;;;; Functions - State Change
-(defun dc/org-todo-state-todo ()
-  "Mark current heading as TODO. Does not log state change
-into the logbook."
-  (interactive)
-  (if (eq major-mode 'org-agenda-mode)
-      (org-agenda-todo "TODO")
-    (org-todo "TODO")))
-
-(defun dc/org-todo-state-doing ()
-  "Mark current heading as DOING. Log state change into
-logbook."
-  (interactive)
-  (if (eq major-mode 'org-agenda-mode)
-      (org-agenda-todo "DOING")
-    (org-todo "DOING")))
-
-(defun dc/org-todo-state-done ()
-  "Mark current heading as DONE. Log state change into
-logbook."
-  (interactive)
-  (if (eq major-mode 'org-agenda-mode)
-      (org-agenda-todo "DONE")
-    (org-todo "DONE")))
-
-(defun dc/org-todo-state-skip ()
-  "Mark current heading as SKIP. Log state change into
-logbook."
-  (interactive)
-  (if (eq major-mode 'org-agenda-mode)
-      (org-agenda-todo "SKIP")
-    (org-todo "SKIP")))
-
-(defun dc/org-todo-state-fail ()
-  "Mark current heading as FAIL. Log state change into
-logbook."
-  (interactive)
-  (if (eq major-mode 'org-agenda-mode)
-      (org-agenda-todo "FAIL")
-    (org-todo "FAIL")))
-
 (defun dc/org-todo-change-state ()
   "Change state of a current heading."
   (interactive)
   (if (eq major-mode 'org-agenda-mode)
       (org-agenda-todo)
     (org-todo)))
+
+(defun dc/org-todo-change-state-and-reschedule ()
+  "Change state of a current heading."
+  (interactive)
+  (if (eq major-mode 'org-agenda-mode)
+      (org-agenda-todo)
+    (org-todo))
+  (if (eq major-mode 'org-agenda-mode)
+      (org-agenda-todo "TODO")
+    (org-todo "TODO"))
+  (run-with-timer 0.1 nil 'dc/org-add-schedule))
 
 (defun dc/org-todo-change-state-with-date ()
   "Change state of the current heading and log with a chosen date."
@@ -456,29 +427,26 @@ logbook."
           (setq dc-time-override-lock nil))
       (message "No date selected"))))
 
-(defun dc/org-todo-log-done-and-reschedule ()
-  "Mark current heading as DONE in the logbook but leave it as TODO
-and add a new schedule to it."
+(defun dc/org-todo-change-state-with-date-and-reschedule ()
+  "Change state of the current heading and log with a chosen date."
   (interactive)
-  (dc/org-todo-state-done)
-  (dc/org-todo-state-todo)
-  (run-with-timer 0.1 nil 'dc/org-add-schedule))
-
-(defun dc/org-todo-log-skip-and-reschedule ()
-  "Mark current heading as SKIP in the logbook but leave it as TODO
-and add a new schedule to it."
-  (interactive)
-  (dc/org-todo-state-skip)
-  (dc/org-todo-state-todo)
-  (run-with-timer 0.1 nil 'dc/org-add-schedule))
-
-(defun dc/org-todo-log-fail-and-reschedule ()
-  "Mark current heading as FAIL in the logbook but leave it as TODO
-and add a new schedule to it."
-  (interactive)
-  (dc/org-todo-state-fail)
-  (dc/org-todo-state-todo)
-  (run-with-timer 0.1 nil 'dc/org-add-schedule))
+  (let ((selected-date (org-read-date nil t nil "Select Date:")))
+    (if selected-date
+        (progn
+          (setq dc-time-override-lock t)
+          (dc/time-adjust-time (format-time-string "<%Y-%m-%d %a>" selected-date))
+          (advice-add 'current-time :override #'dc/time-override-current-time)
+          (if (eq major-mode 'org-agenda-mode)
+              (org-agenda-todo)
+            (org-todo))
+          (if (eq major-mode 'org-agenda-mode)
+              (org-agenda-todo "TODO")
+            (org-todo "TODO"))
+          (run-with-timer 0.1 nil 'dc/org-add-schedule)
+          (advice-remove 'current-time #'dc/time-override-current-time)
+          (setq dc-adjusted-time nil)
+          (setq dc-time-override-lock nil))
+      (message "No date selected"))))
 
 (defun dc/org-todo-skip-all-overdue-tasks ()
   "Mark tasks scheduled for yesterday or earlier as SKIP and
@@ -666,13 +634,6 @@ org file on the year calendar."
   ;; Bind GUI emacs "Enter" clicks
   (define-key calendar-mode-map (kbd "<return>") 'dc/org-logbook--goto-entry))
 
-;;;; Org-timeline
-;;;;; Configuration
-(use-package org-timeline
-  :ensure t
-  :after org
-  )
-
 ;;;; Org-agenda
 ;;;;; Configuration
 (use-package org-agenda
@@ -708,11 +669,9 @@ org file on the year calendar."
         (unless (eq org-agenda-type 'agenda)
           (org-agenda-exit)
           (org-agenda-list))
-        (run-with-idle-timer 0.1 nil view-fn)
-        (run-with-idle-timer 0.1 nil 'org-timeline-insert-timeline))
+        (run-with-idle-timer 0.1 nil view-fn))
     (org-agenda-list)
-    (run-with-idle-timer 0.1 nil view-fn)
-    (run-with-idle-timer 0.1 nil 'org-timeline-insert-timeline)))
+    (run-with-idle-timer 0.1 nil view-fn)))
 
 (defun dc/org-agenda-day-view ()
   "Switch to the Org Agenda daily view from anywhere in Emacs."
