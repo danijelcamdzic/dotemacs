@@ -666,6 +666,13 @@ org file on the year calendar."
   ;; Bind GUI emacs "Enter" clicks
   (define-key calendar-mode-map (kbd "<return>") 'dc/org-logbook--goto-entry))
 
+;;;; Org-timeline
+;;;;; Configuration
+(use-package org-timeline
+  :ensure t
+  :after org
+  )
+
 ;;;; Org-agenda
 ;;;;; Configuration
 (use-package org-agenda
@@ -695,15 +702,17 @@ org file on the year calendar."
 
 ;;;;; Functions - Agenda Views
 (defun dc/org-agenda--switch-to-view (view-fn)
-  "Switch to the given Org Agenda view function VIEW-FN."
+  "Switch to the given Org Agenda view function VIEW-FN and insert timeline."
   (if (eq major-mode 'org-agenda-mode)
       (progn
         (unless (eq org-agenda-type 'agenda)
           (org-agenda-exit)
           (org-agenda-list))
-        (run-with-idle-timer 0.1 nil view-fn))
+        (run-with-idle-timer 0.1 nil view-fn)
+        (run-with-idle-timer 0.1 nil 'org-timeline-insert-timeline))
     (org-agenda-list)
-    (run-with-idle-timer 0.1 nil view-fn)))
+    (run-with-idle-timer 0.1 nil view-fn)
+    (run-with-idle-timer 0.1 nil 'org-timeline-insert-timeline)))
 
 (defun dc/org-agenda-day-view ()
   "Switch to the Org Agenda daily view from anywhere in Emacs."
