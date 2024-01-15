@@ -248,6 +248,7 @@
         dashboard-set-init-info t
         dashboard-set-heading-icons t
         dashboard-agenda-prefix-format "%s %t"
+        dashboard-agenda-tags-format 'ignore
         dashboard-agenda-time-string-format "%Y-%m-%d %H:%M"
         dashboard-agenda-sort-strategy '(time-up))
   (add-to-list 'dashboard-items '(agenda) t)
@@ -789,11 +790,11 @@ The hierarchy includes the NODE title and its ancestor node titles."
   "Return a string which indicates whether a node is a `@note' or a `@daily'."
   (let ((file-path (org-roam-node-file node)))
     (cond
-      ((string-prefix-p (file-name-as-directory org-roam-directory) (file-name-directory file-path))
-       " @note")
-      ((string-prefix-p (file-name-as-directory org-roam-dailies-directory) (file-name-directory file-path))
-       " @daily")
-      (t ""))))
+     ((string-prefix-p (file-name-as-directory org-roam-directory) (file-name-directory file-path))
+      " @note")
+     ((string-prefix-p (file-name-as-directory org-roam-dailies-directory) (file-name-directory file-path))
+      " @daily")
+     (t ""))))
 
 ;; Set the hierarchy display formatting
 (setq org-roam-node-display-template
@@ -909,7 +910,7 @@ Android port."
   
   ;; Use non-greedy regular expression
   (setq org-alert-time-match-string
-      "\\(?:SCHEDULED\\|DEADLINE\\):.*?<.*?\\([0-9]\\{2\\}:[0-9]\\{2\\}\\(?:-[0-9]\\{2\\}:[0-9]\\{2\\}\\)?\\).*")
+        "\\(?:SCHEDULED\\|DEADLINE\\):.*?<.*?\\([0-9]\\{2\\}:[0-9]\\{2\\}\\(?:-[0-9]\\{2\\}:[0-9]\\{2\\}\\)?\\).*")
   
   ;; Enable org-alert
   (org-alert-enable)
