@@ -157,12 +157,18 @@ if you don't find this useful.
 
 ** GUI
 
+*Update*: 2024-01-15 Mon 15:18 I have removed most of GUI options from my workflow
+in order to change some stuff out. The last commit that had all of it in there
+is
+https://github.com/danijelcamdzic/dotemacs/tree/041706b0172ab30b5e18f31eac3d48b125fb4fc9
+so check that one out if you want to see GUI elements in Android and Linux.
+
 In this section, I configure the GUI options in Emacs. I need GUI because I don't
 like using the keyboard shortcuts on Android Emacs and would like all options to be
 available through the GUI menu.
 
 For Linux/Windows I do not like seeing the GUI and so I automatically hide
-it. You can remove the line which calls the =my/gui-hide-bars= function if you don't
+it. You can remove the line which calls the =dc/gui-hide-bars= function if you don't
 want this.
 
 *** Android GUI shortcuts
@@ -213,7 +219,7 @@ and their respective colors as this:
 #+end_src
 
 To visualize the states on the calendar one must simply call the function
-=my/org-logbook-display-states-on-calendar=. It can be used to visualize both
+=dc/org-logbook-display-states-on-calendar=. It can be used to visualize both
 habit like =TODOs= as well as =TODOs= which are supposed to be done over a
 longer period of time.
 
@@ -222,7 +228,7 @@ longer period of time.
 [[assets/todo-gym.png]]
 [[assets/calendar-gym.png]]
 
-In the same manner, you can call the =my/org-logbook-display-notes-on-calendar= and you will see
+In the same manner, you can call the =dc/org-logbook-display-notes-on-calendar= and you will see
 with green dates all the dates that you have made a note in.
 
 You can even go to the place where the =STATE= or =NOTE= was added by clicking on
@@ -230,7 +236,7 @@ the calendar date.
 
 *** Org Roam Nodes with Tag Insertion
 
-There is a function called =my/org-roam-insert-nodes-by-tags=, which enables you to
+There is a function called =dc/org-roam-insert-nodes-by-tags=, which enables you to
 insert in the org file all nodes that have certain tags but do not have other
 tags you specify.
 
@@ -289,7 +295,7 @@ this:
 #+begin_src emacs-lisp
 (require 'alert)
 
-(defun my/alert-android-notifications-notify (info)
+(defun dc/alert-android-notifications-notify (info)
   "Send notifications using `android-notifications-notify'.
 `android-notifications-notify' is a built-in function in the native Emacs
 Android port."
@@ -307,7 +313,7 @@ Android port."
      :replaces-id replaces-id)))
 
 (alert-define-style 'android-notifications :title "Android Notifications"
-                    :notifier #'my/alert-android-notifications-notify)
+                    :notifier #'dc/alert-android-notifications-notify)
 #+end_src
 
 Whether on Android or Linux, I will now get my notifications using the same
@@ -390,7 +396,7 @@ the notification title type.
 #+begin_src emacs-lisp
 (setq my-org-alert-title-type 'parent)
 ;; Update to set up or remove advices based on my-org-alert-title-type
-(my/org-alert-update-advices)
+(dc/org-alert-update-advices)
 #+end_src
 
 We have now set the parent mode and we can see the result:
