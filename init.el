@@ -941,7 +941,7 @@ Android port."
   
   ;; Use non-greedy regular expression
   (setq org-alert-time-match-string
-        "\\(?:SCHEDULED\\|DEADLINE\\):.*?<.*?\\([0-9]\\{2\\}:[0-9]\\{2\\}\\).*>")
+      "\\(?:SCHEDULED\\|DEADLINE\\):.*?<.*?\\([0-9]\\{2\\}:[0-9]\\{2\\}\\(?:-[0-9]\\{2\\}:[0-9]\\{2\\}\\)?\\).*")
   
   ;; Enable org-alert
   (org-alert-enable)
