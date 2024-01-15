@@ -271,19 +271,24 @@
           ["Add" my/org-add-schedule t]
           ["Remove" my/org-remove-schedule t])
          ("States"
-          ["Log as TODO" my/org-log-todo t]
-          ["Log as DOING" my/org-log-doing t]
-          ["Log as DONE" my/org-log-done t]
-          ["Log as SKIP" my/org-log-skip t]
-          ["Log as FAIL" my/log-log-fail t]
-          ["Change State" my/org-change-state t]
-          ["Skip all Overdue" my/org-skip-all-overdue-tasks t]
+          ["State as TODO" my/org-todo-state-todo t]
+          ["State as DOING" my/org-todo-state-doing t]
+          ["State as DONE" my/org-todo-state-done t]
+          ["State as SKIP" my/org-todo-state-skip t]
+          ["State as FAIL" my/org-todo-state-fail t]
+          ["Change State" my/org-todo-change-state t]
+          ["Change State with Date" my/org-todo-change-state-with-date t]
+          ["Log as DONE and Reschedule" my/org-todo-log-done-and-reschedule t]
+          ["Log as SKIP and Reschedule" my/org-todo-log-skip-and-reschedule t]
+          ["Log as SKIP all Overdue" my/org-todo-skip-all-overdue-tasks t]
+          ["Log as FAIL and Reschedule" my/org-todo-log-fail-and-reschedule t]
           ["Show States in Calendar" my/org-logbook-display-states-on-calendar t])
-         ("Clock"
+         ("Clocks"
           ["Clock In" my/org-clock-in t]
           ["Clock Out" my/org-clock-out t]
+          ["Resolve Clocks" org-resolve-clocks t]
           ["Display Clocks" org-clock-display]
-          ["Show Clock Analysis" org-analyzer-start t])
+          ["Open Clock Analyzer" org-analyzer-start t])
          ("Notes"
           ["Add Note" my/org-add-note t]
           ["Show Notes in Calendar" my/org-logbook-display-notes-on-calendar t]))
@@ -298,9 +303,7 @@
           ["Find Date" org-roam-dailies-find-date t])
          ("Nodes"
           ["Find Node" org-roam-node-find t]
-          ["Open Graph" org-roam-ui-open t]))
-        ("Bookmarks"
-         ["List Bookmarks" list-bookmarks t])))
+          ["Open Graph" org-roam-ui-open t]))))
 
     ;; Add the packages center menu to the toolbar to the left of "Tools" section
     (easy-menu-add-item global-map '("menu-bar") my/packages-center-menu "Tools")
@@ -476,89 +479,54 @@ an org file."
         (org-schedule '(4))))))
 
 ;;;;; Functions - State Change
-(defun my/org-log-todo ()
-  "Mark current heading as TODO"
+(defun my/org-todo-state-todo ()
+  "Mark current heading as TODO. Does not log state change
+into the logbook."
   (interactive)
   (if (eq major-mode 'org-agenda-mode)
       (org-agenda-todo "TODO")
     (org-todo "TODO")))
 
-(defun my/org-log-doing ()
-  "Mark current heading as DOING"
+(defun my/org-todo-state-doing ()
+  "Mark current heading as DOING. Log state change into
+logbook."
   (interactive)
   (if (eq major-mode 'org-agenda-mode)
       (org-agenda-todo "DOING")
     (org-todo "DOING")))
 
-(defun my/org-log-done ()
-  "Mark current heading as DONE"
+(defun my/org-todo-state-done ()
+  "Mark current heading as DONE. Log state change into
+logbook."
   (interactive)
   (if (eq major-mode 'org-agenda-mode)
       (org-agenda-todo "DONE")
     (org-todo "DONE")))
 
-(defun my/org-log-skip ()
-  "Mark current heading as SKIP"
+(defun my/org-todo-state-skip ()
+  "Mark current heading as SKIP. Log state change into
+logbook."
   (interactive)
   (if (eq major-mode 'org-agenda-mode)
       (org-agenda-todo "SKIP")
     (org-todo "SKIP")))
 
-(defun my/org-log-fail ()
-  "Mark current heading as FAIL"
+(defun my/org-todo-state-fail ()
+  "Mark current heading as FAIL. Log state change into
+logbook."
   (interactive)
   (if (eq major-mode 'org-agenda-mode)
       (org-agenda-todo "FAIL")
     (org-todo "FAIL")))
 
-(defun my/org-log-done-and-add-schedule ()
-  "Mark current heading as DONE in the logbook but leave it as TODO
-and add a new schedule to it."
-  (interactive)
-  (if (eq major-mode 'org-agenda-mode)
-      (org-agenda-todo "DONE")
-    (org-todo "DONE"))
-  (my/org-log-todo)
-  (run-with-timer 0.1 nil 'my/org-add-schedule))
-
-(defun my/org-log-skip-and-add-schedule ()
-  "Mark current heading as SKIP in the logbook but leave it as TODO
-and add a new schedule to it."
-  (interactive)
-  (if (eq major-mode 'org-agenda-mode)
-      (org-agenda-todo "SKIP")
-    (org-todo "SKIP"))
-  (my/org-log-todo)
-  (run-with-timer 0.1 nil 'my/org-add-schedule))
-
-(defun my/org-log-fail-and-add-schedule ()
-  "Mark current heading as FAIL in the logbook but leave it as TODO
-and add a new schedule to it."
-  (interactive)
-  (if (eq major-mode 'org-agenda-mode)
-      (org-agenda-todo "FAIL")
-    (org-todo "FAIL"))
-  (my/org-log-todo)
-  (run-with-timer 0.1 nil 'my/org-add-schedule))
-
-(defun my/org-log-state-and-add-schedule ()
-  "Log state of a current heading in the logbook but leave it as TODO
-and add a new schedule to it."
-  (interactive)
-  (if (eq major-mode 'org-agenda-mode)
-      (org-agenda-todo)
-    (org-todo))
-  (my/org-log-todo)
-  (run-with-timer 0.1 nil 'my/org-add-schedule))
-
-(defun my/org-change-state ()
+(defun my/org-todo-change-state ()
   "Change state of a current heading."
   (interactive)
   (if (eq major-mode 'org-agenda-mode)
       (org-agenda-todo)
     (org-todo)))
 
-(defun my/org-change-state-with-date ()
+(defun my/org-todo-change-state-with-date ()
   "Change state of the current heading and log with a chosen date."
   (interactive)
   (let ((selected-date (org-read-date nil t nil "Select Date:")))
@@ -575,7 +543,31 @@ and add a new schedule to it."
           (setq my-time-override-lock nil))
       (message "No date selected"))))
 
-(defun my/org-skip-all-overdue-tasks ()
+(defun my/org-todo-log-done-and-reschedule ()
+  "Mark current heading as DONE in the logbook but leave it as TODO
+and add a new schedule to it."
+  (interactive)
+  (my/org-todo-state-done)
+  (my/org-todo-state-todo)
+  (run-with-timer 0.1 nil 'my/org-add-schedule))
+
+(defun my/org-todo-log-skip-and-reschedule ()
+  "Mark current heading as SKIP in the logbook but leave it as TODO
+and add a new schedule to it."
+  (interactive)
+  (my/org-todo-state-skip)
+  (my/org-todo-state-todo)
+  (run-with-timer 0.1 nil 'my/org-add-schedule))
+
+(defun my/org-todo-log-fail-and-reschedule ()
+  "Mark current heading as FAIL in the logbook but leave it as TODO
+and add a new schedule to it."
+  (interactive)
+  (my/org-todo-state-fail)
+  (my/org-todo-state-todo)
+  (run-with-timer 0.1 nil 'my/org-add-schedule))
+
+(defun my/org-todo-skip-all-overdue-tasks ()
   "Mark tasks scheduled for yesterday or earlier as SKIP and
 log them as changed on their scheduled date."
   (interactive)
