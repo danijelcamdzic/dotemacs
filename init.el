@@ -1,7 +1,6 @@
 ;;; init.el -- Personal configuration file for Emacs
 
 ;;; Code:
-
 ;;; User
 ;;;; User Credentials
 ;; User name and email
@@ -10,21 +9,21 @@
 
 ;;;; User Directories
 ;; Define the home directories variables
-(defvar my-android-home "/storage/emulated/0/")
-(defvar my-gnu-linux-home "~/")
-(defvar my-gnu-linux-home-extended "/home/danijelcamdzic/")
+(defvar dc-android-home "/storage/emulated/0/")
+(defvar dc-gnu-linux-home "~/")
+(defvar dc-gnu-linux-home-extended "/home/danijelcamdzic/")
 
 ;; Set the home directory based on system type
-(setq my-home-directory
+(setq dc-home-directory
       (cond
-       ((eq system-type 'gnu/linux) my-gnu-linux-home-extended)
-       ((eq system-type 'android) my-android-home)
-       (t my-gnu-linux-home)))
+       ((eq system-type 'gnu/linux) dc-gnu-linux-home-extended)
+       ((eq system-type 'android) dc-android-home)
+       (t dc-gnu-linux-home)))
 
 ;; Set the user folders
-(setq my-books-directory (concat my-home-directory "Books/"))
-(setq my-notes-directory (concat my-home-directory "Notes/"))
-(setq my-documents-directory (concat my-home-directory "Documents/"))
+(setq dc-books-directory (concat dc-home-directory "Books/"))
+(setq dc-notes-directory (concat dc-home-directory "Notes/"))
+(setq dc-documents-directory (concat dc-home-directory "Documents/"))
 
 ;;; Package Managers
 ;;;; Melpa
@@ -113,12 +112,12 @@
 
 ;;;; Programming
 ;;;;; C/Cpp
-(defun my/c-cpp-mode-setup ()
+(defun dc/c-cpp-mode-setup ()
   "Set basic c and cpp offset."
   (setq c-basic-offset 4))
 
 ;; Set hook to set indentation when in c/cpp file
-(add-hook 'c-mode-common-hook 'my/c-cpp-mode-setup)
+(add-hook 'c-mode-common-hook 'dc/c-cpp-mode-setup)
 
 ;; Disable line numbers
 (global-display-line-numbers-mode 0)
@@ -144,7 +143,7 @@
   )
 
 ;;;;; Functions - IBuffer-sidebar Toggle
-(defun my/ibuffer-sidebar-toggle ()
+(defun dc/ibuffer-sidebar-toggle ()
   "Toggle `ibuffer-sidebar'"
   (interactive)
   (ibuffer-sidebar-toggle-sidebar)
@@ -160,7 +159,7 @@
   )
 
 ;;;;; Functions - Dired-sidebar Toggle
-(defun my/dired-sidebar-toggle ()
+(defun dc/dired-sidebar-toggle ()
   "Toggle `dired-sidebar'"
   (interactive)
   (dired-sidebar-toggle-sidebar)
@@ -217,23 +216,23 @@
 
 ;;; GUI
 ;;;; Functions: GUI Display Show/Hide
-(defun my/gui-hide-bars ()
+(defun dc/gui-hide-bars ()
   "Disable scroll bar, menu bar, and tool bar."
   (interactive)
   (scroll-bar-mode -1)
   (menu-bar-mode -1)
   (tool-bar-mode -1))
 
-(defun my/gui-show-bars ()
+(defun dc/gui-show-bars ()
   "Enable scroll bar, menu bar, and tool bar."
   (interactive)
   (scroll-bar-mode 1)
   (menu-bar-mode 1)
   (tool-bar-mode 1))
 
-;; Hide GUI on startup if in LINUX mode
+;; Hide GUI on startup if on Linux
 (when (eq system-type 'gnu/linux)
-  (my/gui-hide-bars))
+  (dc/gui-hide-bars))
 
 ;;; Dashboard
 ;;;; Configuration
@@ -258,13 +257,13 @@
   )
 
 ;;;; Functions - Agenda Dashboard Relative Days
-(defun my/dashboard-agenda--formatted-time--use-relative-days-advice (orig-fun &rest args)
+(defun dc/dashboard-agenda--formatted-time--use-relative-days-advice (orig-fun &rest args)
   "Modifies the display of time in the dashboard agenda.
 If the time corresponds to 'today', 'yesterday', or 'tomorrow', it replaces the date with these words.
 Keeps the time part unless it's exactly 00:00, in which case only the relative date is displayed."
   (let* ((original-time-string (apply orig-fun args))
          (entry-time (org-get-scheduled-time (point)))
-         (relative-date (my/time-relative-date entry-time))
+         (relative-date (dc/time-relative-date entry-time))
          (time-part (format-time-string "%H:%M" entry-time))
          (time-is-midnight (string= time-part "00:00")))
     (if relative-date
@@ -274,7 +273,7 @@ Keeps the time part unless it's exactly 00:00, in which case only the relative d
       original-time-string)))
 
 ;; Add advice to change the date format of agenda items to 'yesterday', 'today' or 'tomorrow'
-(advice-add 'dashboard-agenda--formatted-time :around #'my/dashboard-agenda--formatted-time--use-relative-days-advice)
+(advice-add 'dashboard-agenda--formatted-time :around #'dc/dashboard-agenda--formatted-time--use-relative-days-advice)
 
 ;;; Org-mode
 ;;;; Org
@@ -283,7 +282,7 @@ Keeps the time part unless it's exactly 00:00, in which case only the relative d
   :ensure t
   :config
   ;; Set org directory
-  (setq org-directory my-notes-directory)
+  (setq org-directory dc-notes-directory)
 
   ;; Set org-mode preferences for buffer display
   (setq org-startup-indented t)
@@ -332,30 +331,30 @@ Keeps the time part unless it's exactly 00:00, in which case only the relative d
         '((sequence "TODO(t)" "DOING(i!)" "|" "DONE(d!)" "SKIP(s!)" "FAIL(f!)")))
   )
 
+;;;;; Functions - Datetime Insertion
+(defun dc/org-insert-current-date-time ()
+  "Insert the current date and time along with the three-letter weekday name in
+the format YYYY-MM-DD Day H:M."
+  (interactive)
+  (insert (format-time-string "%Y-%m-%d %a %H:%M")))
+
 ;;;;; Functions - Clocking
-(defun my/org-clock-in ()
+(defun dc/org-clock-in ()
   "Clock in the current org heading."
   (interactive)
   (if (eq major-mode 'org-agenda-mode)
       (org-agenda-clock-in)
     (org-clock-in)))
 
-(defun my/org-clock-out ()
+(defun dc/org-clock-out ()
   "Clock out of the current org heading."
   (interactive)
   (if (eq major-mode 'org-agenda-mode)
       (org-agenda-clock-out)
     (org-clock-out)))
 
-;;;;; Functions - Datetime Insertion
-(defun my/org-insert-current-date-time ()
-  "Insert the current date and time along with the three-letter weekday name in
-the format YYYY-MM-DD Day H:M."
-  (interactive)
-  (insert (format-time-string "%Y-%m-%d %a %H:%M")))
-
 ;;;;; Functions - Scheduling
-(defun my/org-add-schedule ()
+(defun dc/org-add-schedule ()
   "Add a scheduling timestamp to the current item in the Org Agenda or in
 an org file."
   (interactive)
@@ -372,7 +371,7 @@ an org file."
             (call-interactively 'org-schedule))))
     (call-interactively 'org-schedule)))
 
-(defun my/org-remove-schedule ()
+(defun dc/org-remove-schedule ()
   "Remove the scheduling timestamp from the current item in the Org Agenda
     or in an org file."
   (interactive)
@@ -393,7 +392,7 @@ an org file."
         (org-schedule '(4))))))
 
 ;;;;; Functions - State Change
-(defun my/org-todo-state-todo ()
+(defun dc/org-todo-state-todo ()
   "Mark current heading as TODO. Does not log state change
 into the logbook."
   (interactive)
@@ -401,7 +400,7 @@ into the logbook."
       (org-agenda-todo "TODO")
     (org-todo "TODO")))
 
-(defun my/org-todo-state-doing ()
+(defun dc/org-todo-state-doing ()
   "Mark current heading as DOING. Log state change into
 logbook."
   (interactive)
@@ -409,7 +408,7 @@ logbook."
       (org-agenda-todo "DOING")
     (org-todo "DOING")))
 
-(defun my/org-todo-state-done ()
+(defun dc/org-todo-state-done ()
   "Mark current heading as DONE. Log state change into
 logbook."
   (interactive)
@@ -417,7 +416,7 @@ logbook."
       (org-agenda-todo "DONE")
     (org-todo "DONE")))
 
-(defun my/org-todo-state-skip ()
+(defun dc/org-todo-state-skip ()
   "Mark current heading as SKIP. Log state change into
 logbook."
   (interactive)
@@ -425,7 +424,7 @@ logbook."
       (org-agenda-todo "SKIP")
     (org-todo "SKIP")))
 
-(defun my/org-todo-state-fail ()
+(defun dc/org-todo-state-fail ()
   "Mark current heading as FAIL. Log state change into
 logbook."
   (interactive)
@@ -433,55 +432,55 @@ logbook."
       (org-agenda-todo "FAIL")
     (org-todo "FAIL")))
 
-(defun my/org-todo-change-state ()
+(defun dc/org-todo-change-state ()
   "Change state of a current heading."
   (interactive)
   (if (eq major-mode 'org-agenda-mode)
       (org-agenda-todo)
     (org-todo)))
 
-(defun my/org-todo-change-state-with-date ()
+(defun dc/org-todo-change-state-with-date ()
   "Change state of the current heading and log with a chosen date."
   (interactive)
   (let ((selected-date (org-read-date nil t nil "Select Date:")))
     (if selected-date
         (progn
-          (setq my-time-override-lock t)
-          (my/time-adjust-time (format-time-string "<%Y-%m-%d %a>" selected-date))
-          (advice-add 'current-time :override #'my/time-override-current-time)
+          (setq dc-time-override-lock t)
+          (dc/time-adjust-time (format-time-string "<%Y-%m-%d %a>" selected-date))
+          (advice-add 'current-time :override #'dc/time-override-current-time)
           (if (eq major-mode 'org-agenda-mode)
               (org-agenda-todo)
             (org-todo))
-          (advice-remove 'current-time #'my/time-override-current-time)
-          (setq my-adjusted-time nil)
-          (setq my-time-override-lock nil))
+          (advice-remove 'current-time #'dc/time-override-current-time)
+          (setq dc-adjusted-time nil)
+          (setq dc-time-override-lock nil))
       (message "No date selected"))))
 
-(defun my/org-todo-log-done-and-reschedule ()
+(defun dc/org-todo-log-done-and-reschedule ()
   "Mark current heading as DONE in the logbook but leave it as TODO
 and add a new schedule to it."
   (interactive)
-  (my/org-todo-state-done)
-  (my/org-todo-state-todo)
-  (run-with-timer 0.1 nil 'my/org-add-schedule))
+  (dc/org-todo-state-done)
+  (dc/org-todo-state-todo)
+  (run-with-timer 0.1 nil 'dc/org-add-schedule))
 
-(defun my/org-todo-log-skip-and-reschedule ()
+(defun dc/org-todo-log-skip-and-reschedule ()
   "Mark current heading as SKIP in the logbook but leave it as TODO
 and add a new schedule to it."
   (interactive)
-  (my/org-todo-state-skip)
-  (my/org-todo-state-todo)
-  (run-with-timer 0.1 nil 'my/org-add-schedule))
+  (dc/org-todo-state-skip)
+  (dc/org-todo-state-todo)
+  (run-with-timer 0.1 nil 'dc/org-add-schedule))
 
-(defun my/org-todo-log-fail-and-reschedule ()
+(defun dc/org-todo-log-fail-and-reschedule ()
   "Mark current heading as FAIL in the logbook but leave it as TODO
 and add a new schedule to it."
   (interactive)
-  (my/org-todo-state-fail)
-  (my/org-todo-state-todo)
-  (run-with-timer 0.1 nil 'my/org-add-schedule))
+  (dc/org-todo-state-fail)
+  (dc/org-todo-state-todo)
+  (run-with-timer 0.1 nil 'dc/org-add-schedule))
 
-(defun my/org-todo-skip-all-overdue-tasks ()
+(defun dc/org-todo-skip-all-overdue-tasks ()
   "Mark tasks scheduled for yesterday or earlier as SKIP and
 log them as changed on their scheduled date."
   (interactive)
@@ -494,17 +493,17 @@ log them as changed on their scheduled date."
             (when (and scheduled-time
                        (< (time-to-days scheduled-time)
                           (time-to-days (current-time))))
-              (unless my-time-override-lock
-                (setq my-time-override-lock t)
-                (my/time-adjust-time (format-time-string "<%Y-%m-%d %a>" scheduled-time))
-                (advice-add 'current-time :override #'my/time-override-current-time)
+              (unless dc-time-override-lock
+                (setq dc-time-override-lock t)
+                (dc/time-adjust-time (format-time-string "<%Y-%m-%d %a>" scheduled-time))
+                (advice-add 'current-time :override #'dc/time-override-current-time)
                 (org-todo "SKIP")
-                (advice-remove 'current-time #'my/time-override-current-time)
-                (setq my-adjusted-time nil)
-                (setq my-time-override-lock nil)))))))))
+                (advice-remove 'current-time #'dc/time-override-current-time)
+                (setq dc-adjusted-time nil)
+                (setq dc-time-override-lock nil)))))))))
 
 ;;;;; Functions - Notes
-(defun my/org-add-note ()
+(defun dc/org-add-note ()
   "Add a note to an org heading."
   (interactive)
   (if (eq major-mode 'org-agenda-mode)
@@ -512,7 +511,7 @@ log them as changed on their scheduled date."
     (org-add-note)))
 
 ;;;;; Functions - Logbook Calendar Display
-(defun my/org-logbook--parse-logbook-states (logbook beg buffer)
+(defun dc/org-logbook--parse-logbook-states (logbook beg buffer)
   "Parse a logbook string and return a list of entries with states."
   (let ((lines (split-string logbook "\n" t))
         (line-start-pos beg)
@@ -527,7 +526,7 @@ log them as changed on their scheduled date."
           (push (list state date entry-begin-pos buffer) entries)))
       (setq line-start-pos (+ line-start-pos (length line) 1)))))
 
-(defun my/org-logbook--parse-logbook-notes (logbook beg buffer)
+(defun dc/org-logbook--parse-logbook-notes (logbook beg buffer)
   "Parse a logbook string and return a list of entries with notes."
   (let ((lines (split-string logbook "\n" t))
         (line-start-pos beg)
@@ -541,23 +540,23 @@ log them as changed on their scheduled date."
           (push (list "NOTE" date entry-begin-pos buffer) entries)))
       (setq line-start-pos (+ line-start-pos (length line) 1)))))
 
-(defvar my-logbook-calendar-view-active nil
+(defvar dc-logbook-calendar-view-active nil
   "Flag to indicate if the custom TODO calendar view is active.")
 
-(defun my/org-logbook--reset-calendar-view-flag ()
+(defun dc/org-logbook--reset-calendar-view-flag ()
   "Reset the  calendar view flag."
-  (setq my-logbook-calendar-view-active nil))
+  (setq dc-logbook-calendar-view-active nil))
 
 ;; Define custom faces for different TODO states
-(defface my-mark-DONE '((t :background "#006400")) "")
-(defface my-mark-SKIP '((t :background "#999900")) "")
-(defface my-mark-FAIL '((t :background "#8B0000")) "")
-(defface my-mark-DOING '((t :background "#4B0082")) "")
-(defface my-mark-NOTE '((t :background "#006400")) "")
+(defface dc-mark-DONE '((t :background "#006400")) "")
+(defface dc-mark-SKIP '((t :background "#999900")) "")
+(defface dc-mark-FAIL '((t :background "#8B0000")) "")
+(defface dc-mark-DOING '((t :background "#4B0082")) "")
+(defface dc-mark-NOTE '((t :background "#006400")) "")
 
-(defun my/org-logbook--mark-calendar-dates (entries)
+(defun dc/org-logbook--mark-calendar-dates (entries)
   "Mark days in the calendar for each entry in ENTRIES."
-  (setq my-logbook-marked-entries entries)
+  (setq dc-logbook-marked-entries entries)
   (let ((last-date (current-time)))
     (dolist (entry entries)
       (let* ((state (car entry))
@@ -565,26 +564,26 @@ log them as changed on their scheduled date."
              (next-entry (cadr (member entry entries)))
              (end-date (if next-entry (cadr next-entry) last-date)))
         (when (calendar-date-is-visible-p date)
-          (calendar-mark-visible-date date (intern (concat "my-mark-" state))))
+          (calendar-mark-visible-date date (intern (concat "dc-mark-" state))))
         (when (string= state "DOING")
           (let ((current-date date))
             (while (and (not (equal current-date end-date))
                         (calendar-date-is-visible-p current-date))
-              (calendar-mark-visible-date current-date 'my-mark-DOING)
+              (calendar-mark-visible-date current-date 'dc-mark-DOING)
               (setq current-date (calendar-gregorian-from-absolute
                                   (+ 1 (calendar-absolute-from-gregorian current-date)))))))))))
 
-(defun my/org-logbook--mark-calendar-date-reapply ()
+(defun dc/org-logbook--mark-calendar-date-reapply ()
   "Reapply markings to the calendar."
-  (when my-logbook-calendar-view-active
-    (my/org-logbook--mark-calendar-dates my-logbook-marked-entries)))
+  (when dc-logbook-calendar-view-active
+    (dc/org-logbook--mark-calendar-dates dc-logbook-marked-entries)))
 
-(defun my/org-logbook-display-states-on-calendar ()
+(defun dc/org-logbook-display-states-on-calendar ()
   "Show the state history of the heading at point in the org-agenda buffer or an
 org file on the year calendar."
   (interactive)
-  (setq my-logbook-calendar-view-active t)
-  (setq my-logbook-marked-entries '())
+  (setq dc-logbook-calendar-view-active t)
+  (setq dc-logbook-marked-entries '())
   (let* ((marker (if (eq major-mode 'org-agenda-mode)
                      (or (org-get-at-bol 'org-marker)
                          (org-agenda-error))
@@ -605,16 +604,16 @@ org file on the year calendar."
                    (setq end (line-beginning-position)))
               (progn
                 (setq logbook (buffer-substring-no-properties beg end))
-                (setq entries (my/org-logbook--parse-logbook-states logbook beg buffer))
+                (setq entries (dc/org-logbook--parse-logbook-states logbook beg buffer))
                 (calendar)
-                (my/org-logbook--mark-calendar-dates entries))
+                (dc/org-logbook--mark-calendar-dates entries))
             (error "No LOGBOOK found for this TODO.")))))))
 
-(defun my/org-logbook-display-notes-on-calendar ()
+(defun dc/org-logbook-display-notes-on-calendar ()
   "Show the notes of the heading at point in the org-agenda buffer or an org file on the year calendar."
   (interactive)
-  (setq my-logbook-calendar-view-active t)
-  (setq my-logbook-marked-entries '())
+  (setq dc-logbook-calendar-view-active t)
+  (setq dc-logbook-marked-entries '())
   (let* ((marker (if (eq major-mode 'org-agenda-mode)
                      (or (org-get-at-bol 'org-marker)
                          (org-agenda-error))
@@ -635,16 +634,16 @@ org file on the year calendar."
                    (setq end (line-beginning-position)))
               (progn
                 (setq logbook (buffer-substring-no-properties beg end))
-                (setq entries (my/org-logbook--parse-logbook-notes logbook beg buffer))
+                (setq entries (dc/org-logbook--parse-logbook-notes logbook beg buffer))
                 (calendar)
-                (my/org-logbook--mark-calendar-dates entries))
+                (dc/org-logbook--mark-calendar-dates entries))
             (error "No LOGBOOK found for this TODO.")))))))
 
-(defun my/org-logbook--goto-entry (date)
+(defun dc/org-logbook--goto-entry (date)
   "Navigate to the logbook entry corresponding to DATE."
   (interactive (list (calendar-cursor-to-date t)))
-  (if my-logbook-calendar-view-active
-      (let ((entry (cl-find-if (lambda (entry) (equal date (cadr entry))) my-logbook-marked-entries)))
+  (if dc-logbook-calendar-view-active
+      (let ((entry (cl-find-if (lambda (entry) (equal date (cadr entry))) dc-logbook-marked-entries)))
         (if entry
             (progn
               (switch-to-buffer-other-window (nth 3 entry))
@@ -656,16 +655,16 @@ org file on the year calendar."
 
 (with-eval-after-load 'calendar
   ;; Add hook to reapply markings each time the calendar is moved
-  (add-hook 'calendar-move-hook 'my/org-logbook--mark-calendar-date-reapply)
+  (add-hook 'calendar-move-hook 'dc/org-logbook--mark-calendar-date-reapply)
 
   ;; Add hook to reset the custom calendar view flag when the calendar is closed
-  (add-hook 'calendar-exit-hook 'my/org-logbook--reset-calendar-view-flag)
+  (add-hook 'calendar-exit-hook 'dc/org-logbook--reset-calendar-view-flag)
   
   ;; Bind terminal emacs "Enter" clicks
-  (define-key calendar-mode-map (kbd "RET") 'my/org-logbook--goto-entry)
+  (define-key calendar-mode-map (kbd "RET") 'dc/org-logbook--goto-entry)
   
   ;; Bind GUI emacs "Enter" clicks
-  (define-key calendar-mode-map (kbd "<return>") 'my/org-logbook--goto-entry))
+  (define-key calendar-mode-map (kbd "<return>") 'dc/org-logbook--goto-entry))
 
 ;;;; Org-agenda
 ;;;;; Configuration
@@ -695,7 +694,7 @@ org file on the year calendar."
   )
 
 ;;;;; Functions - Agenda Views
-(defun my/org-agenda--switch-to-view (view-fn)
+(defun dc/org-agenda--switch-to-view (view-fn)
   "Switch to the given Org Agenda view function VIEW-FN."
   (if (eq major-mode 'org-agenda-mode)
       (progn
@@ -706,20 +705,20 @@ org file on the year calendar."
     (org-agenda-list)
     (run-with-idle-timer 0.1 nil view-fn)))
 
-(defun my/org-agenda-day-view ()
+(defun dc/org-agenda-day-view ()
   "Switch to the Org Agenda daily view from anywhere in Emacs."
   (interactive)
-  (my/org-agenda--switch-to-view 'org-agenda-day-view))
+  (dc/org-agenda--switch-to-view 'org-agenda-day-view))
 
-(defun my/org-agenda-week-view ()
+(defun dc/org-agenda-week-view ()
   "Switch to the Org Agenda weekly view from anywhere in Emacs."
   (interactive)
-  (my/org-agenda--switch-to-view 'org-agenda-week-view))
+  (dc/org-agenda--switch-to-view 'org-agenda-week-view))
 
-(defun my/org-agenda-year-view ()
+(defun dc/org-agenda-year-view ()
   "Switch to the Org Agenda yearly view from anywhere in Emacs."
   (interactive)
-  (my/org-agenda--switch-to-view 'org-agenda-year-view))
+  (dc/org-agenda--switch-to-view 'org-agenda-year-view))
 
 ;;;; Org-super-agenda
 ;;;;; Configuration
@@ -732,7 +731,7 @@ org file on the year calendar."
   )
 
 ;;;;; Functions - Auto-Parents
-(defun my/org-super-agenda-get-todo-parent (item)
+(defun dc/org-super-agenda-get-todo-parent (item)
   "Get the parent heading of ITEM, or if none, the file title or filename."
   (org-super-agenda--when-with-marker-buffer (org-super-agenda--get-marker item)
     (if (org-up-heading-safe)
@@ -743,10 +742,10 @@ org file on the year calendar."
           (file-name-nondirectory (buffer-file-name))))))) 
 
 (org-super-agenda--def-auto-group parent "their parent heading or file title/filename"
-  :key-form (my/org-super-agenda-get-todo-parent item))
+  :key-form (dc/org-super-agenda-get-todo-parent item))
 
 ;;;;; Functions - Inventory
-(defun my/org-agenda-inventory ()
+(defun dc/org-agenda-inventory ()
   "Open Org Agenda in the todos view mode with super agenda. Use file title as groups"
   (interactive)
   (let ((org-super-agenda-groups '((:auto-parent t)))
@@ -772,7 +771,7 @@ org file on the year calendar."
   )
 
 ;;;;; Functions - Node Hierarchy
-(defun my/org-roam--get-node-heirarchy (node)
+(defun dc/org-roam--get-node-heirarchy (node)
   "Get the hierarchy of NODE as a list of titles, excluding non-node headings.
 The hierarchy includes the NODE title and its ancestor node titles."
   (let ((titles '())
@@ -791,25 +790,25 @@ The hierarchy includes the NODE title and its ancestor node titles."
     (nreverse titles)))
 
 ;;;;; Functions - Node Display Formatting
-(defvar my-org-roam-hierarchy-display-separator
+(defvar dc-org-roam-hierarchy-display-separator
   (propertize "->" 'face '(shadow))
   "Separator for org-roam hierarchy displaying.")
 
-(defun my/org-roam--create-node-hierarchy-chain (node)
+(defun dc/org-roam--create-node-hierarchy-chain (node)
   "Return the hierarchy of NODE as a string with a predefine separator."
-  (let ((hierarchy (my/org-roam--get-node-heirarchy node)))
+  (let ((hierarchy (dc/org-roam--get-node-heirarchy node)))
     (if (cdr hierarchy)
         (let* ((last-element (car (last hierarchy)))
                (non-last-elements (butlast hierarchy))
                (shadow-italicized-elements (mapcar (lambda (element)
                                                      (propertize element 'face '(shadow italic)))
                                                    non-last-elements)))
-          (concat (mapconcat 'identity shadow-italicized-elements my-org-roam-hierarchy-display-separator) my-org-roam-hierarchy-display-separator last-element))
-      (mapconcat 'identity hierarchy my-org-roam-hierarchy-display-separator))))
+          (concat (mapconcat 'identity shadow-italicized-elements dc-org-roam-hierarchy-display-separator) dc-org-roam-hierarchy-display-separator last-element))
+      (mapconcat 'identity hierarchy dc-org-roam-hierarchy-display-separator))))
 
 (cl-defmethod org-roam-node-hierarchy ((node org-roam-node))
   "Method for obtaining hierarchy display for org-roam nodes."
-  (my/org-roam--create-node-hierarchy-chain node))
+  (dc/org-roam--create-node-hierarchy-chain node))
 
 (cl-defmethod org-roam-node-colon-tags ((node org-roam-node))
   "Tag formatting for org-roam nodes."
@@ -833,11 +832,11 @@ The hierarchy includes the NODE title and its ancestor node titles."
       (concat "${hierarchy}" "${node-type}" (propertize "${colon-tags}" 'face 'org-tag)))
 
 ;;;;; Functions - Inserting Nodes by Tags
-(defvar my-org-roam-hierarchy-insert-separator
+(defvar dc-org-roam-hierarchy-insert-separator
   (propertize "->" 'face '(shadow))
   "Separator for org-roam hierarchy insertion.")
 
-(defun my/org-roam-insert-nodes-by-tags(keywords exclude-keywords &optional filter-fn)
+(defun dc/org-roam-insert-nodes-by-tags(keywords exclude-keywords &optional filter-fn)
   "Inserts all Org-roam nodes connected to the provided keywords and not connected to the exclude keywords.
 KEYWORDS is a space-separated list of keywords to find the connected nodes.
 EXCLUDE-KEYWORDS is a space-separated list of keywords to exclude nodes.
@@ -872,14 +871,14 @@ and when nil is returned the node will be filtered out."
                                 all-nodes))
                (sorted-nodes (sort filtered-nodes
                                    (lambda (a b)
-                                     (let ((hierarchy-a (mapconcat #'identity (my/org-roam--get-node-heirarchy a) my-org-roam-hierarchy-insert-separator))
-                                           (hierarchy-b (mapconcat #'identity (my/org-roam--get-node-heirarchy b) my-org-roam-hierarchy-insert-separator)))
+                                     (let ((hierarchy-a (mapconcat #'identity (dc/org-roam--get-node-heirarchy a) dc-org-roam-hierarchy-insert-separator))
+                                           (hierarchy-b (mapconcat #'identity (dc/org-roam--get-node-heirarchy b) dc-org-roam-hierarchy-insert-separator)))
                                        (string< hierarchy-a hierarchy-b))))))
           (dolist (node sorted-nodes)
             (let* ((id (org-roam-node-id node))
-                   (hierarchy (my/org-roam--get-node-heirarchy node))
+                   (hierarchy (dc/org-roam--get-node-heirarchy node))
                    (arrow-chain (if (> (length hierarchy) 1)
-                                    (mapconcat #'identity hierarchy my-org-roam-hierarchy-insert-separator)
+                                    (mapconcat #'identity hierarchy dc-org-roam-hierarchy-insert-separator)
                                   (org-roam-node-title node)))
                    (link (org-link-make-string (concat "id:" id) arrow-chain)))
               (insert link)
@@ -901,7 +900,7 @@ and when nil is returned the node will be filtered out."
   )
 
 ;;;;; Functions - Android Notifications
-(defun my/alert-android-notifications-notify (info)
+(defun dc/alert-android-notifications-notify (info)
   "Send notifications using `android-notifications-notify'.
 `android-notifications-notify' is a built-in function in the native Emacs
 Android port."
@@ -919,7 +918,7 @@ Android port."
      :replaces-id replaces-id)))
 
 (alert-define-style 'android-notifications :title "Android Notifications"
-                    :notifier #'my/alert-android-notifications-notify)
+                    :notifier #'dc/alert-android-notifications-notify)
 
 ;;;; Org-alert
 ;;;;; Configuration
@@ -949,7 +948,7 @@ Android port."
   )
 
 ;;;;; Functions - Notification Titles
-(defvar my-org-alert-title-type 'custom
+(defvar dc-org-alert-title-type 'custom
   "Control the title type for `org-alert' notifications.
    Possible values are:
       - 'custom: The usual workings of org-alert package. Uses `org-alert-notification-title'
@@ -958,7 +957,7 @@ Android port."
                  If the TODO does not have a parent, it uses the file title instead. If the file
                  does not have a title, it uses the filename as the title for notifications.")
 
-(defun my/org-alert--get-todo-parent ()
+(defun dc/org-alert--get-todo-parent ()
   "Get the immediate parent heading of a TODO. If no parents, use file title. If no file title
 use filename."
   (if (org-up-heading-safe)
@@ -970,9 +969,9 @@ use filename."
 
 (defun org-alert--parse-entry--use-parent-as-title-advice (orig-fun &rest args)
   "Advice for `org-alert--parse-entry' function. It adapts it to accept parameters from the
-`my/org-alert--get-todo-parent' function which retrieves the parent heading or file title/name."
+`dc/org-alert--get-todo-parent' function which retrieves the parent heading or file title/name."
   (let ((head (org-alert--strip-text-properties (org-get-heading t t t t)))
-        (parent-or-file-head (my/org-alert--get-todo-parent)))
+        (parent-or-file-head (dc/org-alert--get-todo-parent)))
     (cl-destructuring-bind (body cutoff) (org-alert--grab-subtree)
       (if (string-match org-alert-time-match-string body)
           (list head parent-or-file-head (match-string 1 body) cutoff)
@@ -988,19 +987,19 @@ use filename."
               (alert (concat time ": " head) :title parent-or-file-head))
           (alert head :title parent-or-file-head))))))
 
-(defun my/org-alert-update-advices ()
+(defun dc/org-alert-update-advices ()
   "Add or remove advice based on the value of `org-alert-title-type'."
-  (cond ((eq my-org-alert-title-type 'parent)
+  (cond ((eq dc-org-alert-title-type 'parent)
          (advice-add 'org-alert--parse-entry :around #'org-alert--parse-entry--use-parent-as-title-advice)
          (advice-add 'org-alert--dispatch :around #'org-alert--dispatch--use-parent-as-title-advice))
-        ((eq my-org-alert-title-type 'custom)
+        ((eq dc-org-alert-title-type 'custom)
          (advice-remove 'org-alert--parse-entry #'org-alert--parse-entry--use-parent-as-title-advice)
          (advice-remove 'org-alert--dispatch #'org-alert--dispatch--use-parent-as-title-advice))))
 
 ;; Set up 'parent mode
-(setq my-org-alert-title-type 'parent)
-;; Update to set up or remove advices based on my-org-alert-title-type
-(my/org-alert-update-advices)
+(setq dc-org-alert-title-type 'parent)
+;; Update to set up or remove advices based on dc-org-alert-title-type
+(dc/org-alert-update-advices)
 
 ;;;; Org-tempo
 ;;;;; Configuration
@@ -1074,7 +1073,7 @@ use filename."
   )
 
 ;;;;; Functions - Screenshot Filename
-(defun my/org-download-clipboard--prompt-for-name-advice (orig-fun &optional basename)
+(defun dc/org-download-clipboard--prompt-for-name-advice (orig-fun &optional basename)
   "Advice to prompt for a basename before calling `org-download-clipboard'."
   (message "Calling advice function")
   (let ((name (if (called-interactively-p 'any)
@@ -1082,7 +1081,7 @@ use filename."
                 basename)))
     (funcall orig-fun (if (string-empty-p name) basename (concat name ".png")))))
 
-(advice-add 'org-download-clipboard :around #'my/org-download-clipboard--prompt-for-name-advice)
+(advice-add 'org-download-clipboard :around #'dc/org-download-clipboard--prompt-for-name-advice)
 
 ;;;; Org-ref
 ;;;;; Configuration
@@ -1114,24 +1113,24 @@ use filename."
   )
 
 ;;;;; Functions - Filename
-(defun my/org-media-note--format-picture-file-name--prepend-timestamp-advice (orig-func &rest args)
+(defun dc/org-media-note--format-picture-file-name--prepend-timestamp-advice (orig-func &rest args)
   "Advice to prepend the current timestamp to the filename created by `org-media-note--format-picture-file-name'."
   (let ((original-filename (apply orig-func args))
         (timestamp (format-time-string "%Y-%m-%d_%H-%M-%S")))
     (concat timestamp "_" original-filename)))
 
-(advice-add 'org-media-note--format-picture-file-name :around #'my/org-media-note--format-picture-file-name--prepend-timestamp-advice)
+(advice-add 'org-media-note--format-picture-file-name :around #'dc/org-media-note--format-picture-file-name--prepend-timestamp-advice)
 
 ;;;;; Functions - Invalid Characters
-(defun my/remove-invalid-characters-from-filename (filename)
+(defun dc/remove-invalid-characters-from-filename (filename)
   "Remove invalid characters from filename in order for it to sync to Android using syncthing."
   (replace-regexp-in-string "[/*\":<>?|]" "" filename))
 
-(defun my/org-media-note--format-picture-file-name--remove-invalid-characters-from-filename-advice (orig-func &rest args)
+(defun dc/org-media-note--format-picture-file-name--remove-invalid-characters-from-filename-advice (orig-func &rest args)
   "Advice to remove invalid characters from filename in `org-media-note--format-picture-file-name'."
-  (my/remove-invalid-characters-from-filename (apply orig-func args)))
+  (dc/remove-invalid-characters-from-filename (apply orig-func args)))
 
-(advice-add 'org-media-note--format-picture-file-name :around #'my/org-media-note--format-picture-file-name--remove-invalid-characters-from-filename-advice)
+(advice-add 'org-media-note--format-picture-file-name :around #'dc/org-media-note--format-picture-file-name--remove-invalid-characters-from-filename-advice)
 
 ;;; Bookmarks
 ;;;; Eww
@@ -1139,7 +1138,7 @@ use filename."
 (use-package eww
   :config
   ;; Set default eww-bookmarks directory
-  (setq eww-bookmarks-directory (concat my-documents-directory "Bookmarks/"))
+  (setq eww-bookmarks-directory (concat dc-documents-directory "Bookmarks/"))
   )
 
 ;;;; Bookmarks
@@ -1147,7 +1146,7 @@ use filename."
 (use-package bookmark
   :config
   ;; Set default bookmark file
-  (setq bookmark-default-file (concat my-documents-directory "Bookmarks/bookmarks"))
+  (setq bookmark-default-file (concat dc-documents-directory "Bookmarks/bookmarks"))
   )
 
 ;;;; Bookmark+
@@ -1163,7 +1162,7 @@ use filename."
   )
 
 ;;;;; Functions - Bookmark Paths on Different Platforms
-(defun my/bookmark-jump--modify-bookmark-path-advice (orig-fun &rest args)
+(defun dc/bookmark-jump--modify-bookmark-path-advice (orig-fun &rest args)
   "Modify the bookmark filename and directory based on system type before opening."
   (let* ((bookmark (car args))
          (bookmark-data (bookmark-get-bookmark bookmark))
@@ -1173,33 +1172,33 @@ use filename."
     (when filename
       (if (eq system-type 'android)
           (progn
-            (when (string-match-p (regexp-quote my-gnu-linux-home) filename)
-              (setq filename (replace-regexp-in-string (regexp-quote my-gnu-linux-home) my-android-home filename)))
-            (when (string-match-p (regexp-quote my-gnu-linux-home-extended) filename)
-              (setq filename (replace-regexp-in-string (regexp-quote my-gnu-linux-home-extended) my-android-home filename))))
-        (when (string-match-p (regexp-quote my-android-home) filename)
-          (setq filename (replace-regexp-in-string (regexp-quote my-android-home) my-gnu-linux-home filename))))
+            (when (string-match-p (regexp-quote dc-gnu-linux-home) filename)
+              (setq filename (replace-regexp-in-string (regexp-quote dc-gnu-linux-home) dc-android-home filename)))
+            (when (string-match-p (regexp-quote dc-gnu-linux-home-extended) filename)
+              (setq filename (replace-regexp-in-string (regexp-quote dc-gnu-linux-home-extended) dc-android-home filename))))
+        (when (string-match-p (regexp-quote dc-android-home) filename)
+          (setq filename (replace-regexp-in-string (regexp-quote dc-android-home) dc-gnu-linux-home filename))))
       (setf (alist-get 'filename bookmark-data) filename))
     ;; Modify dired-directory for directory bookmarks
     (when dired-directory
       (if (eq system-type 'android)
           (progn
-            (when (string-match-p (regexp-quote my-gnu-linux-home) dired-directory)
-              (setq dired-directory (replace-regexp-in-string (regexp-quote my-gnu-linux-home) my-android-home dired-directory)))
-            (when (string-match-p (regexp-quote my-gnu-linux-home-extended) dired-directory)
-              (setq dired-directory (replace-regexp-in-string (regexp-quote my-gnu-linux-home-extended) my-android-home dired-directory))))
-        (when (string-match-p (regexp-quote my-android-home) dired-directory)
-          (setq dired-directory (replace-regexp-in-string (regexp-quote my-android-home) my-gnu-linux-home dired-directory))))
+            (when (string-match-p (regexp-quote dc-gnu-linux-home) dired-directory)
+              (setq dired-directory (replace-regexp-in-string (regexp-quote dc-gnu-linux-home) dc-android-home dired-directory)))
+            (when (string-match-p (regexp-quote dc-gnu-linux-home-extended) dired-directory)
+              (setq dired-directory (replace-regexp-in-string (regexp-quote dc-gnu-linux-home-extended) dc-android-home dired-directory))))
+        (when (string-match-p (regexp-quote dc-android-home) dired-directory)
+          (setq dired-directory (replace-regexp-in-string (regexp-quote dc-android-home) dc-gnu-linux-home dired-directory))))
       (setf (alist-get 'dired-directory bookmark-data) dired-directory))
 
     (apply orig-fun args)))
 
 ;; Add advice so bookmarks will be properly opened
-(advice-add 'bookmark-jump :around #'my/bookmark-jump--modify-bookmark-path-advice)
+(advice-add 'bookmark-jump :around #'dc/bookmark-jump--modify-bookmark-path-advice)
 
 ;;; Datetime
 ;;;; Functions - Relative Dates
-(defun my/time-relative-date (time)
+(defun dc/time-relative-date (time)
   "Determines if the given TIME is 'today', 'yesterday', or 'tomorrow'.
 Returns the corresponding string or nil if the time doesn't match any of these.
 TIME is expected to be in Emacs internal time format."
@@ -1215,19 +1214,19 @@ TIME is expected to be in Emacs internal time format."
             ((eq day-difference -1) "tomorrow ")))))
 
 ;;;; Functions - Time Adjustment
-(defvar my-adjusted-time nil
+(defvar dc-adjusted-time nil
   "Adjusted time. This time will replace current time.")
 
-(defvar my-time-override-lock nil
+(defvar dc-time-override-lock nil
   "Lock to prevent concurrent access to the time override.")
 
-(defun my/time-adjust-time (time)
+(defun dc/time-adjust-time (time)
   "Temporarily adjust `current-time' to the given TIME."
-  (setq my-adjusted-time (append (org-read-date nil t time) '(0 0))))
+  (setq dc-adjusted-time (append (org-read-date nil t time) '(0 0))))
 
-(defun my/time-override-current-time ()
-  "Override for `current-time' using `my/time-adjust-time'."
-  (or my-adjusted-time (current-time)))
+(defun dc/time-override-current-time ()
+  "Override for `current-time' using `dc/time-adjust-time'."
+  (or dc-adjusted-time (current-time)))
 
 ;;;; Time-stamp
 ;;;;; Configuration
@@ -1286,8 +1285,8 @@ TIME is expected to be in Emacs internal time format."
   :config
   ;; Set auth-sources files
   (setq auth-sources
-        `((:source ,(concat my-documents-directory ".secrets/.authinfo-pass.gpg"))
-          (:source ,(concat my-documents-directory ".secrets/.authinfo-totp.gpg"))))
+        `((:source ,(concat dc-documents-directory ".secrets/.authinfo-pass.gpg"))
+          (:source ,(concat dc-documents-directory ".secrets/.authinfo-totp.gpg"))))
 
   ;; Enable authinfo-mode for auth-source files
   (add-to-list 'auto-mode-alist '("\\.authinfo.*\\.gpg\\'" . authinfo-mode))
@@ -1347,7 +1346,7 @@ DIGITS is tre  number of pin digits and defaults to 6."
                      #x7fffffff)
              (expt 10 digits)))))
 
-(defun my/totp-display (auth)
+(defun dc/totp-display (auth)
   "Select a TOTP AUTH from `auth-sources', display its TOTP, and show remaining valid time."
   (interactive
    (list
@@ -1372,7 +1371,7 @@ DIGITS is tre  number of pin digits and defaults to 6."
     code))
 
 ;;;;; Functions - Passwords
-(defun my/password-display (auth)
+(defun dc/password-display (auth)
   "Select a password entry (PASS) from `auth-sources', and briefly display its password."
   (interactive
    (list
