@@ -287,6 +287,12 @@
         '((sequence "TODO(t)" "DOING(i!)" "|" "DONE(d!)" "SKIP(s!)" "FAIL(f!)")))
   )
 
+;;;;; Functions - Common
+(defun dc/org-ctrl-c-ctrl-c ()
+  "Helper functions for completing notes and executing code blocks."
+  (interactive)
+  (org-ctrl-c-ctrl-c))
+
 ;;;;; Functions - Datetime Insertion
 (defun dc/org-insert-current-date-time ()
   "Insert the current date and time along with the three-letter weekday name in
