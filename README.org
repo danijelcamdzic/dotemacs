@@ -138,7 +138,11 @@ enable the keyboard to display even on read-only buffers.
 
 ** Dashboard
 
-I use dashboard package in Emacs. This section contains the configuration for that
+*UPDATE* 2024-01-16 Tue 15:11 I no longer use the =dashboard= package but all
+the functions and configuration are available from this commit:
+https://github.com/danijelcamdzic/dotemacs/tree/4410ef98602937a285ddae8ec2abbdd8cbdbc27b
+
+This section contains the configuration for that
 package as well as some custom functions which improve how the dashboard
 looks. This is mainly related to how the agenda items appear in the dashboard.
 
