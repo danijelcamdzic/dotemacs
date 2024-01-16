@@ -248,7 +248,6 @@
         dashboard-set-init-info t
         dashboard-set-heading-icons t
         dashboard-agenda-prefix-format "%s %t"
-        dashboard-agenda-tags-format 'ignore
         dashboard-agenda-time-string-format "%Y-%m-%d %H:%M"
         dashboard-agenda-sort-strategy '(time-up))
   (add-to-list 'dashboard-items '(agenda) t)
@@ -300,9 +299,6 @@ Keeps the time part unless it's exactly 00:00, in which case only the relative d
   ;; Configure heading logs to be logged in "LOGBOOK" drawer
   (setq org-log-into-drawer t)
   (setq org-log-note-clock-out t)
-
-  ;; Tags excluded from inheritance
-  (setq org-tags-exclude-from-inheritance '("goal" "food" "exercise"))
 
   ;; Display inline images on startup
   (setq org-startup-with-inline-images t)
