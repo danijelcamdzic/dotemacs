@@ -1216,7 +1216,8 @@ TIME is expected to be in Emacs internal time format."
   ;; Set auth-sources files
   (setq auth-sources
         `((:source ,(concat dc-documents-directory ".secrets/.authinfo-pass.gpg"))
-          (:source ,(concat dc-documents-directory ".secrets/.authinfo-totp.gpg"))))
+          (:source ,(concat dc-documents-directory ".secrets/.authinfo-totp.gpg"))
+          (:source ,(concat dc-documents-directory ".secrets/.authinfo-api.gpg"))))
 
   ;; Enable authinfo-mode for auth-source files
   (add-to-list 'auto-mode-alist '("\\.authinfo.*\\.gpg\\'" . authinfo-mode))
@@ -1320,5 +1321,22 @@ DIGITS is tre  number of pin digits and defaults to 6."
       (message "Your password for '%s' is: %s"
                (propertize (plist-get auth :host) 'face 'font-lock-keyword-face)
                (propertize password 'face 'font-lock-string-face)))))
+
+;;; GPT
+;;;; Gptel
+;;;;; Configuration
+(use-package gptel
+  :ensure t
+  :config
+  ;; Set API key to nil at the beginning
+  (setq gptel-api-key nil)
+  )
+
+;;;;; Functions - API key
+(defun dc/set-gptel-openai-api-key ()
+  "Set the `gptel-api-key` variable from auth-source."
+  (interactive)
+  (setq gptel-api-key
+        (auth-source-pick-first-password :host "API:openai.com")))
 
 ;;; init.el ends here
