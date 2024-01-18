@@ -1215,9 +1215,8 @@ TIME is expected to be in Emacs internal time format."
   :config
   ;; Set auth-sources files
   (setq auth-sources
-        `((:source ,(concat dc-documents-directory ".secrets/.authinfo-pass.gpg"))
-          (:source ,(concat dc-documents-directory ".secrets/.authinfo-totp.gpg"))
-          (:source ,(concat dc-documents-directory ".secrets/.authinfo-api.gpg"))))
+        (cl-loop for file in (directory-files (concat dc-documents-directory ".secrets/") t "\\.gpg$")
+                 collect `(:source ,file)))
 
   ;; Enable authinfo-mode for auth-source files
   (add-to-list 'auto-mode-alist '("\\.authinfo.*\\.gpg\\'" . authinfo-mode))
