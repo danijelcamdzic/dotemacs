@@ -83,6 +83,9 @@
 ;; Remove startup screen
 (setq inhibit-startup-screen t)
 
+;; Open org-agenda day view on startup
+(add-hook 'emacs-startup-hook 'dc/org-agenda-day-view)
+
 ;;; Editor
 ;;;; Files
 ;; Disable backup and lock files
@@ -1215,7 +1218,7 @@ TIME is expected to be in Emacs internal time format."
   :config
   ;; Set auth-sources files
   (setq auth-sources
-        (cl-loop for file in (directory-files (concat dc-documents-directory ".secrets/") t "\\.gpg$")
+        (cl-loop for file in (directory-files (concat dc-documents-directory ".auth-sources/") t "\\.gpg$")
                  collect `(:source ,file)))
 
   ;; Enable authinfo-mode for auth-source files
