@@ -80,6 +80,13 @@
 ;; Remove fringes
 (set-fringe-mode 0)
 
+;;; Editor
+;;;; Startup
+;; Bind command call in Android to hardware key
+(when (eq system-type 'android)
+  (global-set-key (kbd "<XF86AudioRaiseVolume>") 'execute-extended-command)
+  )
+
 ;; Remove startup screen
 (setq inhibit-startup-screen t)
 
@@ -88,8 +95,6 @@
           (lambda ()
             (unless (> (length command-line-args) 1)
               (dc/org-agenda-day-view))))
-
-;;; Editor
 ;;;; Files
 ;; Disable backup and lock files
 (setq create-lockfiles nil
