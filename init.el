@@ -84,7 +84,7 @@
 ;;;; Startup
 ;; Bind command call in Android to hardware key
 (when (eq system-type 'android)
-  (global-set-key (kbd "<XF86AudioRaiseVolume>") 'execute-extended-command)
+  (global-set-key (kbd "<volume-up>") 'execute-extended-command)
   )
 
 ;; Remove startup screen
