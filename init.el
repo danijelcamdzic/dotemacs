@@ -84,7 +84,10 @@
 (setq inhibit-startup-screen t)
 
 ;; Open org-agenda day view on startup
-(add-hook 'emacs-startup-hook 'dc/org-agenda-day-view)
+(add-hook 'emacs-startup-hook
+          (lambda ()
+            (unless (> (length command-line-args) 1)
+              (dc/org-agenda-day-view))))
 
 ;;; Editor
 ;;;; Files
