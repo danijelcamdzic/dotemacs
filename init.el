@@ -298,12 +298,6 @@
         '((sequence "TODO(t)" "DOING(i!)" "|" "DONE(d!)" "SKIP(s!)" "FAIL(f!)")))
   )
 
-;;;;; Functions - Common
-(defun dc/org-ctrl-c-ctrl-c ()
-  "Helper functions for completing notes and executing code blocks."
-  (interactive)
-  (org-ctrl-c-ctrl-c))
-
 ;;;;; Functions - Datetime Insertion
 (defun dc/org-insert-current-date-time ()
   "Insert the current date and time along with the three-letter weekday name in
@@ -597,13 +591,10 @@ org file on the year calendar."
 (with-eval-after-load 'calendar
   ;; Add hook to reapply markings each time the calendar is moved
   (add-hook 'calendar-move-hook 'dc/org-logbook--mark-calendar-date-reapply)
-
   ;; Add hook to reset the custom calendar view flag when the calendar is closed
   (add-hook 'calendar-exit-hook 'dc/org-logbook--reset-calendar-view-flag)
-  
   ;; Bind terminal emacs "Enter" clicks
   (define-key calendar-mode-map (kbd "RET") 'dc/org-logbook--goto-entry)
-  
   ;; Bind GUI emacs "Enter" clicks
   (define-key calendar-mode-map (kbd "<return>") 'dc/org-logbook--goto-entry))
 
@@ -685,8 +676,8 @@ org file on the year calendar."
 (org-super-agenda--def-auto-group parent "their parent heading or file title/filename"
   :key-form (dc/org-super-agenda-get-todo-parent item))
 
-;;;;; Functions - Inventory
-(defun dc/org-agenda-inventory ()
+;;;;; Functions - TODOs
+(defun dc/org-agenda-todo-view ()
   "Open Org Agenda in the todos view mode with super agenda. Use file title as groups"
   (interactive)
   (let ((org-super-agenda-groups '((:auto-parent t)))
