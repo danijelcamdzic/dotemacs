@@ -1,6 +1,7 @@
 ;;; init.el -- Personal configuration file for Emacs
 
 ;;; Code:
+
 ;;; User
 ;;;; User Credentials
 ;; User name and email
@@ -26,19 +27,21 @@
 (setq dc-documents-directory (concat dc-home-directory "Documents/"))
 
 ;;; Package Managers
-;;;; Melpa
-;;;;; Configuration
-;; Add melpa package archives
-(add-to-list 'package-archives
-             '("melpa" . "http://melpa.org/packages/") t)
-
 ;;;; Package
 ;;;;; Configuration
+(require 'package)
+
 ;; Temporarily disable signature checks
 (setq package-check-signature nil)
 
 ;; Initialize packages
 (package-initialize)
+
+;;;; Melpa
+;;;;; Configuration
+;; Add melpa package archives
+(add-to-list 'package-archives
+             '("melpa" . "http://melpa.org/packages/") t)
 
 ;;;; Use-package
 ;;;;; Configuration
@@ -46,6 +49,7 @@
 (unless (package-installed-p 'use-package)
   (package-refresh-contents)
   (package-install 'use-package))
+
 (require 'use-package)
 
 ;;;; Quelpa
@@ -68,7 +72,8 @@
   (quelpa-use-package-activate-advice)
   )
 
-;;; Theme
+;;; Editor
+;;;; Theme
 ;; Install gruvbox-theme
 (use-package gruvbox-theme
   :ensure t
@@ -80,21 +85,31 @@
 ;; Remove fringes
 (set-fringe-mode 0)
 
-;;; Editor
 ;;;; Startup
-;; Bind command call in Android to hardware key
+;; Bind command call in Android to hardware keys volume up and volume down
 (when (eq system-type 'android)
+  ;; Volume up calls to execute the command
   (global-set-key (kbd "<volume-up>") 'execute-extended-command)
+  ;; Volume down is bound by default to org-ctrl-c-ctrl-c
+  (global-set-key (kbd "<volume-down>") 'org-ctrl-c-ctrl-c)
+
+  ;; Volume down is also programmable
+  (defun dc/bind-to-android-volume-down ()
+    "Bind a command to the <volume-down> key on Android."
+    (interactive)
+    (let ((command (intern (completing-read "Command: " obarray 'commandp t))))
+      (global-set-key (kbd "<volume-down>") command)))
   )
 
 ;; Remove startup screen
 (setq inhibit-startup-screen t)
 
-;; Open org-agenda day view on startup
+;; Open org-agenda day view on startup (unless called with a file argument)
 (add-hook 'emacs-startup-hook
           (lambda ()
             (unless (> (length command-line-args) 1)
               (dc/org-agenda-day-view))))
+
 ;;;; Files
 ;; Disable backup and lock files
 (setq create-lockfiles nil
@@ -110,19 +125,48 @@
   ;; Touchscreen keyboard spawn
   (setq touch-screen-display-keyboard t))
 
-;;;; Indentation
+;;;;; IBuffer
+;;;;;; Configuration
+(use-package ibuffer-sidebar
+  :ensure t
+  :config
+  )
+
+;;;;;; Functions - IBuffer-sidebar Toggle
+(defun dc/ibuffer-sidebar-toggle ()
+  "Toggle `ibuffer-sidebar'."
+  (interactive)
+  (ibuffer-sidebar-toggle-sidebar))
+
+;;;;; Dired-sidebar
+;;;;;; Configuration
+(use-package dired-sidebar
+  :ensure t
+  :config
+  ;; Make the window not fixed
+  (setq dired-sidebar-window-fixed nil)
+  )
+
+;;;;;; Functions - Dired-sidebar Toggle
+(defun dc/dired-sidebar-toggle ()
+  "Toggle `dired-sidebar'."
+  (interactive)
+  (dired-sidebar-toggle-sidebar))
+
+;;;; Text Editing
+;; Indentation
 (setq-default indent-tabs-mode nil
               tab-width 4
               indent-line-function 'insert-tab)
 
-;;;; Text Faces
+;; Text faces
 (custom-set-faces
  '(bold ((t (:foreground "#008000" :weight bold))))
  '(italic ((t (:foreground "#B0A030" :slant italic))))
  '(strike-through ((t (:foreground "#8B0000" :strike-through t)))))
 
-;;;; Programming
-;;;;; C/Cpp
+;;;;; Programming
+;;;;;; C/CPP
 (defun dc/c-cpp-mode-setup ()
   "Set basic c and cpp offset."
   (setq c-basic-offset 4))
@@ -133,7 +177,14 @@
 ;; Disable line numbers
 (global-display-line-numbers-mode 0)
 
-;;;; Outline
+;;;; Version Control
+;;;;; Magit
+;;;;;; Configuration
+(use-package magit
+  :ensure t
+  )
+
+;;;; Visual Modes
 ;; Enable outline-minor-mode as soon as .el file is opened
 (add-hook 'emacs-lisp-mode-hook 'outline-minor-mode)
 
@@ -146,44 +197,14 @@
                     #'outline-minor-faces-mode)
   )
 
-;;;; IBuffer
-;;;;; Configuration
-(use-package ibuffer-sidebar
-  :ensure t
-  :config
-  )
-
-;;;;; Functions - IBuffer-sidebar Toggle
-(defun dc/ibuffer-sidebar-toggle ()
-  "Toggle `ibuffer-sidebar'"
-  (interactive)
-  (ibuffer-sidebar-toggle-sidebar)
-  (ibuffer-sidebar-mode))
-
-;;;; Dired-sidebar
-;;;;; Configuration
-(use-package dired-sidebar
-  :ensure t
-  :config
-  ;; Make the window not fixed
-  (setq dired-sidebar-window-fixed nil)
-  )
-
-;;;;; Functions - Dired-sidebar Toggle
-(defun dc/dired-sidebar-toggle ()
-  "Toggle `dired-sidebar'"
-  (interactive)
-  (dired-sidebar-toggle-sidebar)
-  (dired-sidebar-mode))
-
-;;;; Pretty-hydra
-;;;;; Configuration
+;;;;; Pretty-hydra
+;;;;;; Configuration
 (use-package pretty-hydra
   :ensure t
   )
 
-;;;; Which-key
-;;;;; Configuration
+;;;;; Which-key
+;;;;;; Configuration
 (use-package which-key
   :ensure t
   :config
@@ -240,10 +261,6 @@
   (scroll-bar-mode 1)
   (menu-bar-mode 1)
   (tool-bar-mode 1))
-
-;; Hide GUI on startup if on Linux
-(when (eq system-type 'gnu/linux)
-  (dc/gui-hide-bars))
 
 ;;; Org-mode
 ;;;; Org
@@ -369,9 +386,7 @@ an org file."
 (defun dc/org-todo-change-state-and-reschedule ()
   "Change state of a current heading."
   (interactive)
-  (if (eq major-mode 'org-agenda-mode)
-      (org-agenda-todo)
-    (org-todo))
+  (dc/org-todo-change-state)
   (if (eq major-mode 'org-agenda-mode)
       (org-agenda-todo "TODO")
     (org-todo "TODO"))
@@ -397,35 +412,26 @@ an org file."
 (defun dc/org-todo-change-state-with-date-and-reschedule ()
   "Change state of the current heading and log with a chosen date."
   (interactive)
-  (let ((selected-date (org-read-date nil t nil "Select Date:")))
-    (if selected-date
-        (progn
-          (setq dc-time-override-lock t)
-          (dc/time-adjust-time (format-time-string "<%Y-%m-%d %a>" selected-date))
-          (advice-add 'current-time :override #'dc/time-override-current-time)
-          (if (eq major-mode 'org-agenda-mode)
-              (org-agenda-todo)
-            (org-todo))
-          (if (eq major-mode 'org-agenda-mode)
-              (org-agenda-todo "TODO")
-            (org-todo "TODO"))
-          (run-with-timer 0.1 nil 'dc/org-add-schedule)
-          (advice-remove 'current-time #'dc/time-override-current-time)
-          (setq dc-adjusted-time nil)
-          (setq dc-time-override-lock nil))
-      (message "No date selected"))))
+  (dc/org-todo-change-state-with-date)
+  (if (eq major-mode 'org-agenda-mode)
+      (org-agenda-todo "TODO")
+    (org-todo "TODO"))
+  (run-with-timer 0.1 nil 'dc/org-add-schedule))
 
-(defun dc/org-todo-skip-all-overdue-tasks ()
+(defun dc/org-todo-skip-overdue-tasks ()
   "Mark tasks scheduled for yesterday or earlier as SKIP and
-log them as changed on their scheduled date."
+log them as changed on their scheduled date, but only if their
+current state is TODO."
   (interactive)
   (dolist (file (directory-files org-directory t "\\.org$"))
     (with-current-buffer (find-file-noselect file)
       (save-excursion
         (goto-char (point-min))
         (while (re-search-forward org-scheduled-time-regexp nil t)
-          (let ((scheduled-time (org-get-scheduled-time (point))))
+          (let ((scheduled-time (org-get-scheduled-time (point)))
+                (todo-state (org-get-todo-state)))
             (when (and scheduled-time
+                       (string= todo-state "TODO")
                        (< (time-to-days scheduled-time)
                           (time-to-days (current-time))))
               (unless dc-time-override-lock
@@ -676,7 +682,7 @@ org file on the year calendar."
 (org-super-agenda--def-auto-group parent "their parent heading or file title/filename"
   :key-form (dc/org-super-agenda-get-todo-parent item))
 
-;;;;; Functions - TODOs
+;;;;; Functions - TODO View
 (defun dc/org-agenda-todo-view ()
   "Open Org Agenda in the todos view mode with super agenda. Use file title as groups"
   (interactive)
@@ -882,7 +888,7 @@ Android port."
 ;;;;; Functions - Notification Titles
 (defvar dc-org-alert-title-type 'custom
   "Control the title type for `org-alert' notifications.
-   Possible values are:
+  /home/danijelcamdzic/Projects/dotemacs/ Possible values are:
       - 'custom: The usual workings of org-alert package. Uses `org-alert-notification-title'
                  as the title of notifications sent.
       - 'parent: Uses the immediate parent heading of the TODO as the title of the notification.
