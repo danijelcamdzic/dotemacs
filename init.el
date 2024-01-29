@@ -758,12 +758,9 @@ The hierarchy includes the NODE title and its ancestor node titles."
 (cl-defmethod org-roam-node-node-type ((node org-roam-node))
   "Return a string which indicates whether a node is a `@note' or a `@daily'."
   (let ((file-path (org-roam-node-file node)))
-    (cond
-     ((string-prefix-p (file-name-as-directory org-roam-directory) (file-name-directory file-path))
-      " @note")
-     ((string-prefix-p (file-name-as-directory org-roam-dailies-directory) (file-name-directory file-path))
-      " @daily")
-     (t ""))))
+    (if (string-prefix-p (file-name-as-directory org-roam-dailies-directory) (file-name-directory file-path))
+        " @daily"
+      " @note")))
 
 ;; Set the hierarchy display formatting
 (setq org-roam-node-display-template
