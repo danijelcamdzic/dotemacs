@@ -1076,7 +1076,7 @@ use filename."
   (setq eww-bookmarks-directory (concat dc-documents-directory "Bookmarks/"))
   )
 
-;;;; Bookmarks
+;;;; Bookmark
 ;;;;; Configuration
 (use-package bookmark
   :config
@@ -1132,22 +1132,6 @@ use filename."
 (advice-add 'bookmark-jump :around #'dc/bookmark-jump--modify-bookmark-path-advice)
 
 ;;; Datetime
-;;;; Functions - Relative Dates
-(defun dc/time-relative-date (time)
-  "Determines if the given TIME is 'today', 'yesterday', or 'tomorrow'.
-Returns the corresponding string or nil if the time doesn't match any of these.
-TIME is expected to be in Emacs internal time format."
-  (when time
-    (let* ((current-time (current-time))
-           (current-date (decode-time current-time))
-           (entry-date (decode-time time))
-           (current-day-num (time-to-days (apply #'encode-time (decode-time (current-time)))))
-           (entry-day-num (time-to-days (apply #'encode-time (decode-time time))))
-           (day-difference (- current-day-num entry-day-num)))
-      (cond ((eq day-difference 0) "today    ")
-            ((eq day-difference 1) "yesterday")
-            ((eq day-difference -1) "tomorrow ")))))
-
 ;;;; Functions - Time Adjustment
 (defvar dc-adjusted-time nil
   "Adjusted time. This time will replace current time.")
