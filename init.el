@@ -823,6 +823,26 @@ and when nil is returned the node will be filtered out."
                                   arrow-chain))))))
   (deactivate-mark))
 
+;;;;; Functions - Embedding Nodes (Sub-nodes)
+(defun dc/org-roam-embed-node ()
+  "Find an org-roam node and insert its contents."
+  (interactive)
+  (let ((node (org-roam-node-read))
+        (origin-buffer (current-buffer)))
+    (when node
+      (with-temp-buffer
+        (insert-file-contents (org-roam-node-file node))
+        (goto-char (point-min))
+        (when-let ((id (org-roam-node-id node)))
+          (search-forward-regexp (concat ":ID:[ \t]+" (regexp-quote id)) nil t)
+          (condition-case nil
+              (org-back-to-heading)
+            (error (user-error "The node is standalone and not a sub-node. It does not make sense to embed it."))))
+        (let ((start (point))
+              (end (progn (org-end-of-subtree) (point))))
+          (with-current-buffer origin-buffer
+            (insert (buffer-substring-no-properties start end))))))))
+
 ;;;; Alert
 ;;;;; Configuration
 (use-package alert
