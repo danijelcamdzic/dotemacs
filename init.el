@@ -823,9 +823,27 @@ and when nil is returned the node will be filtered out."
                                   arrow-chain))))))
   (deactivate-mark))
 
-;;;;; Functions - Embedding Nodes (Sub-nodes)
-(defun dc/org-roam-embed-node ()
-  "Find an org-roam node and insert its contents."
+;;;;; Functions - Embedding Nodes (Heading Nodes)
+(defun dc/org-roam-embed-heading-node--adjust-heading-level-to-root (content)
+  "Adjust the heading levels in CONTENT to make the first heading a level 1 heading.
+Subsequent headings are adjusted accordingly."
+  (with-temp-buffer
+    (insert content)
+    (goto-char (point-min))
+    (let ((first-heading-level (when (looking-at "^\\(\\*+\\)")
+                                  (length (match-string 1)))))
+      (if first-heading-level
+          (let ((adjustment (- first-heading-level 1)))
+            (while (re-search-forward "^\\*+" nil t)
+              (replace-match (make-string (max 1 (- (length (match-string 0)) adjustment)) ?*) nil nil)))
+        (error "Content does not start with a heading")))
+    (buffer-string)))
+
+(defun dc/org-roam-embed-heading-node ()
+  "Find an org-roam node and insert its contents. The ID is kept the same
+because it is presumed only one node of the same content should keep the ID
+and be a node. Also fixes a lot of attachment problems as attachments would
+still work as they are associated with an ID."
   (interactive)
   (let ((node (org-roam-node-read))
         (origin-buffer (current-buffer)))
@@ -841,7 +859,8 @@ and when nil is returned the node will be filtered out."
         (let ((start (point))
               (end (progn (org-end-of-subtree) (point))))
           (with-current-buffer origin-buffer
-            (insert (buffer-substring-no-properties start end))))))))
+            (let ((content (buffer-substring-no-properties start end)))
+              (insert (dc/org-roam-embed-heading-node--adjust-heading-level-to-root content)))))))))
 
 ;;;; Alert
 ;;;;; Configuration
@@ -992,6 +1011,17 @@ use filename."
   :after org
   :ensure t
   )
+
+;;;;; Functions - Transclusion Insertion
+(defun dc/org-transclusion-insert-node ()
+  "Insert a transcluded link to an org-roam node."
+  (interactive)
+  (let ((node (org-roam-node-read)))
+    (when node
+      (let ((link (format "#+transclude: [[id:%s][%s]]"
+                          (org-roam-node-id node)
+                          (org-roam-node-title node))))
+        (insert link)))))
 
 ;;;; Org-attach
 ;;;;; Configuration
