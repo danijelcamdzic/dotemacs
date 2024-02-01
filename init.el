@@ -1079,7 +1079,7 @@ use filename."
         (funcall orig-fun basename))
     (funcall orig-fun basename)))
 
-(advice-add 'org-download-clipboard :around #'org-download-clipboard-android-advice)
+(advice-add 'org-download-clipboard :around #'dc/org-download-clipboard--android-advice)
 
 ;;;; Org-ref
 ;;;;; Configuration
