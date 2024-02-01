@@ -1068,19 +1068,6 @@ use filename."
 
 (advice-add 'org-download-clipboard :around #'dc/org-download-clipboard--prompt-for-name-advice)
 
-;;;;; Functions - Android Clipboard
-(defun dc/org-download-clipboard--android-advice (orig-fun &optional basename)
-  "Advice to handle Android system type in org-download-clipboard."
-  (if (eq system-type 'android)
-      (let ((org-download-screenshot-method
-             (if (executable-find "xclip")
-                 "xclip -selection clipboard -t image/png -o > %s"
-               (user-error "Please install the \"xclip\" program"))))
-        (funcall orig-fun basename))
-    (funcall orig-fun basename)))
-
-(advice-add 'org-download-clipboard :around #'dc/org-download-clipboard--android-advice)
-
 ;;;; Org-ref
 ;;;;; Configuration
 (use-package org-ref
