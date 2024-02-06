@@ -159,6 +159,11 @@
               tab-width 4
               indent-line-function 'insert-tab)
 
+;; New lines on new heading entry
+(customize-set-variable 'org-blank-before-new-entry 
+                        '((heading . nil)
+                          (plain-list-item . nil)))
+
 ;; Text faces
 (custom-set-faces
  '(bold ((t (:foreground "#008000" :weight bold))))
