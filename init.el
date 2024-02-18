@@ -23,8 +23,14 @@
 
 ;; Set the user folders
 (setq dc-books-directory (concat dc-home-directory "Books/"))
-(setq dc-notes-directory (concat dc-home-directory "Notes/"))
 (setq dc-documents-directory (concat dc-home-directory "Documents/"))
+(setq dc-downloads-directory (concat dc-home-directory "Downloads/")) 
+(setq dc-music-directory (concat dc-home-directory "Music/"))         
+(setq dc-notes-directory (concat dc-home-directory "Notes/"))
+(setq dc-pictures-directory (concat dc-home-directory "Pictures/"))   
+(setq dc-projects-directory (concat dc-home-directory "Projects/"))    
+(setq dc-recordings-directory (concat dc-home-directory "Recordings/"))
+(setq dc-videos-directory (concat dc-home-directory "Videos/"))
 
 ;;; Package Managers
 ;;;; Package
@@ -182,6 +188,11 @@
 ;; Disable line numbers
 (global-display-line-numbers-mode 0)
 
+;;;; Document viewing
+;;;;; Doc-view
+;; Set higher resolution for viewing documents
+(setq doc-view-resolution 200)
+
 ;;;; Version Control
 ;;;;; Magit
 ;;;;;; Configuration
@@ -320,6 +331,12 @@
         '((sequence "TODO(t)" "DOING(i!)" "|" "DONE(d!)" "SKIP(s!)" "FAIL(f!)")))
   )
 
+;;;;; Functions - Link insertion
+(defun dc/org-insert-set-link-default-directory (dir)
+  "Set the default directory for org links."
+  (interactive "DSet default directory for org links: ")
+  (setq default-directory dir))
+
 ;;;;; Functions - Datetime Insertion
 (defun dc/org-insert-current-date-time ()
   "Insert the current date and time along with the three-letter weekday name in
@@ -362,7 +379,7 @@ an org file."
 
 (defun dc/org-remove-schedule ()
   "Remove the scheduling timestamp from the current item in the Org Agenda
-    or in an org file."
+or in an org file."
   (interactive)
   (if (eq major-mode 'org-agenda-mode)
       (let* ((marker (or (org-get-at-bol 'org-marker)
@@ -828,45 +845,6 @@ and when nil is returned the node will be filtered out."
                                   arrow-chain))))))
   (deactivate-mark))
 
-;;;;; Functions - Embedding Nodes (Heading Nodes)
-(defun dc/org-roam-embed-heading-node--adjust-heading-level-to-root (content)
-  "Adjust the heading levels in CONTENT to make the first heading a level 1 heading.
-Subsequent headings are adjusted accordingly."
-  (with-temp-buffer
-    (insert content)
-    (goto-char (point-min))
-    (let ((first-heading-level (when (looking-at "^\\(\\*+\\)")
-                                  (length (match-string 1)))))
-      (if first-heading-level
-          (let ((adjustment (- first-heading-level 1)))
-            (while (re-search-forward "^\\*+" nil t)
-              (replace-match (make-string (max 1 (- (length (match-string 0)) adjustment)) ?*) nil nil)))
-        (error "Content does not start with a heading")))
-    (buffer-string)))
-
-(defun dc/org-roam-embed-heading-node ()
-  "Find an org-roam node and insert its contents. The ID is kept the same
-because it is presumed only one node of the same content should keep the ID
-and be a node. Also fixes a lot of attachment problems as attachments would
-still work as they are associated with an ID."
-  (interactive)
-  (let ((node (org-roam-node-read))
-        (origin-buffer (current-buffer)))
-    (when node
-      (with-temp-buffer
-        (insert-file-contents (org-roam-node-file node))
-        (goto-char (point-min))
-        (when-let ((id (org-roam-node-id node)))
-          (search-forward-regexp (concat ":ID:[ \t]+" (regexp-quote id)) nil t)
-          (condition-case nil
-              (org-back-to-heading)
-            (error (user-error "The node is standalone and not a sub-node. It does not make sense to embed it."))))
-        (let ((start (point))
-              (end (progn (org-end-of-subtree) (point))))
-          (with-current-buffer origin-buffer
-            (let ((content (buffer-substring-no-properties start end)))
-              (insert (dc/org-roam-embed-heading-node--adjust-heading-level-to-root content)))))))))
-
 ;;;; Alert
 ;;;;; Configuration
 (use-package alert
@@ -908,7 +886,7 @@ Android port."
   ;; Use different backends depending on the platform
   (alert-default-style (if (eq system-type 'android)
                            'android-notifications
-                         'libnotify))
+                         'notifications))
   :config
   ;; Setup timing
   (setq org-alert-interval 300
@@ -1049,6 +1027,15 @@ use filename."
   (setq org-attach-auto-tag nil)
   )
 
+;;;;; Functions - Attach and insert attachment at once
+(defun dc/org-attach-file-and-insert-link ()
+  "Attach a file to the current Org entry and insert a link to it.
+The attached file is moved to the attachment directory and a link is inserted at point."
+  (interactive)
+  (let ((file (read-file-name "Select file to attach: " default-directory)))
+    (org-attach-attach file nil 'mv)
+    (insert (format "[[attachment:%s]]" (file-name-nondirectory file)))))
+
 ;;;; Org-download
 ;;;;; Configuration
 (use-package org-download
@@ -1150,6 +1137,17 @@ use filename."
   ;; Set default .emacs-bmk-bmenu-commands.el file path
   (setq bmkp-bmenu-commands-file (expand-file-name ".emacs-bmk-bmenu-commands.el" user-emacs-directory))
   )
+
+;;;;; Functions - URL bookmarks
+(defun dc/bookmark-set-url (bookmark-name url)
+  "Add a new URL bookmark."
+  (interactive "sBookmark name: \nsURL: ")
+  (let ((bookmark (list bookmark-name
+                        (cons 'filename url)
+                        (cons 'handler 'eww-bookmark-jump-handler)
+                        (cons 'location url))))
+    (bookmark-store bookmark-name bookmark nil)
+    (bookmark-save)))
 
 ;;;;; Functions - Bookmark Paths on Different Platforms
 (defun dc/bookmark-jump--modify-bookmark-path-advice (orig-fun &rest args)
@@ -1364,22 +1362,5 @@ DIGITS is tre  number of pin digits and defaults to 6."
       (message "Your password for '%s' is: %s"
                (propertize (plist-get auth :host) 'face 'font-lock-keyword-face)
                (propertize password 'face 'font-lock-string-face)))))
-
-;;; GPT
-;;;; Gptel
-;;;;; Configuration
-(use-package gptel
-  :ensure t
-  :config
-  ;; Set API key to nil at the beginning
-  (setq gptel-api-key nil)
-  )
-
-;;;;; Functions - API key
-(defun dc/set-gptel-openai-api-key ()
-  "Set the `gptel-api-key` variable from auth-source."
-  (interactive)
-  (setq gptel-api-key
-        (auth-source-pick-first-password :host "API:openai.com")))
 
 ;;; init.el ends here
