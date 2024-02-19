@@ -2,7 +2,7 @@
 #+AUTHOR: Danijel Camdzic
 
 This repository contains my personal Emacs configuration. This configuration is
-intended to work on both Android port of Emacs and Windows/Linux Emacs. The
+intended to work on both Android port of Emacs and Linux Emacs. The
 installation process and the explanation of some of the more exciting features
 which I use in my workflow are presented in this README file.
 
@@ -60,16 +60,16 @@ From here:
 
 4. Start Emacs and wait for all the packages to be downloaded.
 
-** Installation on Linux/Windows
+** Installation on Linux
 
-To install Emacs on Linux/Windows, the process is much more straightforward.
+To install Emacs on Linux, the process is much more straightforward.
 
 1. Download Emacs (Vanilla one, not Doom or Spacemacs) on your machine depending on your operating system.
 2. Delete (if created) the =.emacs= file
 3. Create the =init.el= file and move it in the =.emacs.d= folder. The =init.el= file
    is the same as in the Android case.
 
-Note that =early-init.el= is not necessary for Linux/Windows cases.
+Note that =early-init.el= is not necessary for Linux cases.
 
 * Syncing
 
@@ -118,7 +118,7 @@ set up to the sidebar configuration.
 I use =dired-sidebar= and =ibuffer-sidebar= and have created wrapper functions which
 I use to seamlessly transition to using them.
 
-*** Android Editor
+*** Android editor
 
 The most important part of this configuration section is the following:
 
@@ -146,7 +146,7 @@ This section contains the configuration for that
 package as well as some custom functions which improve how the dashboard
 looks. This is mainly related to how the agenda items appear in the dashboard.
 
-*** Relative vs Absolute Dates in Dashboard-Agenda
+*** Relative vs absolute dates in dashboard-agenda
 
 In the original version, the agenda items would appear and be shown with their
 scheduled dates. I didn't like seeing the dates as they are, and preffered to see
@@ -194,7 +194,7 @@ In this section, the main parts of the configuration concern the general =org-mo
 
 I will showcase a few here.
 
-*** Calendar Display of States and Notes
+*** Calendar display of states and notes
 
 I wanted to have a way to visualize how my =TODO= (or any heading) changed
 throughout its existance. I want to see when I marked it as =DONE=, when as =FAIL=
@@ -238,7 +238,7 @@ with green dates all the dates that you have made a note in.
 You can even go to the place where the =STATE= or =NOTE= was added by clicking on
 the calendar date.
 
-*** Org Roam Nodes with Tag Insertion
+*** Org-roam nodes with tag insertion
 
 There is a function called =dc/org-roam-insert-nodes-by-tags=, which enables you to
 insert in the org file all nodes that have certain tags but do not have other
@@ -254,7 +254,7 @@ tag =fitness= but do not have the tag =cardio=.
 There are also in here many functions which serve as a wrapper so they can be
 called in either the =org-agenda= buffer or the =org= file.
 
-*** Org-Alert Notification on both Android and Linux
+*** Org-alert notifications on both Android and Linux
 
 I use =org-alert= package for notifications. My usual configuration is rather
 simple:
@@ -328,7 +328,7 @@ Here is an example of how it will look like on Android:
 
 [[assets/android-org-alert.png]]
 
-*** Org-Alert Notification Titles
+*** Org-alert notification titles
 
 I really like how =org-super-agenda= package is able to group TODOs together
 based on the =auto-parent= property. This groups the TODOs based on their
@@ -417,7 +417,7 @@ detect that you are running Android and give you the notification!
 [[assets/org-alert-title-android.png]]
 ** Bookmarks
 
-*** Seamless Bookmark Management on Android and Linux
+*** Seamless bookmark management on Android and Linux
 
 This section contains bookmark related configuration. I use =bookmark+= package and have a
 unified bookmark file which works on both Linux and Android. To be able to work
@@ -428,7 +428,7 @@ home directory depending on the system
 This way syncthing app can be used to sync the bookmark file and the bookmarks
 will be opened seamlessly on both types of systems.
 
-** TOTP and Password Manager
+** TOTP and password manager
 
 This section contains two package configurations which include =auth-sources= and
 =epa=.

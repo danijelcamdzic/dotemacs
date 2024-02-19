@@ -3,12 +3,12 @@
 ;;; Code:
 
 ;;; User
-;;;; User Credentials
+;;;; User credentials
 ;; User name and email
 (setq user-full-name "Danijel Camdzic")
 (setq user-mail-address "danijelcamdzic@tuta.com")
 
-;;;; User Directories
+;;;; User directories
 ;; Define the home directories variables
 (defvar dc-android-home "/storage/emulated/0/")
 (defvar dc-gnu-linux-home "~/")
@@ -24,7 +24,7 @@
 ;; Set the user folders
 (setq dc-books-directory (concat dc-home-directory "Books/"))
 (setq dc-documents-directory (concat dc-home-directory "Documents/"))
-(setq dc-downloads-directory (concat dc-home-directory "Downloads/")) 
+(setq dc-download-directory (concat dc-home-directory "Download/")) 
 (setq dc-music-directory (concat dc-home-directory "Music/"))         
 (setq dc-notes-directory (concat dc-home-directory "Notes/"))
 (setq dc-pictures-directory (concat dc-home-directory "Pictures/"))   
@@ -32,7 +32,26 @@
 (setq dc-recordings-directory (concat dc-home-directory "Recordings/"))
 (setq dc-videos-directory (concat dc-home-directory "Videos/"))
 
-;;; Package Managers
+;;;;; Functions - Open user directory
+(defun dc/open-user-directory ()
+  "Open a user directory in dired."
+  (interactive)
+  (let* ((directories '(("Books" . dc-books-directory)
+                        ("Documents" . dc-documents-directory)
+                        ("Download" . dc-download-directory)
+                        ("Music" . dc-music-directory)
+                        ("Notes" . dc-notes-directory)
+                        ("Pictures" . dc-pictures-directory)
+                        ("Projects" . dc-projects-directory)
+                        ("Recordings" . dc-recordings-directory)
+                        ("Videos" . dc-videos-directory)))
+         (choice (completing-read "Choose a directory: " directories))
+         (directory-symbol (assoc-default choice directories))
+         (directory (symbol-value directory-symbol)))
+    (message "Opening directory: %s" directory) ; Debug message
+    (dired directory)))
+
+;;; Package managers
 ;;;; Package
 ;;;;; Configuration
 (require 'package)
@@ -45,7 +64,6 @@
 
 ;;;; Melpa
 ;;;;; Configuration
-;; Add melpa package archives
 (add-to-list 'package-archives
              '("melpa" . "http://melpa.org/packages/") t)
 
@@ -110,7 +128,8 @@
 ;; Remove startup screen
 (setq inhibit-startup-screen t)
 
-;; Open org-agenda day view on startup (unless called with a file argument)
+;; Open org-agenda day view on startup
+;; (unless called with a file argument)
 (add-hook 'emacs-startup-hook
           (lambda ()
             (unless (> (length command-line-args) 1)
@@ -128,6 +147,7 @@
   ;; Buffer display settings
   (setq display-buffer-alist
         '((".*" (display-buffer-same-window) (inhibit-same-window . nil))))
+  
   ;; Touchscreen keyboard spawn
   (setq touch-screen-display-keyboard t))
 
@@ -153,22 +173,17 @@
   (setq dired-sidebar-window-fixed nil)
   )
 
-;;;;;; Functions - Dired-sidebar Toggle
+;;;;;; Functions - Dired-sidebar toggle
 (defun dc/dired-sidebar-toggle ()
   "Toggle `dired-sidebar'."
   (interactive)
   (dired-sidebar-toggle-sidebar))
 
-;;;; Text Editing
+;;;; Text editing
 ;; Indentation
 (setq-default indent-tabs-mode nil
               tab-width 4
               indent-line-function 'insert-tab)
-
-;; New lines on new heading entry
-(customize-set-variable 'org-blank-before-new-entry 
-                        '((heading . nil)
-                          (plain-list-item . nil)))
 
 ;; Text faces
 (custom-set-faces
@@ -188,12 +203,7 @@
 ;; Disable line numbers
 (global-display-line-numbers-mode 0)
 
-;;;; Document viewing
-;;;;; Doc-view
-;; Set higher resolution for viewing documents
-(setq doc-view-resolution 200)
-
-;;;; Version Control
+;;;; Version control
 ;;;;; Magit
 ;;;;;; Configuration
 (use-package magit
@@ -227,6 +237,11 @@
   ;; Setup which-key-mode
   (which-key-mode)
   )
+
+;;; Document viewing
+;;;; Doc-view
+;; Set higher resolution for viewing documents
+(setq doc-view-resolution 400)
 
 ;;; Completion
 ;;;; Company
@@ -263,7 +278,7 @@
   )
 
 ;;; GUI
-;;;; Functions: GUI Display Show/Hide
+;;;; Functions: GUI display show/hide
 (defun dc/gui-hide-bars ()
   "Disable scroll bar, menu bar, and tool bar."
   (interactive)
@@ -289,10 +304,20 @@
 
   ;; Set org-mode preferences for buffer display
   (setq org-startup-indented t)
+  (setq org-startup-folded t)
   (add-hook 'org-mode-hook (lambda () (setq fill-column 80)))
   (add-hook 'org-mode-hook #'turn-on-auto-fill)
   (add-hook 'org-mode-hook 'org-hide-block-all)
   (add-hook 'org-mode-hook 'org-hide-drawer-all)
+
+  ;; Add new line before heading
+  (setf org-blank-before-new-entry '((heading . t)))
+
+  ;; Display inline images on startup
+  (setq org-startup-with-inline-images t)
+
+  ;; Set the width of the inline images to be the actual size
+  (setq org-image-actual-width t)
 
   ;; Set custom faces for scheduled headings
   (custom-set-faces
@@ -302,12 +327,6 @@
   ;; Configure heading logs to be logged in "LOGBOOK" drawer
   (setq org-log-into-drawer t)
   (setq org-log-note-clock-out t)
-
-  ;; Display inline images on startup
-  (setq org-startup-with-inline-images t)
-
-  ;; Set the width of the inline images to be the actual size
-  (setq org-image-actual-width t)
   
   ;; Set path type to relative so it works on all platforms
   (setq org-link-file-path-type 'relative)
@@ -332,12 +351,12 @@
   )
 
 ;;;;; Functions - Link insertion
-(defun dc/org-insert-set-link-default-directory (dir)
-  "Set the default directory for org links."
-  (interactive "DSet default directory for org links: ")
+(defun dc/org-insert-link-set-default-directory (dir)
+  "Set the default directory for 'org-insert-link' to start from."
+  (interactive "DSet default directory: ")
   (setq default-directory dir))
 
-;;;;; Functions - Datetime Insertion
+;;;;; Functions - Datetime insertion
 (defun dc/org-insert-current-date-time ()
   "Insert the current date and time along with the three-letter weekday name in
 the format YYYY-MM-DD Day H:M."
@@ -397,7 +416,7 @@ or in an org file."
         (org-back-to-heading t)
         (org-schedule '(4))))))
 
-;;;;; Functions - State Change
+;;;;; Functions - State change
 (defun dc/org-todo-change-state ()
   "Change state of a current heading."
   (interactive)
@@ -473,7 +492,7 @@ current state is TODO."
       (org-agenda-add-note)
     (org-add-note)))
 
-;;;;; Functions - Logbook Calendar Display
+;;;;; Functions - Logbook calendar display
 (defun dc/org-logbook--parse-logbook-states (logbook beg buffer)
   "Parse a logbook string and return a list of entries with states."
   (let ((lines (split-string logbook "\n" t))
@@ -653,7 +672,7 @@ org file on the year calendar."
           "......" "----------------"))
   )
 
-;;;;; Functions - Agenda Views
+;;;;; Functions - Agenda views
 (defun dc/org-agenda--switch-to-view (view-fn)
   "Switch to the given Org Agenda view function VIEW-FN and insert timeline."
   (if (eq major-mode 'org-agenda-mode)
@@ -690,7 +709,7 @@ org file on the year calendar."
   (org-super-agenda-mode)
   )
 
-;;;;; Functions - Auto-Parents
+;;;;; Functions - Auto parents
 (defun dc/org-super-agenda-get-todo-parent (item)
   "Get the parent heading of ITEM, or if none, the file title or filename."
   (org-super-agenda--when-with-marker-buffer (org-super-agenda--get-marker item)
@@ -704,7 +723,7 @@ org file on the year calendar."
 (org-super-agenda--def-auto-group parent "their parent heading or file title/filename"
   :key-form (dc/org-super-agenda-get-todo-parent item))
 
-;;;;; Functions - TODO View
+;;;;; Functions - TODO view
 (defun dc/org-agenda-todo-view ()
   "Open Org Agenda in the todos view mode with super agenda. Use file title as groups"
   (interactive)
@@ -730,7 +749,7 @@ org file on the year calendar."
   (org-roam-setup)
   )
 
-;;;;; Functions - Node Hierarchy
+;;;;; Functions - Node hierarchy
 (defun dc/org-roam--get-node-heirarchy (node)
   "Get the hierarchy of NODE as a list of titles, excluding non-node headings.
 The hierarchy includes the NODE title and its ancestor node titles."
@@ -749,7 +768,7 @@ The hierarchy includes the NODE title and its ancestor node titles."
     (push title titles)
     (nreverse titles)))
 
-;;;;; Functions - Node Display Formatting
+;;;;; Functions - Node display formatting
 (defvar dc-org-roam-hierarchy-display-separator
   (propertize "->" 'face '(shadow))
   "Separator for org-roam hierarchy displaying.")
@@ -788,7 +807,7 @@ The hierarchy includes the NODE title and its ancestor node titles."
 (setq org-roam-node-display-template
       (concat "${hierarchy}" "${node-type}" (propertize "${colon-tags}" 'face 'org-tag)))
 
-;;;;; Functions - Inserting Nodes by Tags
+;;;;; Functions - Inserting nodes by tags
 (defvar dc-org-roam-hierarchy-insert-separator
   (propertize "->" 'face '(shadow))
   "Separator for org-roam hierarchy insertion.")
@@ -856,7 +875,7 @@ and when nil is returned the node will be filtered out."
     (setq alert-default-icon "ic_popup_reminder"))
   )
 
-;;;;; Functions - Android Notifications
+;;;;; Functions - Android notifications
 (defun dc/alert-android-notifications-notify (info)
   "Send notifications using `android-notifications-notify'.
 `android-notifications-notify' is a built-in function in the native Emacs
@@ -904,7 +923,7 @@ Android port."
   (org-alert-enable)
   )
 
-;;;;; Functions - Notification Titles
+;;;;; Functions - Notification titles
 (defvar dc-org-alert-title-type 'custom
   "Control the title type for `org-alert' notifications.
   /home/danijelcamdzic/Projects/dotemacs/ Possible values are:
@@ -995,7 +1014,7 @@ use filename."
   :ensure t
   )
 
-;;;;; Functions - Transclusion Insertion
+;;;;; Functions - Transclusion insertion
 (defun dc/org-transclusion-insert-node ()
   "Insert a transcluded link to an org-roam node."
   (interactive)
@@ -1025,15 +1044,18 @@ use filename."
   
   ;; Remove default tag for attachments
   (setq org-attach-auto-tag nil)
+  
+  ;; Set default attachment method to copy
+  (setq org-attach-method 'cp)
   )
 
 ;;;;; Functions - Attach and insert attachment at once
 (defun dc/org-attach-file-and-insert-link ()
   "Attach a file to the current Org entry and insert a link to it.
-The attached file is moved to the attachment directory and a link is inserted at point."
+The attached file is copied to the attachment directory and a link is inserted at point."
   (interactive)
   (let ((file (read-file-name "Select file to attach: " default-directory)))
-    (org-attach-attach file nil 'mv)
+    (org-attach-attach file nil 'cp)
     (insert (format "[[attachment:%s]]" (file-name-nondirectory file)))))
 
 ;;;; Org-download
@@ -1049,7 +1071,7 @@ The attached file is moved to the attachment directory and a link is inserted at
   (setq-default org-download-heading-lvl nil)
   )
 
-;;;;; Functions - Screenshot Filename
+;;;;; Functions - Screenshot filename
 (defun dc/org-download-clipboard--prompt-for-name-advice (orig-fun &optional basename)
   "Advice to prompt for a basename before calling `org-download-clipboard'."
   (message "Calling advice function")
@@ -1098,7 +1120,7 @@ The attached file is moved to the attachment directory and a link is inserted at
 
 (advice-add 'org-media-note--format-picture-file-name :around #'dc/org-media-note--format-picture-file-name--prepend-timestamp-advice)
 
-;;;;; Functions - Invalid Characters
+;;;;; Functions - Invalid characters
 (defun dc/remove-invalid-characters-from-filename (filename)
   "Remove invalid characters from filename in order for it to sync to Android using syncthing."
   (replace-regexp-in-string "[/*\":<>?|]" "" filename))
@@ -1149,7 +1171,7 @@ The attached file is moved to the attachment directory and a link is inserted at
     (bookmark-store bookmark-name bookmark nil)
     (bookmark-save)))
 
-;;;;; Functions - Bookmark Paths on Different Platforms
+;;;;; Functions - Bookmark paths on different platforms
 (defun dc/bookmark-jump--modify-bookmark-path-advice (orig-fun &rest args)
   "Modify the bookmark filename and directory based on system type before opening."
   (let* ((bookmark (car args))
@@ -1185,7 +1207,7 @@ The attached file is moved to the attachment directory and a link is inserted at
 (advice-add 'bookmark-jump :around #'dc/bookmark-jump--modify-bookmark-path-advice)
 
 ;;; Datetime
-;;;; Functions - Time Adjustment
+;;;; Functions - Time adjustment
 (defvar dc-adjusted-time nil
   "Adjusted time. This time will replace current time.")
 

@@ -2,7 +2,7 @@
 
 ;;; Code:
 
-;;; Emacs/Termux Android Collaboration
+;;; Emacs/Termux Android collaboration
 ;; Set up PATH so Termux-installed packages can be used by Emacs on Android
 (setenv "PATH" (format "%s:%s" "/data/data/com.termux/files/usr/bin"
 		               (getenv "PATH")))
