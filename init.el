@@ -128,12 +128,14 @@
 ;; Remove startup screen
 (setq inhibit-startup-screen t)
 
-;; Open org-agenda day view on startup
+;; Open org-agenda day view and org-roam daily note on startup
 ;; (unless called with a file argument)
-(add-hook 'emacs-startup-hook
+(add-hook 'window-setup-hook
           (lambda ()
             (unless (> (length command-line-args) 1)
-              (dc/org-agenda-day-view))))
+              (org-roam-dailies-goto-today)
+              (dc/org-agenda-day-view)  
+              )))
 
 ;;;; Files
 ;; Disable backup and lock files
