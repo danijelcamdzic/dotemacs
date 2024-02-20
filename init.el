@@ -663,8 +663,10 @@ org file on the year calendar."
 (use-package org-agenda
   :after org
   :config
-  ;; Set org-agenda-files to org-directory
-  (setq org-agenda-files (list org-directory))
+  ;; Set org-agenda-files to all files in org-directory ending in _agenda.org
+  ;; This is done so org-agenda-files does not search through many files
+  (setq org-agenda-files
+        (directory-files org-directory t "_agenda\\.org$"))
   
   ;; Customize org-agenda view
   (setq org-agenda-prefix-format  '((agenda . "  %t ")
@@ -684,6 +686,13 @@ org file on the year calendar."
           (0000 0200 0400 0600 0800 1000 1200 1400 1600 1800 2000 2200 2359)
           "......" "----------------"))
   )
+
+;;;;; Functions - Agenda files
+(defun dc/org-agenda-update-agenda-files ()
+  "Update org-agenda-files with all files in org-directory ending in _agenda.org."
+  (interactive)
+  (setq org-agenda-files
+        (directory-files org-directory t "_agenda\\.org$")))
 
 ;;;;; Functions - Agenda views
 (defun dc/org-agenda--switch-to-view (view-fn)
