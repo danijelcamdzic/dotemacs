@@ -33,6 +33,7 @@
 (setq dc-videos-directory (concat dc-home-directory "Videos/"))
 
 ;;;;; Functions - Open user directory
+
 (defun dc/open-user-directory ()
   "Open a user directory in dired."
   (interactive)
@@ -128,15 +129,6 @@
 ;; Remove startup screen
 (setq inhibit-startup-screen t)
 
-;; Open org-agenda day view and org-roam daily note on startup
-;; (unless called with a file argument)
-(add-hook 'window-setup-hook
-          (lambda ()
-            (unless (> (length command-line-args) 1)
-              (org-roam-dailies-goto-today)
-              (dc/org-agenda-day-view)  
-              )))
-
 ;;;; Files
 ;; Disable backup and lock files
 (setq create-lockfiles nil
@@ -152,6 +144,25 @@
   
   ;; Touchscreen keyboard spawn
   (setq touch-screen-display-keyboard t))
+
+;; Open org-agenda day view and org-roam daily note on startup
+;; (unless called with a file argument)
+(add-hook 'emacs-startup-hook
+          (lambda ()
+            (unless (> (length command-line-args) 1)
+              (org-roam-dailies-goto-today)
+              (dc/org-agenda-day-view)
+              )))
+
+;;;;; Functions - Killing all buffers
+(defun dc/kill-background-buffers ()
+  "Kill all buffers that are not currently visible in any window, except the *Messages* buffer."
+  (interactive)
+  (let ((visible-buffers (mapcar 'window-buffer (window-list))))
+    (dolist (buffer (buffer-list))
+      (unless (or (member buffer visible-buffers)
+                  (string= (buffer-name buffer) "*Messages*"))
+        (kill-buffer buffer)))))
 
 ;;;;; IBuffer
 ;;;;;; Configuration
