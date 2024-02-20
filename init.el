@@ -176,12 +176,16 @@
 ;;;;; Functions - Killing all buffers
 
 (defun dc/kill-background-buffers ()
-  "Kill all buffers that are not currently visible in any window, except the *Messages* buffer."
+  "Kill all buffers that are not currently visible in any window, except the *Messages*, *Org Agenda*,
+and today's Org Roam daily buffer."
   (interactive)
-  (let ((visible-buffers (mapcar 'window-buffer (window-list))))
+  (let ((visible-buffers (mapcar 'window-buffer (window-list)))
+        (today-daily-file (format-time-string "%Y-%m-%d.org" (current-time))))
     (dolist (buffer (buffer-list))
       (unless (or (member buffer visible-buffers)
-                  (string= (buffer-name buffer) "*Messages*"))
+                  (string= (buffer-name buffer) "*Messages*")
+                  (string= (buffer-name buffer) "*Org Agenda*")
+                  (string= (buffer-name buffer) today-daily-file))
         (kill-buffer buffer)))))
 
 ;;;;; IBuffer
