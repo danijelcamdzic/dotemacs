@@ -3,12 +3,15 @@
 ;;; Code:
 
 ;;; User
+
 ;;;; User credentials
+
 ;; User name and email
 (setq user-full-name "Danijel Camdzic")
 (setq user-mail-address "danijelcamdzic@tuta.com")
 
 ;;;; User directories
+
 ;; Define the home directories variables
 (defvar dc-android-home "/storage/emulated/0/")
 (defvar dc-gnu-linux-home "~/")
@@ -53,8 +56,11 @@
     (dired directory)))
 
 ;;; Package managers
+
 ;;;; Package
+
 ;;;;; Configuration
+
 (require 'package)
 
 ;; Temporarily disable signature checks
@@ -64,12 +70,16 @@
 (package-initialize)
 
 ;;;; Melpa
+
 ;;;;; Configuration
+
 (add-to-list 'package-archives
              '("melpa" . "http://melpa.org/packages/") t)
 
 ;;;; Use-package
+
 ;;;;; Configuration
+
 ;; Install use-package
 (unless (package-installed-p 'use-package)
   (package-refresh-contents)
@@ -78,7 +88,9 @@
 (require 'use-package)
 
 ;;;; Quelpa
+
 ;;;;; Configuration
+
 (use-package quelpa
   :ensure t
   :init
@@ -88,7 +100,9 @@
   )
 
 ;;;; Quelpa-use-package
+
 ;;;;; Configuration
+
 (use-package quelpa-use-package
   :ensure t
   :after (quelpa)
@@ -98,7 +112,9 @@
   )
 
 ;;; Editor
+
 ;;;; Theme
+
 ;; Install gruvbox-theme
 (use-package gruvbox-theme
   :ensure t
@@ -111,6 +127,7 @@
 (set-fringe-mode 0)
 
 ;;;; Startup
+
 ;; Bind command call in Android to hardware keys volume up and volume down
 (when (eq system-type 'android)
   ;; Volume up calls to execute the command
@@ -130,12 +147,14 @@
 (setq inhibit-startup-screen t)
 
 ;;;; Files
+
 ;; Disable backup and lock files
 (setq create-lockfiles nil
       auto-save-default nil
       make-backup-files nil)
 
 ;;;; Buffers
+
 ;; Change buffer behavior on Android
 (when (eq system-type 'android)
   ;; Buffer display settings
@@ -155,6 +174,7 @@
               )))
 
 ;;;;; Functions - Killing all buffers
+
 (defun dc/kill-background-buffers ()
   "Kill all buffers that are not currently visible in any window, except the *Messages* buffer."
   (interactive)
@@ -165,20 +185,25 @@
         (kill-buffer buffer)))))
 
 ;;;;; IBuffer
+
 ;;;;;; Configuration
+
 (use-package ibuffer-sidebar
   :ensure t
   :config
   )
 
 ;;;;;; Functions - IBuffer-sidebar Toggle
+
 (defun dc/ibuffer-sidebar-toggle ()
   "Toggle `ibuffer-sidebar'."
   (interactive)
   (ibuffer-sidebar-toggle-sidebar))
 
 ;;;;; Dired-sidebar
+
 ;;;;;; Configuration
+
 (use-package dired-sidebar
   :ensure t
   :config
@@ -187,12 +212,14 @@
   )
 
 ;;;;;; Functions - Dired-sidebar toggle
+
 (defun dc/dired-sidebar-toggle ()
   "Toggle `dired-sidebar'."
   (interactive)
   (dired-sidebar-toggle-sidebar))
 
 ;;;; Text editing
+
 ;; Indentation
 (setq-default indent-tabs-mode nil
               tab-width 4
@@ -205,7 +232,9 @@
  '(strike-through ((t (:foreground "#8B0000" :strike-through t)))))
 
 ;;;;; Programming
+
 ;;;;;; C/CPP
+
 (defun dc/c-cpp-mode-setup ()
   "Set basic c and cpp offset."
   (setq c-basic-offset 4))
@@ -217,18 +246,24 @@
 (global-display-line-numbers-mode 0)
 
 ;;;; Version control
+
 ;;;;; Magit
+
 ;;;;;; Configuration
+
 (use-package magit
   :ensure t
   )
 
 ;;;; Visual Modes
+
 ;; Enable outline-minor-mode as soon as .el file is opened
 (add-hook 'emacs-lisp-mode-hook 'outline-minor-mode)
 
 ;;;;; Outline-minor-mode
+
 ;;;;;; Configuration
+
 (use-package outline-minor-faces
   :ensure t
   :after outline
@@ -237,13 +272,17 @@
   )
 
 ;;;;; Pretty-hydra
+
 ;;;;;; Configuration
+
 (use-package pretty-hydra
   :ensure t
   )
 
 ;;;;; Which-key
+
 ;;;;;; Configuration
+
 (use-package which-key
   :ensure t
   :config
@@ -252,13 +291,18 @@
   )
 
 ;;; Document viewing
+
 ;;;; Doc-view
+
 ;; Set higher resolution for viewing documents
 (setq doc-view-resolution 400)
 
 ;;; Completion
+
 ;;;; Company
+
 ;;;;; Configuration
+
 (use-package company
   :ensure t
   :config
@@ -270,13 +314,17 @@
   )
 
 ;;;; Orderless
+
 ;;;;; Configuration
+
 (use-package orderless
   :ensure t
   )
 
 ;;;; Vertico
+
 ;;;;; Configuration
+
 (use-package vertico
   :after orderless
   :ensure t
@@ -291,7 +339,9 @@
   )
 
 ;;; GUI
+
 ;;;; Functions: GUI display show/hide
+
 (defun dc/gui-hide-bars ()
   "Disable scroll bar, menu bar, and tool bar."
   (interactive)
@@ -307,8 +357,11 @@
   (tool-bar-mode 1))
 
 ;;; Org-mode
+
 ;;;; Org
+
 ;;;;; Configuration
+
 (use-package org
   :ensure t
   :config
@@ -364,12 +417,14 @@
   )
 
 ;;;;; Functions - Link insertion
+
 (defun dc/org-insert-link-set-default-directory (dir)
   "Set the default directory for 'org-insert-link' to start from."
   (interactive "DSet default directory: ")
   (setq default-directory dir))
 
 ;;;;; Functions - Datetime insertion
+
 (defun dc/org-insert-current-date-time ()
   "Insert the current date and time along with the three-letter weekday name in
 the format YYYY-MM-DD Day H:M."
@@ -377,6 +432,7 @@ the format YYYY-MM-DD Day H:M."
   (insert (format-time-string "%Y-%m-%d %a %H:%M")))
 
 ;;;;; Functions - Clocking
+
 (defun dc/org-clock-in ()
   "Clock in the current org heading."
   (interactive)
@@ -392,6 +448,7 @@ the format YYYY-MM-DD Day H:M."
     (org-clock-out)))
 
 ;;;;; Functions - Scheduling
+
 (defun dc/org-add-schedule ()
   "Add a scheduling timestamp to the current item in the Org Agenda or in
 an org file."
@@ -430,6 +487,7 @@ or in an org file."
         (org-schedule '(4))))))
 
 ;;;;; Functions - State change
+
 (defun dc/org-todo-change-state ()
   "Change state of a current heading."
   (interactive)
@@ -498,6 +556,7 @@ current state is TODO."
                 (setq dc-time-override-lock nil)))))))))
 
 ;;;;; Functions - Notes
+
 (defun dc/org-add-note ()
   "Add a note to an org heading."
   (interactive)
@@ -506,6 +565,7 @@ current state is TODO."
     (org-add-note)))
 
 ;;;;; Functions - Logbook calendar display
+
 (defun dc/org-logbook--parse-logbook-states (logbook beg buffer)
   "Parse a logbook string and return a list of entries with states."
   (let ((lines (split-string logbook "\n" t))
@@ -659,7 +719,9 @@ org file on the year calendar."
   (define-key calendar-mode-map (kbd "<return>") 'dc/org-logbook--goto-entry))
 
 ;;;; Org-agenda
+
 ;;;;; Configuration
+
 (use-package org-agenda
   :after org
   :config
@@ -688,6 +750,7 @@ org file on the year calendar."
   )
 
 ;;;;; Functions - Agenda files
+
 (defun dc/org-agenda-update-agenda-files ()
   "Update org-agenda-files with all files in org-directory ending in _agenda.org."
   (interactive)
@@ -695,6 +758,7 @@ org file on the year calendar."
         (directory-files org-directory t "_agenda\\.org$")))
 
 ;;;;; Functions - Agenda views
+
 (defun dc/org-agenda--switch-to-view (view-fn)
   "Switch to the given Org Agenda view function VIEW-FN and insert timeline."
   (if (eq major-mode 'org-agenda-mode)
@@ -722,7 +786,9 @@ org file on the year calendar."
   (dc/org-agenda--switch-to-view 'org-agenda-year-view))
 
 ;;;; Org-super-agenda
+
 ;;;;; Configuration
+
 (use-package org-super-agenda
   :after org-agenda
   :ensure t
@@ -732,6 +798,7 @@ org file on the year calendar."
   )
 
 ;;;;; Functions - Auto parents
+
 (defun dc/org-super-agenda-get-todo-parent (item)
   "Get the parent heading of ITEM, or if none, the file title or filename."
   (org-super-agenda--when-with-marker-buffer (org-super-agenda--get-marker item)
@@ -746,6 +813,7 @@ org file on the year calendar."
   :key-form (dc/org-super-agenda-get-todo-parent item))
 
 ;;;;; Functions - TODO view
+
 (defun dc/org-agenda-todo-view ()
   "Open Org Agenda in the todos view mode with super agenda. Use file title as groups"
   (interactive)
@@ -755,7 +823,9 @@ org file on the year calendar."
     (setq org-super-agenda-groups '())))
 
 ;;;; Org-roam
+
 ;;;;; Configuration
+
 (use-package org-roam
   :after org
   :ensure t
@@ -772,6 +842,7 @@ org file on the year calendar."
   )
 
 ;;;;; Functions - Node hierarchy
+
 (defun dc/org-roam--get-node-heirarchy (node)
   "Get the hierarchy of NODE as a list of titles, excluding non-node headings.
 The hierarchy includes the NODE title and its ancestor node titles."
@@ -791,6 +862,7 @@ The hierarchy includes the NODE title and its ancestor node titles."
     (nreverse titles)))
 
 ;;;;; Functions - Node display formatting
+
 (defvar dc-org-roam-hierarchy-display-separator
   (propertize "->" 'face '(shadow))
   "Separator for org-roam hierarchy displaying.")
@@ -830,6 +902,7 @@ The hierarchy includes the NODE title and its ancestor node titles."
       (concat "${hierarchy}" "${node-type}" (propertize "${colon-tags}" 'face 'org-tag)))
 
 ;;;;; Functions - Inserting nodes by tags
+
 (defvar dc-org-roam-hierarchy-insert-separator
   (propertize "->" 'face '(shadow))
   "Separator for org-roam hierarchy insertion.")
@@ -887,7 +960,9 @@ and when nil is returned the node will be filtered out."
   (deactivate-mark))
 
 ;;;; Alert
+
 ;;;;; Configuration
+
 (use-package alert
   :ensure t
   :config
@@ -898,6 +973,7 @@ and when nil is returned the node will be filtered out."
   )
 
 ;;;;; Functions - Android notifications
+
 (defun dc/alert-android-notifications-notify (info)
   "Send notifications using `android-notifications-notify'.
 `android-notifications-notify' is a built-in function in the native Emacs
@@ -919,7 +995,9 @@ Android port."
                     :notifier #'dc/alert-android-notifications-notify)
 
 ;;;; Org-alert
+
 ;;;;; Configuration
+
 (use-package org-alert
   :ensure t
   :after org
@@ -946,6 +1024,7 @@ Android port."
   )
 
 ;;;;; Functions - Notification titles
+
 (defvar dc-org-alert-title-type 'custom
   "Control the title type for `org-alert' notifications.
   /home/danijelcamdzic/Projects/dotemacs/ Possible values are:
@@ -1000,13 +1079,17 @@ use filename."
 (dc/org-alert-update-advices)
 
 ;;;; Org-tempo
+
 ;;;;; Configuration
+
 (use-package org-tempo
   :after org
   )
 
 ;;;; Org-analyzer
+
 ;;;;; Configuration
+
 (use-package org-analyzer
   :after org
   :ensure t
@@ -1016,27 +1099,34 @@ use filename."
   )
 
 ;;;; Websocket
+
 ;;;;; Configuration
+
 (use-package websocket
   :after org-roam
   :ensure t
   )
 
 ;;;; Org-roam-ui
+
 ;;;;; Configuration
+
 (use-package org-roam-ui
   :after org-roam
   :ensure t
   )
 
 ;;;; Org-transclusion
+
 ;;;;; Configuration
+
 (use-package org-transclusion
   :after org
   :ensure t
   )
 
 ;;;;; Functions - Transclusion insertion
+
 (defun dc/org-transclusion-insert-node ()
   "Insert a transcluded link to an org-roam node."
   (interactive)
@@ -1048,7 +1138,9 @@ use filename."
         (insert link)))))
 
 ;;;; Org-attach
+
 ;;;;; Configuration
+
 (use-package org-attach
   :after org
   :config
@@ -1072,6 +1164,7 @@ use filename."
   )
 
 ;;;;; Functions - Attach and insert attachment at once
+
 (defun dc/org-attach-file-and-insert-link ()
   "Attach a file to the current Org entry and insert a link to it.
 The attached file is copied to the attachment directory and a link is inserted at point."
@@ -1081,7 +1174,9 @@ The attached file is copied to the attachment directory and a link is inserted a
     (insert (format "[[attachment:%s]]" (file-name-nondirectory file)))))
 
 ;;;; Org-download
+
 ;;;;; Configuration
+
 (use-package org-download
   :ensure t
   :after org
@@ -1094,6 +1189,7 @@ The attached file is copied to the attachment directory and a link is inserted a
   )
 
 ;;;;; Functions - Screenshot filename
+
 (defun dc/org-download-clipboard--prompt-for-name-advice (orig-fun &optional basename)
   "Advice to prompt for a basename before calling `org-download-clipboard'."
   (message "Calling advice function")
@@ -1105,14 +1201,18 @@ The attached file is copied to the attachment directory and a link is inserted a
 (advice-add 'org-download-clipboard :around #'dc/org-download-clipboard--prompt-for-name-advice)
 
 ;;;; Org-ref
+
 ;;;;; Configuration
+
 (use-package org-ref
   :ensure t
   :after org
   )
 
 ;;;; Org-noter
+
 ;;;;; Configuration
+
 (use-package org-noter
   :ensure t  
   :after org 
@@ -1122,7 +1222,9 @@ The attached file is copied to the attachment directory and a link is inserted a
   )
 
 ;;;; Org-media-note
+
 ;;;;; Configuration
+
 (use-package org-media-note
   :quelpa (org-media-note :fetcher github :repo "yuchen-lea/org-media-note")
   :hook (org-mode .  org-media-note-mode)
@@ -1134,6 +1236,7 @@ The attached file is copied to the attachment directory and a link is inserted a
   )
 
 ;;;;; Functions - Filename
+
 (defun dc/org-media-note--format-picture-file-name--prepend-timestamp-advice (orig-func &rest args)
   "Advice to prepend the current timestamp to the filename created by `org-media-note--format-picture-file-name'."
   (let ((original-filename (apply orig-func args))
@@ -1143,6 +1246,7 @@ The attached file is copied to the attachment directory and a link is inserted a
 (advice-add 'org-media-note--format-picture-file-name :around #'dc/org-media-note--format-picture-file-name--prepend-timestamp-advice)
 
 ;;;;; Functions - Invalid characters
+
 (defun dc/remove-invalid-characters-from-filename (filename)
   "Remove invalid characters from filename in order for it to sync to Android using syncthing."
   (replace-regexp-in-string "[/*\":<>?|]" "" filename))
@@ -1154,8 +1258,11 @@ The attached file is copied to the attachment directory and a link is inserted a
 (advice-add 'org-media-note--format-picture-file-name :around #'dc/org-media-note--format-picture-file-name--remove-invalid-characters-from-filename-advice)
 
 ;;; Bookmarks
+
 ;;;; Eww
+
 ;;;;; Configuration
+
 (use-package eww
   :config
   ;; Set default eww-bookmarks directory
@@ -1163,7 +1270,9 @@ The attached file is copied to the attachment directory and a link is inserted a
   )
 
 ;;;; Bookmark
+
 ;;;;; Configuration
+
 (use-package bookmark
   :config
   ;; Set default bookmark file
@@ -1171,7 +1280,9 @@ The attached file is copied to the attachment directory and a link is inserted a
   )
 
 ;;;; Bookmark+
+
 ;;;;; Configuration
+
 (use-package bookmark+
   :quelpa (bookmark+ :fetcher github :repo "emacsmirror/bookmark-plus")
   :config
@@ -1183,6 +1294,7 @@ The attached file is copied to the attachment directory and a link is inserted a
   )
 
 ;;;;; Functions - URL bookmarks
+
 (defun dc/bookmark-set-url (bookmark-name url)
   "Add a new URL bookmark."
   (interactive "sBookmark name: \nsURL: ")
@@ -1194,6 +1306,7 @@ The attached file is copied to the attachment directory and a link is inserted a
     (bookmark-save)))
 
 ;;;;; Functions - Bookmark paths on different platforms
+
 (defun dc/bookmark-jump--modify-bookmark-path-advice (orig-fun &rest args)
   "Modify the bookmark filename and directory based on system type before opening."
   (let* ((bookmark (car args))
@@ -1229,7 +1342,9 @@ The attached file is copied to the attachment directory and a link is inserted a
 (advice-add 'bookmark-jump :around #'dc/bookmark-jump--modify-bookmark-path-advice)
 
 ;;; Datetime
+
 ;;;; Functions - Time adjustment
+
 (defvar dc-adjusted-time nil
   "Adjusted time. This time will replace current time.")
 
@@ -1245,7 +1360,9 @@ The attached file is copied to the attachment directory and a link is inserted a
   (or dc-adjusted-time (current-time)))
 
 ;;;; Time-stamp
+
 ;;;;; Configuration
+
 (use-package time-stamp
   :config
   ;; Set up time-stamp format
@@ -1258,7 +1375,9 @@ The attached file is copied to the attachment directory and a link is inserted a
   )
 
 ;;;; Calendar
+
 ;;;;; Configuration
+
 (use-package calendar
   :config
   ;; Set calendar to start on Monday
@@ -1266,8 +1385,11 @@ The attached file is copied to the attachment directory and a link is inserted a
   )
 
 ;;; Encryption
+
 ;;;; Epa
+
 ;;;;; Configuration
+
 (use-package epa
   :ensure t
   :config
@@ -1294,8 +1416,11 @@ The attached file is copied to the attachment directory and a link is inserted a
   )
 
 ;;; Authentication
+
 ;;;; Auth-source
+
 ;;;;; Configuration
+
 (use-package auth-source
   :ensure t
   :config
@@ -1312,6 +1437,7 @@ The attached file is copied to the attachment directory and a link is inserted a
   )
 
 ;;;;; Functions - TOTP
+
 (require 'bindat)
 (require 'gnutls)
 (require 'hexl)
@@ -1387,6 +1513,7 @@ DIGITS is tre  number of pin digits and defaults to 6."
     code))
 
 ;;;;; Functions - Passwords
+
 (defun dc/password-display (auth)
   "Select a password entry (PASS) from `auth-sources', and briefly display its password."
   (interactive
