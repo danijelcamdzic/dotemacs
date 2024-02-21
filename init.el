@@ -153,6 +153,10 @@
       auto-save-default nil
       make-backup-files nil)
 
+;; Set custom variable file
+(setq custom-file (concat dc-documents-directory "custom.el"))
+(load custom-file 'noerror)
+
 ;;;; Buffers
 
 ;; Change buffer behavior on Android
@@ -728,12 +732,7 @@ org file on the year calendar."
 
 (use-package org-agenda
   :after org
-  :config
-  ;; Set org-agenda-files to all files in org-directory ending in _agenda.org
-  ;; This is done so org-agenda-files does not search through many files
-  (setq org-agenda-files
-        (directory-files org-directory t "_agenda\\.org$"))
-  
+  :config  
   ;; Customize org-agenda view
   (setq org-agenda-prefix-format  '((agenda . "  %t ")
                                     (todo . "%t ")
@@ -752,14 +751,6 @@ org file on the year calendar."
           (0000 0200 0400 0600 0800 1000 1200 1400 1600 1800 2000 2200 2359)
           "......" "----------------"))
   )
-
-;;;;; Functions - Agenda files
-
-(defun dc/org-agenda-update-agenda-files ()
-  "Update org-agenda-files with all files in org-directory ending in _agenda.org."
-  (interactive)
-  (setq org-agenda-files
-        (directory-files org-directory t "_agenda\\.org$")))
 
 ;;;;; Functions - Agenda views
 
@@ -895,11 +886,11 @@ The hierarchy includes the NODE title and its ancestor node titles."
       "")))
 
 (cl-defmethod org-roam-node-node-type ((node org-roam-node))
-  "Return a string which indicates whether a node is a `@note' or a `@daily'."
+  "Return a string which indicates whether a node is a `@roam' or a `@daily'."
   (let ((file-path (org-roam-node-file node)))
     (if (string-prefix-p (file-name-as-directory org-roam-dailies-directory) (file-name-directory file-path))
         " @daily"
-      " @note")))
+      " @roam")))
 
 ;; Set the hierarchy display formatting
 (setq org-roam-node-display-template
