@@ -752,6 +752,22 @@ org file on the year calendar."
           "......" "----------------"))
   )
 
+;;;;; Functions - Agenda files across systems
+
+(defun dc/org-aenda-adjust-org-agenda-files-paths ()
+  "Adjust the paths in `org-agenda-files` based on the system type."
+  (setq org-agenda-files
+        (mapcar (lambda (file)
+                  (cond ((eq system-type 'android)
+                         (replace-regexp-in-string (regexp-quote dc-gnu-linux-home) dc-android-home
+                                                   (replace-regexp-in-string (regexp-quote dc-gnu-linux-home-extended) dc-android-home file)))
+                        (t
+                         (replace-regexp-in-string (regexp-quote dc-android-home) dc-gnu-linux-home file))))
+                org-agenda-files)))
+
+;; Call the function to adjust the paths
+(dc/org-aenda-adjust-org-agenda-files-paths)
+
 ;;;;; Functions - Agenda views
 
 (defun dc/org-agenda--switch-to-view (view-fn)
