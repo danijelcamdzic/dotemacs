@@ -154,7 +154,7 @@
       make-backup-files nil)
 
 ;; Set custom variable file
-(setq custom-file (concat dc-documents-directory "custom.el"))
+(setq custom-file (concat dc-documents-directory "Emacs/custom.el"))
 (load custom-file 'noerror)
 
 ;;;; Buffers
@@ -754,7 +754,7 @@ org file on the year calendar."
 
 ;;;;; Functions - Agenda files across systems
 
-(defun dc/org-aenda-adjust-org-agenda-files-paths ()
+(defun dc/org-agenda-adjust-org-agenda-files-paths ()
   "Adjust the paths in `org-agenda-files` based on the system type."
   (setq org-agenda-files
         (mapcar (lambda (file)
@@ -766,7 +766,7 @@ org file on the year calendar."
                 org-agenda-files)))
 
 ;; Call the function to adjust the paths
-(dc/org-aenda-adjust-org-agenda-files-paths)
+(dc/org-agenda-adjust-org-agenda-files-paths)
 
 ;;;;; Functions - Agenda views
 
@@ -1277,7 +1277,7 @@ The attached file is copied to the attachment directory and a link is inserted a
 (use-package eww
   :config
   ;; Set default eww-bookmarks directory
-  (setq eww-bookmarks-directory (concat dc-documents-directory "Bookmarks/"))
+  (setq eww-bookmarks-directory (concat dc-documents-directory "Emacs/"))
   )
 
 ;;;; Bookmark
@@ -1287,7 +1287,7 @@ The attached file is copied to the attachment directory and a link is inserted a
 (use-package bookmark
   :config
   ;; Set default bookmark file
-  (setq bookmark-default-file (concat dc-documents-directory "Bookmarks/bookmarks"))
+  (setq bookmark-default-file (concat dc-documents-directory "Emacs/bookmarks"))
   )
 
 ;;;; Bookmark+
