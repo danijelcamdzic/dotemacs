@@ -1437,7 +1437,7 @@ The attached file is copied to the attachment directory and a link is inserted a
   :config
   ;; Set auth-sources files
   (setq auth-sources
-        (cl-loop for file in (directory-files (concat dc-documents-directory ".auth-sources/") t "\\.gpg$")
+        (cl-loop for file in (directory-files (concat dc-documents-directory "Emacs/.auth-sources/") t "\\.gpg$")
                  collect `(:source ,file)))
 
   ;; Enable authinfo-mode for auth-source files
