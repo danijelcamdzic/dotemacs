@@ -185,6 +185,122 @@ In the GUI menu bar, I add a bunch of features I have created all over my
 configuration for easy access. Some of then are in the ="Commands"= menu and some
 are in the ="Tools"= menu.
 
+** MPV
+
+I use [[https://mpv.io/][mpv]] player on both Linux and Android.
+
+*** Linux installation
+
+To install it on Linux, it is pretty straightforward, you just install it with
+your package manager. Here is an example using Arch Linux:
+
+#+begin_src bash
+pacman -S mpv
+#+end_src
+
+If you wish and are allowed to do so, you can install an additional package called
+[[https://github.com/yt-dlp/yt-dlp][yt-dlp]] which would enable you to play remote videos. I am not encouraging its
+use, but simply making you aware that this package exists and serves that
+purpose :).
+
+You can use this package even without Emacs, as it is simply a very powerful video player.
+
+*** Android installation
+
+The installation process on Android involves installing an app called
+[[https://github.com/mpv-android/mpv-android][mpv-android]]. The Github repository offers the '.apk' file in the releases.
+
+If you wish and are allowed to do so, you can install a version of the app with
+'yt-dlp' by visiting [[https://github.com/mpv-android/mpv-android/pull/58][this]] pull request which would enable you to play
+remote videos. Again, I am not encouraging its use, but simply making you aware that
+this version of the app exists and serves that purpose :).
+
+You can use this app even without Emacs, as it is simply a very powerful video player.
+
+*** Usage
+
+Now that you have installed Linux and Android MPV clients, you can integrate
+them into your Emacs and use them.
+
+There is an emacs package called [[https://github.com/kljohann/mpv.el][mpv.el]] which utilizes MPV and lets you play
+local and remote videos using MPV.
+
+**** Usage on Linux
+
+If you are using Linux, than there is no other configuratio necessary. You can
+use commands:
+
+#+begin_src text
+mpv-play
+mpv-play-url
+#+end_src
+
+and they work without problems.
+
+**** Usage on Android
+
+Android in my case had a problem of playing a video through MPV using the above
+methods. I got errors saying:
+
+#+begin_src text
+"Failed to connect to mpv"
+#+end_src
+
+Since I have mpv-android installed, I could use Termux and Emacs to communicate
+together and send commands to the mpv-android app and let it play videos.
+
+To do this, it is necessary to advise the `mpv-play` command from Emacs in order
+to use a different set of commands when requesting to play a video on
+mpv-android as opposed to a regular mpv package from Linux.
+
+The code which does this is given below:
+
+#+begin_src emacs-lisp
+;; This should only be done on Android
+(when (eq system-type 'android)
+  (defun dc/mpv-start--android-advice (orig-fun &rest args)
+    "Advice to use a different mpv command on Android. Android uses
+Termux package called mpv-android and Emacs should pass appropriate
+commands to it.
+
+This is an example of a full command passed down to mpv-android:
+
+am start -a android.intent.action.VIEW -t video/* -d file:///storage/emulated/0/Download/why_i_like_cats.mp4 --ei position 30000 -p is.xyz.mpv
+"
+    (let* ((media-path (car args))
+           (start-time (if (> (length args) 1) (nth 1 args) 0))
+           (start-time-ms (when (stringp start-time)
+                            (* (string-to-number (replace-regexp-in-string "\\`--start=\\+" "" start-time)) 1000)))
+           (is-remote (or (string-prefix-p "http://" media-path)
+                          (string-prefix-p "https://" media-path)))
+           (mpv-command (format "am start -a android.intent.action.VIEW -t video/* %s%s"
+                                (if is-remote "-d " "-d file:///")
+                                media-path)))
+      (when start-time-ms
+        (setq mpv-command (format "%s --ei position %d" mpv-command start-time-ms)))
+      (setq mpv-command (format "%s -p is.xyz.mpv" mpv-command))
+      (start-process "mpv-android" nil "sh" "-c" mpv-command)))
+
+  ;; Add advice to mpv-start so it open the correct player each time
+  (advice-add 'mpv-start :around #'dc/mpv-start--android-advice))
+#+end_src
+
+With this configuration in your init.el file, you can now use the commands:
+
+#+begin_src text
+mpv-play
+mpv-play-url
+#+end_src
+
+without problems as you did on Linux. This config works on both Linux and
+Android and you system will recognize which commands it needs to call in each
+case.
+
+Here is an example of me using Emacs on Android to play a video through the
+mpv-android app on my phone:
+
+[[assets/mpv-android.gif]]
+
 ** Org-mode
 
 This is the biggest part of my configuration and contains numerous functions.
