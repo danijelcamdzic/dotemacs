@@ -199,11 +199,11 @@ pacman -S mpv
 #+end_src
 
 If you wish and are allowed to do so, you can install an additional package called
-[[https://github.com/yt-dlp/yt-dlp][yt-dlp]] which would enable you to play remote videos. I am not encouraging its
+[[https://github.com/yt-dlp/yt-dlp][yt-dlp]] which would enable you to play remote media. I am not encouraging its
 use, but simply making you aware that this package exists and serves that
 purpose :).
 
-You can use this package even without Emacs, as it is simply a very powerful video player.
+You can use this package even without Emacs, as it is simply a very powerful media player.
 
 *** Android installation
 
@@ -212,10 +212,10 @@ The installation process on Android involves installing an app called
 
 If you wish and are allowed to do so, you can install a version of the app with
 'yt-dlp' by visiting [[https://github.com/mpv-android/mpv-android/pull/58][this]] pull request which would enable you to play
-remote videos. Again, I am not encouraging its use, but simply making you aware that
+remote media. Again, I am not encouraging its use, but simply making you aware that
 this version of the app exists and serves that purpose :).
 
-You can use this app even without Emacs, as it is simply a very powerful video player.
+You can use this app even without Emacs, as it is simply a very powerful media player.
 
 *** Usage
 
@@ -223,7 +223,7 @@ Now that you have installed Linux and Android MPV clients, you can integrate
 them into your Emacs and use them.
 
 There is an emacs package called [[https://github.com/kljohann/mpv.el][mpv.el]] which utilizes MPV and lets you play
-local and remote videos using MPV.
+local and remote media using MPV.
 
 **** Usage on Linux
 
@@ -239,7 +239,7 @@ and they work without problems.
 
 **** Usage on Android
 
-Android in my case had a problem of playing a video through MPV using the above
+Android in my case had a problem of playing a media through MPV using the above
 methods. I got errors saying:
 
 #+begin_src text
@@ -247,10 +247,10 @@ methods. I got errors saying:
 #+end_src
 
 Since I have mpv-android installed, I could use Termux and Emacs to communicate
-together and send commands to the mpv-android app and let it play videos.
+together and send commands to the mpv-android app and let it play media.
 
 To do this, it is necessary to advise the `mpv-play` command from Emacs in order
-to use a different set of commands when requesting to play a video on
+to use a different set of commands when requesting to play media on
 mpv-android as opposed to a regular mpv package from Linux.
 
 The code which does this is given below:
