@@ -1246,6 +1246,20 @@ The attached file is copied to the attachment directory and a link is inserted a
   (setq org-media-note-screenshot-link-type-when-save-in-attach-dir 'attach)
   )
 
+;;;;; Functons - Play videos on Android
+
+(when (eq system-type 'android)
+  (defun dc/mpv-start--android-advice (orig-fun &rest args)
+    "Advice to use a different mpv command on Android."
+    (if (eq system-type 'android)
+        (let ((file-path (car args))
+              (mpv-command "am start -a android.intent.action.VIEW -d file:///%s -t video/* is.xyz.mpv"))
+          (shell-command (format mpv-command file-path)))
+      (apply orig-fun args)))
+
+  ;; Add advice to mpv-start in case of Android
+  (advice-add 'mpv-start :around #'my/mpv-start--android-advice))
+
 ;;;;; Functions - Filename
 
 (defun dc/org-media-note--format-picture-file-name--prepend-timestamp-advice (orig-func &rest args)
