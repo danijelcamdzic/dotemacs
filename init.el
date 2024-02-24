@@ -1246,19 +1246,35 @@ The attached file is copied to the attachment directory and a link is inserted a
   (setq org-media-note-screenshot-link-type-when-save-in-attach-dir 'attach)
   )
 
-;;;;; Functons - Play videos on Android
+;;;;; Functons - mpv-android
 
+;; This should only be done on Android
 (when (eq system-type 'android)
   (defun dc/mpv-start--android-advice (orig-fun &rest args)
-    "Advice to use a different mpv command on Android."
-    (if (eq system-type 'android)
-        (let ((file-path (car args))
-              (mpv-command "am start -a android.intent.action.VIEW -d file:///%s -t video/* is.xyz.mpv"))
-          (shell-command (format mpv-command file-path)))
-      (apply orig-fun args)))
+    "Advice to use a different mpv command on Android. Android uses
+Termux package called mpv-android and Emacs should pass appropriate
+commands to it.
 
-  ;; Add advice to mpv-start in case of Android
-  (advice-add 'mpv-start :around #'my/mpv-start--android-advice))
+This is an example of a full command passed down to mpv-android:
+
+am start -a android.intent.action.VIEW -t video/* -d file:///storage/emulated/0/Download/why_i_like_cats.mp4 --ei position 30000 -p is.xyz.mpv
+"
+    (let* ((media-path (car args))
+           (start-time (if (> (length args) 1) (nth 1 args) 0))
+           (start-time-ms (when (stringp start-time)
+                            (* (string-to-number (replace-regexp-in-string "\\`--start=\\+" "" start-time)) 1000)))
+           (is-remote (or (string-prefix-p "http://" media-path)
+                          (string-prefix-p "https://" media-path)))
+           (mpv-command (format "am start -a android.intent.action.VIEW -t video/* %s%s"
+                                (if is-remote "-d " "-d file:///")
+                                media-path)))
+      (when start-time-ms
+        (setq mpv-command (format "%s --ei position %d" mpv-command start-time-ms)))
+      (setq mpv-command (format "%s -p is.xyz.mpv" mpv-command))
+      (start-process "mpv-android" nil "sh" "-c" mpv-command)))
+
+  ;; Add advice to mpv-start so it open the correct player each time
+  (advice-add 'mpv-start :around #'dc/mpv-start--android-advice))
 
 ;;;;; Functions - Filename
 
