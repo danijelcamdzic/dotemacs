@@ -97,7 +97,7 @@
   (define-prefix-command 'dc-dired-map)
   (global-set-key (kbd "C-c d") 'dc-dired-map))
 
-;; Add function to the C-c d keymap
+;; Add functions to the C-c d keymap
 (define-key dc-dired-map (kbd "g") 'rgrep)
 
 ;;;; Functions - Open a folder or file from the home directory
@@ -165,7 +165,7 @@
   (define-prefix-command 'dc-dired-map)
   (global-set-key (kbd "C-c d") 'dc-dired-map))
 
-;; Add function to the C-c d keymap
+;; Add functions to the C-c d keymap
 (define-key dc-dired-map (kbd "t") 'dc/dired-sidebar-toggle)
 
 ;;; Editor
@@ -494,7 +494,7 @@ and today's Org Roam daily buffer."
 (define-prefix-command 'dc-gui-map)
 (global-set-key (kbd "C-c g") 'dc-gui-map))
 
-;; Add your functions to the C-c g keymap
+;; Add functions to the C-c g keymap
 (define-key dc-gui-map (kbd "a") 'dc/gui-show-all-bars)
 (define-key dc-gui-map (kbd "h") 'dc/gui-hide-all-bars)
 (define-key dc-gui-map (kbd "s") 'dc/gui-scrolless-mode)
@@ -595,7 +595,7 @@ the format YYYY-MM-DD Day H:M."
   (define-prefix-command 'dc-org-map)
   (global-set-key (kbd "C-c o") 'dc-org-map))
 
-;; Add your functions to the C-c o keymap
+;; Add functions to the C-c o keymap
 (define-key dc-org-map (kbd "g") 'dc/org-insert-current-date-time)
 
 ;;;;; Functions - Clocking in and clocking out
@@ -762,7 +762,7 @@ current state is TODO."
   (define-prefix-command 'dc-org-map)
   (global-set-key (kbd "C-c o") 'dc-org-map))
 
-;; Add your functions to the C-c o keymap
+;; Add functions to the C-c o keymap
 (define-key dc-org-map (kbd "t") 'dc/org-todo-change-state)
 (define-key dc-org-map (kbd "s") 'dc/org-todo-change-state-and-reschedule)
 (define-key dc-org-map (kbd "d") 'dc/org-todo-change-state-on-date)
@@ -791,7 +791,7 @@ current state is TODO."
   (define-prefix-command 'dc-org-map)
   (global-set-key (kbd "C-c o") 'dc-org-map))
 
-;; Add your functions to the C-c o keymap
+;; Add functions to the C-c o keymap
 (define-key dc-org-map (kbd "n") 'dc/org-add-note)
 
 ;; Bind to org-agenda buffer also
@@ -959,7 +959,7 @@ org file on the year calendar."
   (define-prefix-command 'dc-org-map)
   (global-set-key (kbd "C-c o") 'dc-org-map))
 
-;; Add your functions to the C-c o keymap
+;; Add functions to the C-c o keymap
 (define-key dc-org-map (kbd "T") 'dc/org-logbook-display-states-on-calendar)
 (define-key dc-org-map (kbd "N") 'dc/org-logbook-display-notes-on-calendar)
 
@@ -1059,7 +1059,7 @@ based on the system type."
   (define-prefix-command 'dc-agenda-map)
   (global-set-key (kbd "C-c a") 'dc-agenda-map))
 
-;; Add your functions to the C-c a keymap
+;; Add functions to the C-c a keymap
 (define-key dc-agenda-map (kbd "d") 'dc/org-agenda-day-view)
 (define-key dc-agenda-map (kbd "w") 'dc/org-agenda-week-view)
 (define-key dc-agenda-map (kbd "y") 'dc/org-agenda-year-view)
@@ -1114,7 +1114,7 @@ based on the system type."
   (define-prefix-command 'dc-agenda-map)
   (global-set-key (kbd "C-c a") 'dc-agenda-map))
 
-;; Add your functions to the C-c a keymap
+;; Add functions to the C-c a keymap
 (define-key dc-agenda-map (kbd "x") 'dc/org-agenda-todo-view)
 
 ;; Bind to org-agenda buffer also
