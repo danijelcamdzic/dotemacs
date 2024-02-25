@@ -318,7 +318,8 @@ and today's Org Roam daily buffer."
   :config
   (shrface-basic)
   (shrface-trial)
-  (setq shrface-href-versatile t))
+  (setq shrface-href-versatile t)
+  (setq shrface-bullets-bullet-list '("*")))
 
 ;;;;;;; Keybindings
 
