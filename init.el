@@ -2,61 +2,6 @@
 
 ;;; Code:
 
-;;; User
-
-;;;; User credentials
-
-;; User name and email
-(setq user-full-name "Danijel Camdzic")
-(setq user-mail-address "danijelcamdzic@tuta.com")
-
-;;;; User directories
-
-;; Define the home directories variables
-(defvar dc-android-home "/storage/emulated/0/")
-(defvar dc-gnu-linux-home "~/")
-(defvar dc-gnu-linux-home-extended "/home/danijelcamdzic/")
-
-;; Set the home directory based on system type
-(setq dc-home-directory
-      (cond
-       ((eq system-type 'gnu/linux) dc-gnu-linux-home-extended)
-       ((eq system-type 'android) dc-android-home)
-       (t dc-gnu-linux-home)))
-
-;; Define variables which represent the home directory folders
-(setq dc-books-directory (concat dc-home-directory "Books/"))
-(setq dc-documents-directory (concat dc-home-directory "Documents/"))
-(setq dc-download-directory (concat dc-home-directory "Download/")) 
-(setq dc-music-directory (concat dc-home-directory "Music/"))         
-(setq dc-notes-directory (concat dc-home-directory "Notes/"))
-(setq dc-pictures-directory (concat dc-home-directory "Pictures/"))   
-(setq dc-projects-directory (concat dc-home-directory "Projects/"))    
-(setq dc-recordings-directory (concat dc-home-directory "Recordings/"))
-(setq dc-videos-directory (concat dc-home-directory "Videos/"))
-
-;;;;; Functions - Open a folder from the home directory
-
-(defun dc/open-folder-from-home-directory ()
-  "Open a folder from home directory in dired."
-  (interactive)
-  (let* ((directories '(("Books" . dc-books-directory)
-                        ("Documents" . dc-documents-directory)
-                        ("Download" . dc-download-directory)
-                        ("Music" . dc-music-directory)
-                        ("Notes" . dc-notes-directory)
-                        ("Pictures" . dc-pictures-directory)
-                        ("Projects" . dc-projects-directory)
-                        ("Recordings" . dc-recordings-directory)
-                        ("Videos" . dc-videos-directory)))
-         (choice (completing-read "Choose a directory: " directories))
-         (directory-symbol (assoc-default choice directories))
-         (directory (symbol-value directory-symbol)))
-    (dired directory)))
-
-;; Create a keybinding for this function
-;;(global-set-key (kbd "C-c d") 'dc/open-folder-from-home-directory)
-
 ;;; Package managers
 
 ;;;; Package
@@ -114,6 +59,115 @@
   (quelpa-use-package-activate-advice)
   )
 
+;;; User
+
+;; User name and email
+(setq user-full-name "Danijel Camdzic")
+(setq user-mail-address "danijelcamdzic@tuta.com")
+
+;;; Directories
+
+;; Define the home directories variables
+(defvar dc-android-home "/storage/emulated/0/")
+(defvar dc-gnu-linux-home "~/")
+(defvar dc-gnu-linux-home-extended "/home/danijelcamdzic/")
+
+;; Set the home directory based on system type
+(setq dc-home-directory
+      (cond
+       ((eq system-type 'gnu/linux) dc-gnu-linux-home-extended)
+       ((eq system-type 'android) dc-android-home)
+       (t dc-gnu-linux-home)))
+
+;; Define variables which represent the home directory folders
+(setq dc-books-directory (concat dc-home-directory "Books/"))
+(setq dc-documents-directory (concat dc-home-directory "Documents/"))
+(setq dc-download-directory (concat dc-home-directory "Download/")) 
+(setq dc-music-directory (concat dc-home-directory "Music/"))         
+(setq dc-notes-directory (concat dc-home-directory "Notes/"))
+(setq dc-pictures-directory (concat dc-home-directory "Pictures/"))   
+(setq dc-projects-directory (concat dc-home-directory "Projects/"))    
+(setq dc-recordings-directory (concat dc-home-directory "Recordings/"))
+(setq dc-videos-directory (concat dc-home-directory "Videos/"))
+
+;;;; Keybindings
+
+;; Check if C-c d keymap exists, if not, create it
+(unless (keymapp (lookup-key global-map (kbd "C-c d")))
+  (define-prefix-command 'dc-dired-map)
+  (global-set-key (kbd "C-c d") 'dc-dired-map))
+
+;; Add function to the C-c d keymap
+(define-key dc-dired-map (kbd "g") 'rgrep)
+
+;;;; Functions - Open a folder or file from the home directory
+
+(defun dc/open-folder-from-home-directory ()
+  "Open a folder from home directory in dired."
+  (interactive)
+  (let* ((directories '(("Books" . dc-books-directory)
+                        ("Documents" . dc-documents-directory)
+                        ("Download" . dc-download-directory)
+                        ("Music" . dc-music-directory)
+                        ("Notes" . dc-notes-directory)
+                        ("Pictures" . dc-pictures-directory)
+                        ("Projects" . dc-projects-directory)
+                        ("Recordings" . dc-recordings-directory)
+                        ("Videos" . dc-videos-directory)))
+         (choice (completing-read "Choose a directory: " directories))
+         (directory-symbol (assoc-default choice directories))
+         (directory (symbol-value directory-symbol)))
+    (dired directory)))
+
+(defun dc/ropen-folder-from-home-directory ()
+  "Open a folder from home directory in dired using regex search."
+  (interactive)
+  (let* ((search-term (read-string "Enter search term: "))
+         (search-regex (concat ".*" search-term ".*"))
+         (all-paths (directory-files-recursively dc-home-directory search-regex t))
+         (directories (seq-filter 'file-directory-p all-paths))
+         (choice (completing-read "Choose a directory: " directories)))
+    (dired choice)))
+
+;;;;; Keybindings
+
+;; Check if C-c d keymap exists, if not, create it
+(unless (keymapp (lookup-key global-map (kbd "C-c d")))
+  (define-prefix-command 'dc-dired-map)
+  (global-set-key (kbd "C-c d") 'dc-dired-map))
+
+;; Add functions to the C-c d keymap
+(define-key dc-dired-map (kbd "h") 'dc/open-folder-from-home-directory)
+(define-key dc-dired-map (kbd "r") 'dc/ropen-from-home-directory)
+
+;;;; Dired-sidebar
+
+;;;;; Configuration
+
+(use-package dired-sidebar
+  :ensure t
+  :config
+  ;; Make the window size not fixed
+  (setq dired-sidebar-window-fixed nil)
+  )
+
+;;;;; Functions - Dired-sidebar toggle
+
+(defun dc/dired-sidebar-toggle ()
+  "Toggle `dired-sidebar'."
+  (interactive)
+  (dired-sidebar-toggle-sidebar))
+
+;;;;;; Keybindings
+
+;; Check if C-c d keymap exists, if not, create it
+(unless (keymapp (lookup-key global-map (kbd "C-c d")))
+  (define-prefix-command 'dc-dired-map)
+  (global-set-key (kbd "C-c d") 'dc-dired-map))
+
+;; Add function to the C-c d keymap
+(define-key dc-dired-map (kbd "t") 'dc/dired-sidebar-toggle)
+
 ;;; Editor
 
 ;;;; Theme
@@ -157,7 +211,7 @@
       auto-save-default nil
       make-backup-files nil)
 
-;; Set custom variable file so my init.el isn't flooded
+;; Set custom file
 (setq custom-file (concat dc-documents-directory "Emacs/custom.el"))
 (load custom-file 'noerror)
 
@@ -198,6 +252,16 @@ and today's Org Roam daily buffer."
                   (string= (buffer-name buffer) today-daily-file))
         (kill-buffer buffer)))))
 
+;;;;;; Keybindings
+
+;; Check if C-c b keymap exists, if not, create it
+(unless (keymapp (lookup-key global-map (kbd "C-c b")))
+  (define-prefix-command 'dc-buffer-map)
+  (global-set-key (kbd "C-c b") 'dc-buffer-map))
+
+;; Add functions to the C-c b keymap
+(define-key dc-buffer-map (kbd "k") 'dc/kill-background-buffers)
+
 ;;;;; IBuffer
 
 ;;;;;; Configuration
@@ -214,23 +278,57 @@ and today's Org Roam daily buffer."
   (interactive)
   (ibuffer-sidebar-toggle-sidebar))
 
-;;;;; Dired-sidebar
+;;;;;;; Keybindings
+
+;; Check if C-c b keymap exists, if not, create it
+(unless (keymapp (lookup-key global-map (kbd "C-c b")))
+  (define-prefix-command 'dc-buffer-map)
+  (global-set-key (kbd "C-c b") 'dc-buffer-map))
+
+;; Add functions to the C-c b keymap
+(define-key dc-buffer-map (kbd "t") 'dc/ibuffer-sidebar-toggle)
+
+;;;;; Imenu-list
 
 ;;;;;; Configuration
 
-(use-package dired-sidebar
+(use-package imenu-list
   :ensure t
   :config
-  ;; Make the window size not fixed
-  (setq dired-sidebar-window-fixed nil)
+  ;; Allow for buffer resize
+  (setq imenu-list-auto-resize t)
   )
 
-;;;;;; Functions - Dired-sidebar toggle
+;;;;;;; Keybindings
 
-(defun dc/dired-sidebar-toggle ()
-  "Toggle `dired-sidebar'."
-  (interactive)
-  (dired-sidebar-toggle-sidebar))
+;; Check if C-c b keymap exists, if not, create it
+(unless (keymapp (lookup-key global-map (kbd "C-c b")))
+  (define-prefix-command 'dc-buffer-map)
+  (global-set-key (kbd "C-c b") 'dc-buffer-map))
+
+;; Add functions to the C-c b keymap
+(define-key dc-buffer-map (kbd "l") 'imenu-list-smart-toggle)
+
+;;;;; Shrface
+
+;;;;;; Configuration
+
+(use-package shrface
+  :ensure t
+  :config
+  (shrface-basic)
+  (shrface-trial)
+  (setq shrface-href-versatile t))
+
+;;;;;;; Keybindings
+
+;; Check if C-c b keymap exists, if not, create it
+(unless (keymapp (lookup-key global-map (kbd "C-c b")))
+  (define-prefix-command 'dc-buffer-map)
+  (global-set-key (kbd "C-c b") 'dc-buffer-map))
+
+;; Add functions to the C-c b keymap
+(define-key dc-buffer-map (kbd "m") 'shrface-mode)
 
 ;;;; Text editing
 
@@ -245,6 +343,9 @@ and today's Org Roam daily buffer."
  '(italic ((t (:foreground "#B0A030" :slant italic))))
  '(strike-through ((t (:foreground "#8B0000" :strike-through t)))))
 
+;; Disable line numbers
+(global-display-line-numbers-mode 0)
+
 ;;;;; Programming
 
 ;;;;;; C/CPP
@@ -253,16 +354,19 @@ and today's Org Roam daily buffer."
   "Set basic c and cpp offset."
   (setq c-basic-offset 4))
 
+;; Enable line numbers for  C modes
+(add-hook 'c-mode-common-hook (lambda () (display-line-numbers-mode 1)))
+
 ;; Set hook to set indentation when in c/cpp file
 (add-hook 'c-mode-common-hook 'dc/setup-c-cpp-mode)
-
-;; Disable line numbers
-(global-display-line-numbers-mode 0)
 
 ;;;;;; Python
 
 ;; Set the indentation level for Python code
 (setq python-indent-offset 4)
+
+;; Enable line numbers for Python mode
+(add-hook 'python-mode-hook (lambda () (display-line-numbers-mode 1)))
 
 ;;;; Version control
 
@@ -359,7 +463,7 @@ and today's Org Roam daily buffer."
 
 ;;; GUI
 
-;;;; Functions: GUI display show/hide
+;;;; Functions: GUI display modes
 
 (defun dc/gui-hide-all-bars ()
   "Disable scroll bar, menu bar, and tool bar."
@@ -382,6 +486,18 @@ and today's Org Roam daily buffer."
 
 ;; Start Emacs without scroll bar
 (dc/gui-scrolless-mode)
+
+;;;;; Keybindings
+
+;; Check if C-c g keymap exists, if not, create it
+(unless (keymapp (lookup-key global-map (kbd "C-c g")))
+(define-prefix-command 'dc-gui-map)
+(global-set-key (kbd "C-c g") 'dc-gui-map))
+
+;; Add your functions to the C-c g keymap
+(define-key dc-gui-map (kbd "a") 'dc/gui-show-all-bars)
+(define-key dc-gui-map (kbd "h") 'dc/gui-hide-all-bars)
+(define-key dc-gui-map (kbd "s") 'dc/gui-scrolless-mode)
 
 ;;; Org-mode
 
@@ -454,6 +570,16 @@ and today's Org Roam daily buffer."
    '(org-scheduled-today ((t (:foreground "grey")))))
   )
 
+;;;;;; Keybindings
+
+;; Check if C-c o keymap exists, if not, create it
+(unless (keymapp (lookup-key global-map (kbd "C-c o")))
+  (define-prefix-command 'dc-org-map)
+  (global-set-key (kbd "C-c o") 'dc-org-map))
+
+;; Add functions to the C-c o keymap
+(define-key dc-org-map (kbd "l") 'org-insert-link)
+
 ;;;;; Functions - Inserting datetime into an org file
 
 (defun dc/org-insert-current-date-time ()
@@ -461,6 +587,16 @@ and today's Org Roam daily buffer."
 the format YYYY-MM-DD Day H:M."
   (interactive)
   (insert (format-time-string "%Y-%m-%d %a %H:%M")))
+
+;;;;;; Keybindings
+
+;; Check if C-c o keymap exists, if not, create it
+(unless (keymapp (lookup-key global-map (kbd "C-c o")))
+  (define-prefix-command 'dc-org-map)
+  (global-set-key (kbd "C-c o") 'dc-org-map))
+
+;; Add your functions to the C-c o keymap
+(define-key dc-org-map (kbd "g") 'dc/org-insert-current-date-time)
 
 ;;;;; Functions - Clocking in and clocking out
 
@@ -477,6 +613,22 @@ the format YYYY-MM-DD Day H:M."
   (if (eq major-mode 'org-agenda-mode)
       (org-agenda-clock-out)
     (org-clock-out)))
+
+;;;;;; Keybindings
+
+;; Check if C-c o keymap exists, if not, create it
+(unless (keymapp (lookup-key global-map (kbd "C-c o")))
+  (define-prefix-command 'dc-org-map)
+  (global-set-key (kbd "C-c o") 'dc-org-map))
+
+;; Add functions to the C-c o keymap
+(define-key dc-org-map (kbd "i") 'dc/org-clock-in)
+(define-key dc-org-map (kbd "o") 'dc/org-clock-out)
+
+;; Bind to org-agenda buffer also
+(with-eval-after-load 'org-agenda
+  (define-key org-agenda-mode-map (kbd "i") 'dc/org-clock-in)
+  (define-key org-agenda-mode-map (kbd "o") 'dc/org-clock-out))
 
 ;;;;; Functions - Adding and removing a schedule
 
@@ -516,6 +668,22 @@ or in an org file."
       (save-excursion
         (org-back-to-heading t)
         (org-schedule '(4))))))
+
+;;;;;; Keybindings
+
+;; Check if C-c o keymap exists, if not, create it
+(unless (keymapp (lookup-key global-map (kbd "C-c o")))
+  (define-prefix-command 'dc-org-map)
+  (global-set-key (kbd "C-c o") 'dc-org-map))
+
+;; Add functions to the C-c o keymap
+(define-key dc-org-map (kbd "a") 'dc/org-add-schedule)
+(define-key dc-org-map (kbd "r") 'dc/org-remove-schedule)
+
+;; Bind to org-agenda buffer also
+(with-eval-after-load 'org-agenda
+  (define-key org-agenda-mode-map (kbd "a") 'dc/org-add-schedule)
+  (define-key org-agenda-mode-map (kbd "r") 'dc/org-remove-schedule))
 
 ;;;;; Functions - Changing a TODO state
 
@@ -587,6 +755,26 @@ current state is TODO."
                 (setq dc-adjusted-time nil)
                 (setq dc-time-override-lock nil)))))))))
 
+;;;;;; Keybindings
+
+;; Check if C-c o keymap exists, if not, create it
+(unless (keymapp (lookup-key global-map (kbd "C-c o")))
+  (define-prefix-command 'dc-org-map)
+  (global-set-key (kbd "C-c o") 'dc-org-map))
+
+;; Add your functions to the C-c o keymap
+(define-key dc-org-map (kbd "t") 'dc/org-todo-change-state)
+(define-key dc-org-map (kbd "s") 'dc/org-todo-change-state-and-reschedule)
+(define-key dc-org-map (kbd "d") 'dc/org-todo-change-state-on-date)
+(define-key dc-org-map (kbd "D") 'dc/org-todo-change-state-on-date-and-reschedule)
+
+;; Bind to org-agenda buffer also
+(with-eval-after-load 'org-agenda
+  (define-key org-agenda-mode-map (kbd "a") 'dc/org-todo-change-state)
+  (define-key org-agenda-mode-map (kbd "r") 'dc/org-todo-change-state-and-reschedule)
+  (define-key org-agenda-mode-map (kbd "d") 'dc/org-todo-change-state-on-date)
+  (define-key org-agenda-mode-map (kbd "D") 'dc/org-todo-change-state-on-date-and-reschedule))
+
 ;;;;; Functions - Adding notes
 
 (defun dc/org-add-note ()
@@ -595,6 +783,20 @@ current state is TODO."
   (if (eq major-mode 'org-agenda-mode)
       (org-agenda-add-note)
     (org-add-note)))
+
+;;;;;; Keybindings
+
+;; Check if C-c o keymap exists, if not, create it
+(unless (keymapp (lookup-key global-map (kbd "C-c o")))
+  (define-prefix-command 'dc-org-map)
+  (global-set-key (kbd "C-c o") 'dc-org-map))
+
+;; Add your functions to the C-c o keymap
+(define-key dc-org-map (kbd "n") 'dc/org-add-note)
+
+;; Bind to org-agenda buffer also
+(with-eval-after-load 'org-agenda
+  (define-key org-agenda-mode-map (kbd "n") 'dc/org-add-note))
 
 ;;;;; Functions - Display heading logbook states and notes on a calendar
 
@@ -750,6 +952,22 @@ org file on the year calendar."
   ;; Bind GUI emacs "Enter" clicks
   (define-key calendar-mode-map (kbd "<return>") 'dc/org-logbook--goto-entry))
 
+;;;;;; Keybindings
+
+;; Check if C-c o keymap exists, if not, create it
+(unless (keymapp (lookup-key global-map (kbd "C-c o")))
+  (define-prefix-command 'dc-org-map)
+  (global-set-key (kbd "C-c o") 'dc-org-map))
+
+;; Add your functions to the C-c o keymap
+(define-key dc-org-map (kbd "T") 'dc/org-logbook-display-states-on-calendar)
+(define-key dc-org-map (kbd "N") 'dc/org-logbook-display-notes-on-calendar)
+
+;; Bind to org-agenda buffer also
+(with-eval-after-load 'org-agenda
+  (define-key org-agenda-mode-map (kbd "T") 'dc/org-logbook-display-states-on-calendar)
+  (define-key org-agenda-mode-map (kbd "N") 'dc/org-logbook-display-notes-on-calendar))
+
 ;;;; Org-agenda
 
 ;;;;; Configuration
@@ -834,6 +1052,24 @@ based on the system type."
   (interactive)
   (dc/org-agenda--switch-to-view 'org-agenda-year-view))
 
+;;;;;; Keybindings
+
+;; Check if C-c a keymap exists, if not, create it
+(unless (keymapp (lookup-key global-map (kbd "C-c a")))
+  (define-prefix-command 'dc-agenda-map)
+  (global-set-key (kbd "C-c a") 'dc-agenda-map))
+
+;; Add your functions to the C-c a keymap
+(define-key dc-agenda-map (kbd "d") 'dc/org-agenda-day-view)
+(define-key dc-agenda-map (kbd "w") 'dc/org-agenda-week-view)
+(define-key dc-agenda-map (kbd "y") 'dc/org-agenda-year-view)
+
+;; Bind to org-agenda buffer also
+(with-eval-after-load 'org-agenda
+  (define-key org-agenda-mode-map (kbd "d") 'dc/org-agenda-day-view)
+  (define-key org-agenda-mode-map (kbd "w") 'dc/org-agenda-week-view)
+  (define-key org-agenda-mode-map (kbd "y") 'dc/org-agenda-year-view))
+
 ;;;; Org-super-agenda
 
 ;;;;; Configuration
@@ -871,6 +1107,20 @@ based on the system type."
     (org-agenda nil "t")
     (setq org-super-agenda-groups '())))
 
+;;;;;; Keybindings
+
+;; Check if C-c a keymap exists, if not, create it
+(unless (keymapp (lookup-key global-map (kbd "C-c a")))
+  (define-prefix-command 'dc-agenda-map)
+  (global-set-key (kbd "C-c a") 'dc-agenda-map))
+
+;; Add your functions to the C-c a keymap
+(define-key dc-agenda-map (kbd "x") 'dc/org-agenda-todo-view)
+
+;; Bind to org-agenda buffer also
+(with-eval-after-load 'org-agenda
+  (define-key org-agenda-mode-map (kbd "x") 'dc/org-agenda-todo-view))
+
 ;;;; Org-roam
 
 ;;;;; Configuration
@@ -889,6 +1139,19 @@ based on the system type."
   ;; Setup org-roam
   (org-roam-setup)
   )
+
+;;;;;; Keybindings
+
+;; Check if C-c r keymap exists, if not, create it
+(unless (keymapp (lookup-key global-map (kbd "C-c r")))
+  (define-prefix-command 'dc-roam-map)
+  (global-set-key (kbd "C-c r") 'dc-roam-map))
+
+;; Add functions to the C-c r keymap
+(define-key dc-roam-map (kbd "c") 'org-roam-dailies-find-date)
+(define-key dc-roam-map (kbd "d") 'org-roam-dailies-goto-today)
+(define-key dc-roam-map (kbd "f") 'org-roam-node-find)
+(define-key dc-roam-map (kbd "i") 'org-roam-node-insert)
 
 ;;;;; Functions - Get current node hierarchy
 
@@ -1007,6 +1270,16 @@ and when nil is returned the node will be filtered out."
                                   id
                                   arrow-chain))))))
   (deactivate-mark))
+
+;;;;;; Keybindings
+
+;; Check if C-c r keymap exists, if not, create it
+(unless (keymapp (lookup-key global-map (kbd "C-c r")))
+  (define-prefix-command 'dc-roam-map)
+  (global-set-key (kbd "C-c r") 'dc-roam-map))
+
+;; Add functions to the C-c r keymap
+(define-key dc-roam-map (kbd "t") 'dc/org-roam-insert-nodes-by-tags)
 
 ;;;; Alert
 
@@ -1187,6 +1460,16 @@ use filename."
                           (org-roam-node-title node))))
         (insert link)))))
 
+;;;;;; Keybindings
+
+;; Check if C-c o keymap exists, if not, create it
+(unless (keymapp (lookup-key global-map (kbd "C-c o")))
+  (define-prefix-command 'dc-org-map)
+  (global-set-key (kbd "C-c o") 'dc-org-map))
+
+;; Add functions to the C-c o keymap
+(define-key dc-org-map (kbd "z") 'dc/org-transclusion-insert-node)
+
 ;;;; Org-attach
 
 ;;;;; Configuration
@@ -1212,6 +1495,16 @@ use filename."
   ;; Set default attachment method to copy
   (setq org-attach-method 'cp)
   )
+
+;;;;;; Keybindings
+
+;; Check if C-c o keymap exists, if not, create it
+(unless (keymapp (lookup-key global-map (kbd "C-c o")))
+  (define-prefix-command 'dc-org-map)
+  (global-set-key (kbd "C-c o") 'dc-org-map))
+
+;; Add functions to the C-c o keymap
+(define-key dc-org-map (kbd "k") 'org-attach-attach)
 
 ;;;;; Functions - Attach and insert attachment at once
 
@@ -1239,6 +1532,16 @@ The attached file is copied to the attachment directory and a link is inserted a
     (org-attach-attach file nil 'cp)
     (insert (format "[[attachment:%s]]" (file-name-nondirectory file)))))
 
+;;;;;; Keybindings
+
+;; Check if C-c o keymap exists, if not, create it
+(unless (keymapp (lookup-key global-map (kbd "C-c o")))
+  (define-prefix-command 'dc-org-map)
+  (global-set-key (kbd "C-c o") 'dc-org-map))
+
+;; Add functions to the C-c o keymap
+(define-key dc-org-map (kbd "j") 'dc/org-attach-file-and-insert-link)
+
 ;;;; Org-download
 
 ;;;;; Configuration
@@ -1253,6 +1556,16 @@ The attached file is copied to the attachment directory and a link is inserted a
   ;; Don't create folders based on heading levels
   (setq-default org-download-heading-lvl nil)
   )
+
+;;;;;; Keybindings
+
+;; Check if C-c o keymap exists, if not, create it
+(unless (keymapp (lookup-key global-map (kbd "C-c o")))
+  (define-prefix-command 'dc-org-map)
+  (global-set-key (kbd "C-c o") 'dc-org-map))
+
+;; Add functions to the C-c o keymap
+(define-key dc-org-map (kbd "v") 'org-download-clipboard)
 
 ;;;;; Functions - Choose screenshot filename
 
@@ -1388,6 +1701,25 @@ am start -a android.intent.action.VIEW -t video/* -d file:///storage/emulated/0/
   ;; Set default .emacs-bmk-bmenu-commands.el file path
   (setq bmkp-bmenu-commands-file (expand-file-name ".emacs-bmk-bmenu-commands.el" user-emacs-directory))
   )
+
+;;;;;; Keybindings
+
+;; Check if C-c b keymap exists, if not, create it
+(unless (keymapp (lookup-key global-map (kbd "C-c b")))
+  (define-prefix-command 'dc-buffer-map)
+  (global-set-key (kbd "C-c b") 'dc-buffer-map))
+
+;; Check if C-c b b keymap exists, if not, create it
+(unless (keymapp (lookup-key dc-buffer-map (kbd "b")))
+  (define-prefix-command 'dc-bookmark-map)
+  (define-key dc-buffer-map (kbd "b") 'dc-bookmark-map))
+
+;; Add functions to the C-c b b keymap
+(define-key dc-bookmark-map (kbd "l") 'list-bookmarks)
+(define-key dc-bookmark-map (kbd "s") 'bookmark-set)
+(define-key dc-bookmark-map (kbd "d") 'bmkp-bmenu-delete-marked)
+(define-key dc-bookmark-map (kbd "n") 'bmkp-bmenu-filter-bookmark-name-incrementally)
+(define-key dc-bookmark-map (kbd "t") 'bmkp-bmenu-filter-tags-incrementally)
 
 ;;;;; Functions - Opening bookmarks on both Linux and Android
 
