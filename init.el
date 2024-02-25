@@ -1311,7 +1311,7 @@ This is an example of a full command passed down to mpv-android:
 
 am start -a android.intent.action.VIEW -t video/* -d file:///storage/emulated/0/Download/why_i_like_cats.mp4 --ei position 30000 -p is.xyz.mpv
 "
-    (let* ((media-path (car args))
+    (let* ((media-path (replace-regexp-in-string " " "\\\\ " (car args)))
            (start-time (if (> (length args) 1) (nth 1 args) 0))
            (start-time-ms (when (stringp start-time)
                             (* (string-to-number (replace-regexp-in-string "\\`--start=\\+" "" start-time)) 1000)))
@@ -1323,7 +1323,7 @@ am start -a android.intent.action.VIEW -t video/* -d file:///storage/emulated/0/
       (when start-time-ms
         (setq mpv-command (format "%s --ei position %d" mpv-command start-time-ms)))
       (setq mpv-command (format "%s -p is.xyz.mpv" mpv-command))
-      (start-process "mpv-android" nil "sh" "-c" mpv-command)))
+      (start-process "mpv-android" nil "sh" "-c" mpv-command))))
 
   ;; Add advice to mpv-start so it open the correct player each time
   (advice-add 'mpv-start :around #'dc/mpv-start--android-advice))
