@@ -88,6 +88,15 @@ on stuff.
 I use =use-package= to pack my config and =outline-minor-mode= and
 =outline-minor-faces= to view it.
 
+When using these packages the configuration can be seen in a structured and
+visually pleasing manner by using =outline-hide-sublevels=,
+=outline-show-subtree= and similar commands.
+
+Below is an example of how the configuration looks like when only the config
+structures are highlighted.
+
+[[assets/outline-mode.png]]
+
 Here I will elaborate on my =init.el= file and present some
 interesting (to me at least) features I have added to my workflow in order to
 make it more useful.
@@ -208,10 +217,10 @@ You can use this package even without Emacs, as it is simply a very powerful med
 *** Android installation
 
 The installation process on Android involves installing an app called
-[[https://github.com/mpv-android/mpv-android][mpv-android]]. The Github repository offers the '.apk' file in the releases.
+[[https://github.com/mpv-android/mpv-android][mpv-android]]. The Github repository offers the =.apk= file in the releases.
 
 If you wish and are allowed to do so, you can install a version of the app with
-'yt-dlp' by visiting [[https://github.com/mpv-android/mpv-android/pull/58][this]] pull request which would enable you to play
+=yt-dlp= by visiting [[https://github.com/mpv-android/mpv-android/pull/58][this]] pull request which would enable you to play
 remote media. Again, I am not encouraging its use, but simply making you aware that
 this version of the app exists and serves that purpose :).
 
@@ -246,10 +255,10 @@ methods. I got errors saying:
 "Failed to connect to mpv"
 #+end_src
 
-Since I have mpv-android installed, I could use Termux and Emacs to communicate
+Since I have =mpv-android= installed, I could use Termux and Emacs to communicate
 together and send commands to the mpv-android app and let it play media.
 
-To do this, it is necessary to advise the `mpv-play` command from Emacs in order
+To do this, it is necessary to advise the =mpv-play= command from Emacs in order
 to use a different set of commands when requesting to play media on
 mpv-android as opposed to a regular mpv package from Linux.
 
@@ -297,7 +306,7 @@ Android and you system will recognize which commands it needs to call in each
 case.
 
 Here is an example of me using Emacs on Android to play a video through the
-mpv-android app on my phone:
+=mpv-android= app on my phone:
 
 [[assets/mpv-android.gif]]
 
