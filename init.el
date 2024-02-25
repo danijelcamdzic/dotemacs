@@ -424,13 +424,6 @@ and today's Org Roam daily buffer."
         '((sequence "TODO(t)" "DOING(i!)" "|" "DONE(d!)" "SKIP(s!)" "FAIL(f!)")))
   )
 
-;;;;; Functions - Link insertion
-
-(defun dc/org-insert-link-set-default-directory (dir)
-  "Set the default directory for 'org-insert-link' to start from."
-  (interactive "DSet default directory: ")
-  (setq default-directory dir))
-
 ;;;;; Functions - Datetime insertion
 
 (defun dc/org-insert-current-date-time ()
@@ -1176,11 +1169,27 @@ use filename."
 
 ;;;;; Functions - Attach and insert attachment at once
 
+(defvar dc-preferred-directory ""
+  "Preferred starting directory to search files to attach in Org mode.")
+
+(defun dc/set-preferred-directory (dir)
+  "Set the preferred directory."
+  (interactive "DSet preferred directory: ")
+  (setq dc-preferred-directory dir))
+
+(defun dc/reset-preferred-directory ()
+  "Reset the preferred directory."
+  (interactive)
+  (setq dc-preferred-directory ""))
+
 (defun dc/org-attach-file-and-insert-link ()
   "Attach a file to the current Org entry and insert a link to it.
 The attached file is copied to the attachment directory and a link is inserted at point."
   (interactive)
-  (let ((file (read-file-name "Select file to attach: " default-directory)))
+  (let* ((search-directory (if (string-empty-p dc-preferred-directory)
+                               default-directory
+                             dc-preferred-directory))
+         (file (read-file-name "Select file to attach: " search-directory)))
     (org-attach-attach file nil 'cp)
     (insert (format "[[attachment:%s]]" (file-name-nondirectory file)))))
 
