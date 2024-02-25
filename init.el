@@ -54,6 +54,9 @@
          (directory (symbol-value directory-symbol)))
     (dired directory)))
 
+;; Create a keybinding for this function
+;;(global-set-key (kbd "C-c d") 'dc/open-folder-from-home-directory)
+
 ;;; Package managers
 
 ;;;; Package
@@ -1323,7 +1326,7 @@ am start -a android.intent.action.VIEW -t video/* -d file:///storage/emulated/0/
       (when start-time-ms
         (setq mpv-command (format "%s --ei position %d" mpv-command start-time-ms)))
       (setq mpv-command (format "%s -p is.xyz.mpv" mpv-command))
-      (start-process "mpv-android" nil "sh" "-c" mpv-command))))
+      (start-process "mpv-android" nil "sh" "-c" mpv-command)))
 
   ;; Add advice to mpv-start so it open the correct player each time
   (advice-add 'mpv-start :around #'dc/mpv-start--android-advice))
