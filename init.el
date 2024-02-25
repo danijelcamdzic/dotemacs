@@ -24,7 +24,7 @@
        ((eq system-type 'android) dc-android-home)
        (t dc-gnu-linux-home)))
 
-;; Set the user folders
+;; Define variables which represent the home directory folders
 (setq dc-books-directory (concat dc-home-directory "Books/"))
 (setq dc-documents-directory (concat dc-home-directory "Documents/"))
 (setq dc-download-directory (concat dc-home-directory "Download/")) 
@@ -35,10 +35,10 @@
 (setq dc-recordings-directory (concat dc-home-directory "Recordings/"))
 (setq dc-videos-directory (concat dc-home-directory "Videos/"))
 
-;;;;; Functions - Open user directory
+;;;;; Functions - Open a folder from the home directory
 
-(defun dc/open-user-directory ()
-  "Open a user directory in dired."
+(defun dc/open-folder-from-home-directory ()
+  "Open a folder from home directory in dired."
   (interactive)
   (let* ((directories '(("Books" . dc-books-directory)
                         ("Documents" . dc-documents-directory)
@@ -52,7 +52,6 @@
          (choice (completing-read "Choose a directory: " directories))
          (directory-symbol (assoc-default choice directories))
          (directory (symbol-value directory-symbol)))
-    (message "Opening directory: %s" directory) ; Debug message
     (dired directory)))
 
 ;;; Package managers
@@ -73,6 +72,7 @@
 
 ;;;;; Configuration
 
+;; Add melpa package archives
 (add-to-list 'package-archives
              '("melpa" . "http://melpa.org/packages/") t)
 
@@ -123,19 +123,20 @@
 ;; Set gruvbox-theme as the system theme
 (load-theme 'gruvbox-dark-hard t)
 
-;; Remove fringes
+;; Remove fringes for better visuals
 (set-fringe-mode 0)
 
 ;;;; Startup
 
-;; Bind command call in Android to hardware keys volume up and volume down
+;; Create shortcuts in Android with volume-up and volume-down keys
 (when (eq system-type 'android)
   ;; Volume up calls to execute the command
   (global-set-key (kbd "<volume-up>") 'execute-extended-command)
+  
   ;; Volume down is bound by default to org-ctrl-c-ctrl-c
   (global-set-key (kbd "<volume-down>") 'org-ctrl-c-ctrl-c)
 
-  ;; Volume down is also programmable
+  ;; Make volume down programmable
   (defun dc/bind-to-android-volume-down ()
     "Bind a command to the <volume-down> key on Android."
     (interactive)
@@ -153,13 +154,15 @@
       auto-save-default nil
       make-backup-files nil)
 
-;; Set custom variable file
+;; Set custom variable file so my init.el isn't flooded
 (setq custom-file (concat dc-documents-directory "Emacs/custom.el"))
 (load custom-file 'noerror)
 
 ;;;; Buffers
 
 ;; Change buffer behavior on Android
+;; Since screen size on Android is not suitable (for me) to use
+;; split screen, I choose to open each buffer in full screen mode
 (when (eq system-type 'android)
   ;; Buffer display settings
   (setq display-buffer-alist
@@ -215,7 +218,7 @@ and today's Org Roam daily buffer."
 (use-package dired-sidebar
   :ensure t
   :config
-  ;; Make the window not fixed
+  ;; Make the window size not fixed
   (setq dired-sidebar-window-fixed nil)
   )
 
@@ -243,15 +246,20 @@ and today's Org Roam daily buffer."
 
 ;;;;;; C/CPP
 
-(defun dc/c-cpp-mode-setup ()
+(defun dc/setup-c-cpp-mode ()
   "Set basic c and cpp offset."
   (setq c-basic-offset 4))
 
 ;; Set hook to set indentation when in c/cpp file
-(add-hook 'c-mode-common-hook 'dc/c-cpp-mode-setup)
+(add-hook 'c-mode-common-hook 'dc/setup-c-cpp-mode)
 
 ;; Disable line numbers
 (global-display-line-numbers-mode 0)
+
+;;;;;; Python
+
+;; Set the indentation level for Python code
+(setq python-indent-offset 4)
 
 ;;;; Version control
 
@@ -263,7 +271,7 @@ and today's Org Roam daily buffer."
   :ensure t
   )
 
-;;;; Visual Modes
+;;;; Visual modes
 
 ;; Enable outline-minor-mode as soon as .el file is opened
 (add-hook 'emacs-lisp-mode-hook 'outline-minor-mode)
@@ -350,19 +358,27 @@ and today's Org Roam daily buffer."
 
 ;;;; Functions: GUI display show/hide
 
-(defun dc/gui-hide-bars ()
+(defun dc/gui-hide-all-bars ()
   "Disable scroll bar, menu bar, and tool bar."
   (interactive)
   (scroll-bar-mode -1)
   (menu-bar-mode -1)
   (tool-bar-mode -1))
 
-(defun dc/gui-show-bars ()
+(defun dc/gui-show-all-bars ()
   "Enable scroll bar, menu bar, and tool bar."
   (interactive)
   (scroll-bar-mode 1)
   (menu-bar-mode 1)
   (tool-bar-mode 1))
+
+(defun dc/gui-scrolless-mode ()
+  "Disable scroll bar."
+  (interactive)
+  (scroll-bar-mode -1))
+
+;; Start Emacs without scroll bar
+(dc/gui-scrolless-mode)
 
 ;;; Org-mode
 
@@ -376,15 +392,25 @@ and today's Org Roam daily buffer."
   ;; Set org directory
   (setq org-directory dc-notes-directory)
 
-  ;; Set org-mode preferences for buffer display
+  ;; Set indentation for headings
   (setq org-startup-indented t)
+
+  ;; Fold all headings
   (setq org-startup-folded t)
+
+  ;; Set coloumn limit for a paragraph to 80 characters
   (add-hook 'org-mode-hook (lambda () (setq fill-column 80)))
+
+  ;; Turn on auto-fill mode
   (add-hook 'org-mode-hook #'turn-on-auto-fill)
+
+  ;; Fold all blocks in a buffer
   (add-hook 'org-mode-hook 'org-hide-block-all)
+
+  ;; Fold all drawers in a buffer
   (add-hook 'org-mode-hook 'org-hide-drawer-all)
 
-  ;; Add new line before heading
+  ;; Add new line before each heading
   (setf org-blank-before-new-entry '((heading . t)))
 
   ;; Display inline images on startup
@@ -392,11 +418,6 @@ and today's Org Roam daily buffer."
 
   ;; Set the width of the inline images to be the actual size
   (setq org-image-actual-width t)
-
-  ;; Set custom faces for scheduled headings
-  (custom-set-faces
-   '(org-scheduled ((t (:foreground "#555555"))))
-   '(org-scheduled-today ((t (:foreground "grey")))))
 
   ;; Configure heading logs to be logged in "LOGBOOK" drawer
   (setq org-log-into-drawer t)
@@ -411,20 +432,26 @@ and today's Org Roam daily buffer."
    '((python . t)    ; Enable Python
      (C . t)))       ; Enable C
 
-  ;; Python configuration
+  ;; Set the command for executing Python code in Org Babel
   (setq org-babel-python-command "python3")
-  (setq python-indent-offset 4)
+
+  ;; Set the indentation level for org-babel source block content
   (setq org-edit-src-content-indentation 0)
 
-  ;; Don't ask for confirmation during org babel execution
+  ;; Disable confirmation prompts when executing org-babel code blocks
   (setq org-confirm-babel-evaluate nil)
 
   ;; Set the org-todo-keywords and their states
   (setq org-todo-keywords
         '((sequence "TODO(t)" "DOING(i!)" "|" "DONE(d!)" "SKIP(s!)" "FAIL(f!)")))
+
+  ;; Set custom faces for scheduled headings
+  (custom-set-faces
+   '(org-scheduled ((t (:foreground "#555555"))))
+   '(org-scheduled-today ((t (:foreground "grey")))))
   )
 
-;;;;; Functions - Datetime insertion
+;;;;; Functions - Inserting datetime into an org file
 
 (defun dc/org-insert-current-date-time ()
   "Insert the current date and time along with the three-letter weekday name in
@@ -432,7 +459,7 @@ the format YYYY-MM-DD Day H:M."
   (interactive)
   (insert (format-time-string "%Y-%m-%d %a %H:%M")))
 
-;;;;; Functions - Clocking
+;;;;; Functions - Clocking in and clocking out
 
 (defun dc/org-clock-in ()
   "Clock in the current org heading."
@@ -448,7 +475,7 @@ the format YYYY-MM-DD Day H:M."
       (org-agenda-clock-out)
     (org-clock-out)))
 
-;;;;; Functions - Scheduling
+;;;;; Functions - Adding and removing a schedule
 
 (defun dc/org-add-schedule ()
   "Add a scheduling timestamp to the current item in the Org Agenda or in
@@ -487,7 +514,7 @@ or in an org file."
         (org-back-to-heading t)
         (org-schedule '(4))))))
 
-;;;;; Functions - State change
+;;;;; Functions - Changing a TODO state
 
 (defun dc/org-todo-change-state ()
   "Change state of a current heading."
@@ -497,7 +524,7 @@ or in an org file."
     (org-todo)))
 
 (defun dc/org-todo-change-state-and-reschedule ()
-  "Change state of a current heading."
+  "Change state of a current heading and reschedule it as a TODO."
   (interactive)
   (dc/org-todo-change-state)
   (if (eq major-mode 'org-agenda-mode)
@@ -505,7 +532,7 @@ or in an org file."
     (org-todo "TODO"))
   (run-with-timer 0.1 nil 'dc/org-add-schedule))
 
-(defun dc/org-todo-change-state-with-date ()
+(defun dc/org-todo-change-state-on-date ()
   "Change state of the current heading and log with a chosen date."
   (interactive)
   (let ((selected-date (org-read-date nil t nil "Select Date:")))
@@ -522,8 +549,9 @@ or in an org file."
           (setq dc-time-override-lock nil))
       (message "No date selected"))))
 
-(defun dc/org-todo-change-state-with-date-and-reschedule ()
-  "Change state of the current heading and log with a chosen date."
+(defun dc/org-todo-change-state-on-date-and-reschedule ()
+  "Change state of the current heading and log with a chosen date.
+Also reschedule as a TODO."
   (interactive)
   (dc/org-todo-change-state-with-date)
   (if (eq major-mode 'org-agenda-mode)
@@ -556,7 +584,7 @@ current state is TODO."
                 (setq dc-adjusted-time nil)
                 (setq dc-time-override-lock nil)))))))))
 
-;;;;; Functions - Notes
+;;;;; Functions - Adding notes
 
 (defun dc/org-add-note ()
   "Add a note to an org heading."
@@ -565,7 +593,7 @@ current state is TODO."
       (org-agenda-add-note)
     (org-add-note)))
 
-;;;;; Functions - Logbook calendar display
+;;;;; Functions - Display heading logbook states and notes on a calendar
 
 (defun dc/org-logbook--parse-logbook-states (logbook beg buffer)
   "Parse a logbook string and return a list of entries with states."
@@ -726,29 +754,43 @@ org file on the year calendar."
 (use-package org-agenda
   :after org
   :config  
-  ;; Customize org-agenda view
+  ;; Set the prefix format for agenda items
   (setq org-agenda-prefix-format  '((agenda . "  %t ")
                                     (todo . "%t ")
                                     (tags . "")
                                     (search . "%i")))
+  
+  ;; Define sorting strategy for agenda items
   (setq org-agenda-sorting-strategy '((agenda time-up priority-up category-keep)
                                       (todo priority-up time-up category-keep)
                                       (tags time-up priority-up category-keep)
                                       (search time-up priority-up category-keep)))
+  
+  ;; Customize leaders for scheduled items in the agenda
   (setq org-agenda-scheduled-leaders '("" ""))
+  
+  ;; Set the number of days displayed in the agenda view
   (setq org-agenda-span 7)
+  
+  ;; Configure the display of future repeats in the agenda
   (setq org-agenda-show-future-repeats 'next)
+  
+  ;; Enable the use of a time grid in the agenda view
   (setq org-agenda-use-time-grid t)
+  
+  ;; Define the time grid for the agenda view
   (setq org-agenda-time-grid
         '((daily weekly today require-timed)
           (0000 0200 0400 0600 0800 1000 1200 1400 1600 1800 2000 2200 2359)
           "......" "----------------"))
   )
 
-;;;;; Functions - Agenda files across systems
+;;;;; Functions - Using org-agenda-files list across Linux and Android
 
 (defun dc/org-agenda-adjust-org-agenda-files-paths ()
-  "Adjust the paths in `org-agenda-files` based on the system type."
+  "Adjust the paths in `org-agenda-files` based on the system type.
+The function reads the org-agenda-files list and adjusts the paths
+based on the system type."
   (setq org-agenda-files
         (mapcar (lambda (file)
                   (cond ((eq system-type 'android)
@@ -761,7 +803,7 @@ org file on the year calendar."
 ;; Call the function to adjust the paths
 (dc/org-agenda-adjust-org-agenda-files-paths)
 
-;;;;; Functions - Agenda views
+;;;;; Functions - Change agenda buffer views
 
 (defun dc/org-agenda--switch-to-view (view-fn)
   "Switch to the given Org Agenda view function VIEW-FN and insert timeline."
@@ -801,7 +843,7 @@ org file on the year calendar."
   (org-super-agenda-mode)
   )
 
-;;;;; Functions - Auto parents
+;;;;; Functions - Get TODO parent name automatically
 
 (defun dc/org-super-agenda-get-todo-parent (item)
   "Get the parent heading of ITEM, or if none, the file title or filename."
@@ -816,7 +858,7 @@ org file on the year calendar."
 (org-super-agenda--def-auto-group parent "their parent heading or file title/filename"
   :key-form (dc/org-super-agenda-get-todo-parent item))
 
-;;;;; Functions - TODO view
+;;;;; Functions - Change to all TODOs view in agenda buffer
 
 (defun dc/org-agenda-todo-view ()
   "Open Org Agenda in the todos view mode with super agenda. Use file title as groups"
@@ -845,7 +887,7 @@ org file on the year calendar."
   (org-roam-setup)
   )
 
-;;;;; Functions - Node hierarchy
+;;;;; Functions - Get current node hierarchy
 
 (defun dc/org-roam--get-node-heirarchy (node)
   "Get the hierarchy of NODE as a list of titles, excluding non-node headings.
@@ -865,7 +907,7 @@ The hierarchy includes the NODE title and its ancestor node titles."
     (push title titles)
     (nreverse titles)))
 
-;;;;; Functions - Node display formatting
+;;;;; Functions - Display of nodes in org-roam search
 
 (defvar dc-org-roam-hierarchy-display-separator
   (propertize "->" 'face '(shadow))
@@ -976,7 +1018,7 @@ and when nil is returned the node will be filtered out."
     (setq alert-default-icon "ic_popup_reminder"))
   )
 
-;;;;; Functions - Android notifications
+;;;;; Functions - Support Android notifications
 
 (defun dc/alert-android-notifications-notify (info)
   "Send notifications using `android-notifications-notify'.
@@ -1027,7 +1069,7 @@ Android port."
   (org-alert-enable)
   )
 
-;;;;; Functions - Notification titles
+;;;;; Functions - Change title of notifications
 
 (defvar dc-org-alert-title-type 'custom
   "Control the title type for `org-alert' notifications.
@@ -1079,6 +1121,7 @@ use filename."
 
 ;; Set up 'parent mode
 (setq dc-org-alert-title-type 'parent)
+
 ;; Update to set up or remove advices based on dc-org-alert-title-type
 (dc/org-alert-update-advices)
 
@@ -1129,7 +1172,7 @@ use filename."
   :ensure t
   )
 
-;;;;; Functions - Transclusion insertion
+;;;;; Functions - Insertion of transcluded nodes
 
 (defun dc/org-transclusion-insert-node ()
   "Insert a transcluded link to an org-roam node."
@@ -1208,7 +1251,7 @@ The attached file is copied to the attachment directory and a link is inserted a
   (setq-default org-download-heading-lvl nil)
   )
 
-;;;;; Functions - Screenshot filename
+;;;;; Functions - Choose screenshot filename
 
 (defun dc/org-download-clipboard--prompt-for-name-advice (orig-fun &optional basename)
   "Advice to prompt for a basename before calling `org-download-clipboard'."
@@ -1255,7 +1298,7 @@ The attached file is copied to the attachment directory and a link is inserted a
   (setq org-media-note-screenshot-link-type-when-save-in-attach-dir 'attach)
   )
 
-;;;;; Functons - mpv-android
+;;;;; Functions - Enable mpv-android support on Android
 
 ;; This should only be done on Android
 (when (eq system-type 'android)
@@ -1285,7 +1328,7 @@ am start -a android.intent.action.VIEW -t video/* -d file:///storage/emulated/0/
   ;; Add advice to mpv-start so it open the correct player each time
   (advice-add 'mpv-start :around #'dc/mpv-start--android-advice))
 
-;;;;; Functions - Filename
+;;;;; Functions - Prepend timestamp to screenshot
 
 (defun dc/org-media-note--format-picture-file-name--prepend-timestamp-advice (orig-func &rest args)
   "Advice to prepend the current timestamp to the filename created by `org-media-note--format-picture-file-name'."
@@ -1295,7 +1338,7 @@ am start -a android.intent.action.VIEW -t video/* -d file:///storage/emulated/0/
 
 (advice-add 'org-media-note--format-picture-file-name :around #'dc/org-media-note--format-picture-file-name--prepend-timestamp-advice)
 
-;;;;; Functions - Invalid characters
+;;;;; Functions - Remove invalid characters (unsupported by syncthing)
 
 (defun dc/remove-invalid-characters-from-filename (filename)
   "Remove invalid characters from filename in order for it to sync to Android using syncthing."
@@ -1307,7 +1350,7 @@ am start -a android.intent.action.VIEW -t video/* -d file:///storage/emulated/0/
 
 (advice-add 'org-media-note--format-picture-file-name :around #'dc/org-media-note--format-picture-file-name--remove-invalid-characters-from-filename-advice)
 
-;;; Bookmarks
+;;; Browsing & bookmarks
 
 ;;;; Eww
 
@@ -1343,19 +1386,7 @@ am start -a android.intent.action.VIEW -t video/* -d file:///storage/emulated/0/
   (setq bmkp-bmenu-commands-file (expand-file-name ".emacs-bmk-bmenu-commands.el" user-emacs-directory))
   )
 
-;;;;; Functions - URL bookmarks
-
-(defun dc/bookmark-set-url (bookmark-name url)
-  "Add a new URL bookmark."
-  (interactive "sBookmark name: \nsURL: ")
-  (let ((bookmark (list bookmark-name
-                        (cons 'filename url)
-                        (cons 'handler 'eww-bookmark-jump-handler)
-                        (cons 'location url))))
-    (bookmark-store bookmark-name bookmark nil)
-    (bookmark-save)))
-
-;;;;; Functions - Bookmark paths on different platforms
+;;;;; Functions - Opening bookmarks on both Linux and Android
 
 (defun dc/bookmark-jump--modify-bookmark-path-advice (orig-fun &rest args)
   "Modify the bookmark filename and directory based on system type before opening."
@@ -1391,7 +1422,7 @@ am start -a android.intent.action.VIEW -t video/* -d file:///storage/emulated/0/
 ;; Add advice so bookmarks will be properly opened
 (advice-add 'bookmark-jump :around #'dc/bookmark-jump--modify-bookmark-path-advice)
 
-;;; Datetime
+;;; Date & time
 
 ;;;; Functions - Time adjustment
 
@@ -1434,7 +1465,7 @@ am start -a android.intent.action.VIEW -t video/* -d file:///storage/emulated/0/
   (setq calendar-week-start-day 1)
   )
 
-;;; Encryption
+;;; Encryption & authentication
 
 ;;;; Epa
 
@@ -1464,8 +1495,6 @@ am start -a android.intent.action.VIEW -t video/* -d file:///storage/emulated/0/
   ;; environment where GUI pinentry dialogs are not available
   (setq epa-pinentry-mode 'loopback)
   )
-
-;;; Authentication
 
 ;;;; Auth-source
 
