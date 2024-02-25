@@ -319,7 +319,8 @@ and today's Org Roam daily buffer."
   (shrface-basic)
   (shrface-trial)
   (setq shrface-href-versatile t)
-  (setq shrface-bullets-bullet-list '("*")))
+  (setq shrface-bullets-bullet-list '("*"))
+  )
 
 ;;;;;;; Keybindings
 
@@ -492,8 +493,8 @@ and today's Org Roam daily buffer."
 
 ;; Check if C-c g keymap exists, if not, create it
 (unless (keymapp (lookup-key global-map (kbd "C-c g")))
-(define-prefix-command 'dc-gui-map)
-(global-set-key (kbd "C-c g") 'dc-gui-map))
+  (define-prefix-command 'dc-gui-map)
+  (global-set-key (kbd "C-c g") 'dc-gui-map))
 
 ;; Add functions to the C-c g keymap
 (define-key dc-gui-map (kbd "a") 'dc/gui-show-all-bars)
