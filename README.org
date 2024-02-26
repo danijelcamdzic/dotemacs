@@ -194,7 +194,7 @@ In the GUI menu bar, I add a bunch of features I have created all over my
 configuration for easy access. Some of then are in the ="Commands"= menu and some
 are in the ="Tools"= menu.
 
-** MPV
+** mpv
 
 I use [[https://mpv.io/][mpv]] player on both Linux and Android.
 
@@ -310,7 +310,7 @@ Here is an example of me using Emacs on Android to play a video through the
 
 [[assets/mpv-android.gif]]
 
-** Org-mode
+** org-mode
 
 This is the biggest part of my configuration and contains numerous functions.
 
@@ -363,7 +363,7 @@ with green dates all the dates that you have made a note in.
 You can even go to the place where the =STATE= or =NOTE= was added by clicking on
 the calendar date.
 
-*** Org-roam nodes with tag insertion
+*** org-roam nodes with tag insertion
 
 There is a function called =dc/org-roam-insert-nodes-by-tags=, which enables you to
 insert in the org file all nodes that have certain tags but do not have other
@@ -379,7 +379,7 @@ tag =fitness= but do not have the tag =cardio=.
 There are also in here many functions which serve as a wrapper so they can be
 called in either the =org-agenda= buffer or the =org= file.
 
-*** Org-alert notifications on both Android and Linux
+*** org-alert notifications on both Android and Linux
 
 I use =org-alert= package for notifications. My usual configuration is rather
 simple:
@@ -453,7 +453,7 @@ Here is an example of how it will look like on Android:
 
 [[assets/android-org-alert.png]]
 
-*** Org-alert notification titles
+*** org-alert notification titles
 
 I really like how =org-super-agenda= package is able to group TODOs together
 based on the =auto-parent= property. This groups the TODOs based on their

@@ -1,10 +1,10 @@
-;;; init.el -- Personal configuration file for Emacs
+;;; init.el - Personal configuration file for Emacs
 
 ;;; Code:
 
 ;;; Package managers
 
-;;;; Package
+;;;; package
 
 ;;;;; Configuration
 
@@ -16,7 +16,7 @@
 ;; Initialize packages
 (package-initialize)
 
-;;;; Melpa
+;;;; melpa
 
 ;;;;; Configuration
 
@@ -24,7 +24,7 @@
 (add-to-list 'package-archives
              '("melpa" . "http://melpa.org/packages/") t)
 
-;;;; Use-package
+;;;; use-package
 
 ;;;;; Configuration
 
@@ -35,7 +35,7 @@
 
 (require 'use-package)
 
-;;;; Quelpa
+;;;; quelpa
 
 ;;;;; Configuration
 
@@ -47,7 +47,7 @@
   (setq quelpa-update-melpa-p nil)
   )
 
-;;;; Quelpa-use-package
+;;;; quelpa-use-package
 
 ;;;;; Configuration
 
@@ -73,22 +73,22 @@
 (defvar dc-gnu-linux-home-extended "/home/danijelcamdzic/")
 
 ;; Set the home directory based on system type
-(setq dc-home-directory
+(defvar dc-home-directory
       (cond
        ((eq system-type 'gnu/linux) dc-gnu-linux-home-extended)
        ((eq system-type 'android) dc-android-home)
        (t dc-gnu-linux-home)))
 
 ;; Define variables which represent the home directory folders
-(setq dc-books-directory (concat dc-home-directory "Books/"))
-(setq dc-documents-directory (concat dc-home-directory "Documents/"))
-(setq dc-download-directory (concat dc-home-directory "Download/")) 
-(setq dc-music-directory (concat dc-home-directory "Music/"))         
-(setq dc-notes-directory (concat dc-home-directory "Notes/"))
-(setq dc-pictures-directory (concat dc-home-directory "Pictures/"))   
-(setq dc-projects-directory (concat dc-home-directory "Projects/"))    
-(setq dc-recordings-directory (concat dc-home-directory "Recordings/"))
-(setq dc-videos-directory (concat dc-home-directory "Videos/"))
+(defvar dc-books-directory (concat dc-home-directory "Books/"))
+(defvar dc-documents-directory (concat dc-home-directory "Documents/"))
+(defvar dc-download-directory (concat dc-home-directory "Download/")) 
+(defvar dc-music-directory (concat dc-home-directory "Music/"))         
+(defvar dc-notes-directory (concat dc-home-directory "Notes/"))
+(defvar dc-pictures-directory (concat dc-home-directory "Pictures/"))   
+(defvar dc-projects-directory (concat dc-home-directory "Projects/"))    
+(defvar dc-recordings-directory (concat dc-home-directory "Recordings/"))
+(defvar dc-videos-directory (concat dc-home-directory "Videos/"))
 
 ;;;; Keybindings
 
@@ -124,10 +124,11 @@
   (interactive)
   (let* ((search-term (read-string "Enter search term: "))
          (search-regex (concat ".*" search-term ".*"))
-         (all-paths (directory-files-recursively dc-home-directory search-regex t))
+         (all-paths (ignore-errors (directory-files-recursively dc-home-directory search-regex t)))
          (directories (seq-filter 'file-directory-p all-paths))
          (choice (completing-read "Choose a directory: " directories)))
-    (dired choice)))
+    (when choice
+      (dired choice))))
 
 ;;;;; Keybindings
 
@@ -138,9 +139,9 @@
 
 ;; Add functions to the C-c d keymap
 (define-key dc-dired-map (kbd "h") 'dc/open-folder-from-home-directory)
-(define-key dc-dired-map (kbd "r") 'dc/ropen-from-home-directory)
+(define-key dc-dired-map (kbd "r") 'dc/ropen-folder-from-home-directory)
 
-;;;; Dired-sidebar
+;;;; dired-sidebar
 
 ;;;;; Configuration
 
@@ -151,7 +152,7 @@
   (setq dired-sidebar-window-fixed nil)
   )
 
-;;;;; Functions - Dired-sidebar toggle
+;;;;; Functions - Toggle dired-sidebar
 
 (defun dc/dired-sidebar-toggle ()
   "Toggle `dired-sidebar'."
@@ -166,11 +167,9 @@
   (global-set-key (kbd "C-c d") 'dc-dired-map))
 
 ;; Add functions to the C-c d keymap
-(define-key dc-dired-map (kbd "t") 'dc/dired-sidebar-toggle)
+(define-key dc-dired-map (kbd "s") 'dc/dired-sidebar-toggle)
 
-;;; Editor
-
-;;;; Theme
+;;; Theme
 
 ;; Install gruvbox-theme
 (use-package gruvbox-theme
@@ -180,10 +179,16 @@
 ;; Set gruvbox-theme as the system theme
 (load-theme 'gruvbox-dark-hard t)
 
-;; Remove fringes for better visuals
-(set-fringe-mode 0)
+;;; Buffers
 
-;;;; Startup
+;; Disable backup and lock files
+(setq create-lockfiles nil
+      auto-save-default nil
+      make-backup-files nil)
+
+;; Set custom file
+(setq custom-file (concat dc-documents-directory "Emacs/custom.el"))
+(load custom-file 'noerror)
 
 ;; Create shortcuts in Android with volume-up and volume-down keys
 (when (eq system-type 'android)
@@ -201,22 +206,6 @@
       (global-set-key (kbd "<volume-down>") command)))
   )
 
-;; Remove startup screen
-(setq inhibit-startup-screen t)
-
-;;;; Files
-
-;; Disable backup and lock files
-(setq create-lockfiles nil
-      auto-save-default nil
-      make-backup-files nil)
-
-;; Set custom file
-(setq custom-file (concat dc-documents-directory "Emacs/custom.el"))
-(load custom-file 'noerror)
-
-;;;; Buffers
-
 ;; Change buffer behavior on Android
 ;; Since screen size on Android is not suitable (for me) to use
 ;; split screen, I choose to open each buffer in full screen mode
@@ -228,6 +217,12 @@
   ;; Touchscreen keyboard spawn
   (setq touch-screen-display-keyboard t))
 
+;; Remove startup screen
+(setq inhibit-startup-screen t)
+
+;; Remove fringes from buffers
+(set-fringe-mode 0)
+
 ;; Open org-agenda day view and org-roam daily note on startup
 ;; (unless called with a file argument)
 (add-hook 'emacs-startup-hook
@@ -237,7 +232,7 @@
               (dc/org-agenda-day-view)
               )))
 
-;;;;; Functions - Killing all buffers
+;;;; Functions - Killing all buffers
 
 (defun dc/kill-background-buffers ()
   "Kill all buffers that are not currently visible in any window, except the *Messages*, *Org Agenda*,
@@ -252,7 +247,7 @@ and today's Org Roam daily buffer."
                   (string= (buffer-name buffer) today-daily-file))
         (kill-buffer buffer)))))
 
-;;;;;; Keybindings
+;;;;; Keybindings
 
 ;; Check if C-c b keymap exists, if not, create it
 (unless (keymapp (lookup-key global-map (kbd "C-c b")))
@@ -262,23 +257,23 @@ and today's Org Roam daily buffer."
 ;; Add functions to the C-c b keymap
 (define-key dc-buffer-map (kbd "k") 'dc/kill-background-buffers)
 
-;;;;; IBuffer
+;;;; ibuffer
 
-;;;;;; Configuration
+;;;;; Configuration
 
 (use-package ibuffer-sidebar
   :ensure t
   :config
   )
 
-;;;;;; Functions - IBuffer-sidebar Toggle
+;;;;; Functions - Toggle ibuffer-sidebar
 
 (defun dc/ibuffer-sidebar-toggle ()
   "Toggle `ibuffer-sidebar'."
   (interactive)
   (ibuffer-sidebar-toggle-sidebar))
 
-;;;;;;; Keybindings
+;;;;;; Keybindings
 
 ;; Check if C-c b keymap exists, if not, create it
 (unless (keymapp (lookup-key global-map (kbd "C-c b")))
@@ -286,20 +281,18 @@ and today's Org Roam daily buffer."
   (global-set-key (kbd "C-c b") 'dc-buffer-map))
 
 ;; Add functions to the C-c b keymap
-(define-key dc-buffer-map (kbd "t") 'dc/ibuffer-sidebar-toggle)
+(define-key dc-buffer-map (kbd "s") 'dc/ibuffer-sidebar-toggle)
 
-;;;;; Imenu-list
+;;;; imenu-list
 
-;;;;;; Configuration
+;;;;; Configuration
 
 (use-package imenu-list
   :ensure t
   :config
-  ;; Allow for buffer resize
-  (setq imenu-list-auto-resize t)
   )
 
-;;;;;;; Keybindings
+;;;;;; Keybindings
 
 ;; Check if C-c b keymap exists, if not, create it
 (unless (keymapp (lookup-key global-map (kbd "C-c b")))
@@ -309,30 +302,7 @@ and today's Org Roam daily buffer."
 ;; Add functions to the C-c b keymap
 (define-key dc-buffer-map (kbd "l") 'imenu-list-smart-toggle)
 
-;;;;; Shrface
-
-;;;;;; Configuration
-
-(use-package shrface
-  :ensure t
-  :config
-  (shrface-basic)
-  (shrface-trial)
-  (setq shrface-href-versatile t)
-  (setq shrface-bullets-bullet-list '("*"))
-  )
-
-;;;;;;; Keybindings
-
-;; Check if C-c b keymap exists, if not, create it
-(unless (keymapp (lookup-key global-map (kbd "C-c b")))
-  (define-prefix-command 'dc-buffer-map)
-  (global-set-key (kbd "C-c b") 'dc-buffer-map))
-
-;; Add functions to the C-c b keymap
-(define-key dc-buffer-map (kbd "m") 'shrface-mode)
-
-;;;; Text editing
+;;; Editor
 
 ;; Indentation
 (setq-default indent-tabs-mode nil
@@ -348,44 +318,12 @@ and today's Org Roam daily buffer."
 ;; Disable line numbers
 (global-display-line-numbers-mode 0)
 
-;;;;; Programming
-
-;;;;;; C/CPP
-
-(defun dc/setup-c-cpp-mode ()
-  "Set basic c and cpp offset."
-  (setq c-basic-offset 4))
-
-;; Enable line numbers for  C modes
-(add-hook 'c-mode-common-hook (lambda () (display-line-numbers-mode 1)))
-
-;; Set hook to set indentation when in c/cpp file
-(add-hook 'c-mode-common-hook 'dc/setup-c-cpp-mode)
-
-;;;;;; Python
-
-;; Set the indentation level for Python code
-(setq python-indent-offset 4)
-
-;; Enable line numbers for Python mode
-(add-hook 'python-mode-hook (lambda () (display-line-numbers-mode 1)))
-
-;;;; Version control
-
-;;;;; Magit
-
-;;;;;; Configuration
-
-(use-package magit
-  :ensure t
-  )
-
-;;;; Visual modes
+;;;; Visual
 
 ;; Enable outline-minor-mode as soon as .el file is opened
 (add-hook 'emacs-lisp-mode-hook 'outline-minor-mode)
 
-;;;;; Outline-minor-mode
+;;;;; outline-minor-faces
 
 ;;;;;; Configuration
 
@@ -396,7 +334,7 @@ and today's Org Roam daily buffer."
                     #'outline-minor-faces-mode)
   )
 
-;;;;; Pretty-hydra
+;;;;; pretty-hydra
 
 ;;;;;; Configuration
 
@@ -404,7 +342,7 @@ and today's Org Roam daily buffer."
   :ensure t
   )
 
-;;;;; Which-key
+;;;;; which-key
 
 ;;;;;; Configuration
 
@@ -415,18 +353,16 @@ and today's Org Roam daily buffer."
   (which-key-mode)
   )
 
-;;; Document viewing
-
-;;;; Doc-view
+;;;;; doc-view
 
 ;; Set higher resolution for viewing documents
 (setq doc-view-resolution 400)
 
-;;; Completion
+;;;; Completion
 
-;;;; Company
+;;;;; company
 
-;;;;; Configuration
+;;;;;; Configuration
 
 (use-package company
   :ensure t
@@ -438,17 +374,17 @@ and today's Org Roam daily buffer."
   (add-hook 'after-init-hook 'global-company-mode)
   )
 
-;;;; Orderless
+;;;;; orderless
 
-;;;;; Configuration
+;;;;;; Configuration
 
 (use-package orderless
   :ensure t
   )
 
-;;;; Vertico
+;;;;; vertico
 
-;;;;; Configuration
+;;;;;; Configuration
 
 (use-package vertico
   :after orderless
@@ -463,9 +399,41 @@ and today's Org Roam daily buffer."
         completion-category-overrides '((file (styles . (partial-completion)))))
   )
 
+;;;; Programming
+
+;;;;; C/Cpp
+
+(defun dc/setup-c-cpp-mode ()
+  "Set basic c and cpp offset."
+  (setq c-basic-offset 4))
+
+;; Enable line numbers for  C modes
+(add-hook 'c-mode-common-hook (lambda () (display-line-numbers-mode 1)))
+
+;; Set hook to set indentation when in c/cpp file
+(add-hook 'c-mode-common-hook 'dc/setup-c-cpp-mode)
+
+;;;;; Python
+
+;; Set the indentation level for Python code
+(setq python-indent-offset 4)
+
+;; Enable line numbers for Python mode
+(add-hook 'python-mode-hook (lambda () (display-line-numbers-mode 1)))
+
+;;;; Version control
+
+;;;;; magit
+
+;;;;;; Configuration
+
+(use-package magit
+  :ensure t
+  )
+
 ;;; GUI
 
-;;;; Functions: GUI display modes
+;;;; Functions - GUI display modes
 
 (defun dc/gui-hide-all-bars ()
   "Disable scroll bar, menu bar, and tool bar."
@@ -501,9 +469,9 @@ and today's Org Roam daily buffer."
 (define-key dc-gui-map (kbd "h") 'dc/gui-hide-all-bars)
 (define-key dc-gui-map (kbd "s") 'dc/gui-scrolless-mode)
 
-;;; Org-mode
+;;; Org
 
-;;;; Org
+;;;; org-mode
 
 ;;;;; Configuration
 
@@ -598,7 +566,7 @@ the format YYYY-MM-DD Day H:M."
   (global-set-key (kbd "C-c o") 'dc-org-map))
 
 ;; Add functions to the C-c o keymap
-(define-key dc-org-map (kbd "g") 'dc/org-insert-current-date-time)
+(define-key dc-org-map (kbd "q") 'dc/org-insert-current-date-time)
 
 ;;;;; Functions - Clocking in and clocking out
 
@@ -684,7 +652,7 @@ or in an org file."
 
 ;; Bind to org-agenda buffer also
 (with-eval-after-load 'org-agenda
-  (define-key org-agenda-mode-map (kbd "a") 'dc/org-add-schedule)
+  (define-key org-agenda-mode-map (kbd "r") 'dc/org-add-schedule)
   (define-key org-agenda-mode-map (kbd "r") 'dc/org-remove-schedule))
 
 ;;;;; Functions - Changing a TODO state
@@ -766,14 +734,14 @@ current state is TODO."
 
 ;; Add functions to the C-c o keymap
 (define-key dc-org-map (kbd "t") 'dc/org-todo-change-state)
-(define-key dc-org-map (kbd "s") 'dc/org-todo-change-state-and-reschedule)
+(define-key dc-org-map (kbd "T") 'dc/org-todo-change-state-and-reschedule)
 (define-key dc-org-map (kbd "d") 'dc/org-todo-change-state-on-date)
 (define-key dc-org-map (kbd "D") 'dc/org-todo-change-state-on-date-and-reschedule)
 
 ;; Bind to org-agenda buffer also
 (with-eval-after-load 'org-agenda
-  (define-key org-agenda-mode-map (kbd "a") 'dc/org-todo-change-state)
-  (define-key org-agenda-mode-map (kbd "r") 'dc/org-todo-change-state-and-reschedule)
+  (define-key org-agenda-mode-map (kbd "t") 'dc/org-todo-change-state)
+  (define-key org-agenda-mode-map (kbd "T") 'dc/org-todo-change-state-and-reschedule)
   (define-key org-agenda-mode-map (kbd "d") 'dc/org-todo-change-state-on-date)
   (define-key org-agenda-mode-map (kbd "D") 'dc/org-todo-change-state-on-date-and-reschedule))
 
@@ -800,7 +768,7 @@ current state is TODO."
 (with-eval-after-load 'org-agenda
   (define-key org-agenda-mode-map (kbd "n") 'dc/org-add-note))
 
-;;;;; Functions - Display heading logbook states and notes on a calendar
+;;;;; Functions - Display logbook states and notes on a calendar
 
 (defun dc/org-logbook--parse-logbook-states (logbook beg buffer)
   "Parse a logbook string and return a list of entries with states."
@@ -962,15 +930,15 @@ org file on the year calendar."
   (global-set-key (kbd "C-c o") 'dc-org-map))
 
 ;; Add functions to the C-c o keymap
-(define-key dc-org-map (kbd "T") 'dc/org-logbook-display-states-on-calendar)
+(define-key dc-org-map (kbd "S") 'dc/org-logbook-display-states-on-calendar)
 (define-key dc-org-map (kbd "N") 'dc/org-logbook-display-notes-on-calendar)
 
 ;; Bind to org-agenda buffer also
 (with-eval-after-load 'org-agenda
-  (define-key org-agenda-mode-map (kbd "T") 'dc/org-logbook-display-states-on-calendar)
+  (define-key org-agenda-mode-map (kbd "S") 'dc/org-logbook-display-states-on-calendar)
   (define-key org-agenda-mode-map (kbd "N") 'dc/org-logbook-display-notes-on-calendar))
 
-;;;; Org-agenda
+;;;; org-agenda
 
 ;;;;; Configuration
 
@@ -1008,7 +976,7 @@ org file on the year calendar."
           "......" "----------------"))
   )
 
-;;;;; Functions - Using org-agenda-files list across Linux and Android
+;;;;; Functions - Using org-agenda-files across Linux and Android
 
 (defun dc/org-agenda-adjust-org-agenda-files-paths ()
   "Adjust the paths in `org-agenda-files` based on the system type.
@@ -1072,7 +1040,7 @@ based on the system type."
   (define-key org-agenda-mode-map (kbd "w") 'dc/org-agenda-week-view)
   (define-key org-agenda-mode-map (kbd "y") 'dc/org-agenda-year-view))
 
-;;;; Org-super-agenda
+;;;; org-super-agenda
 
 ;;;;; Configuration
 
@@ -1117,13 +1085,13 @@ based on the system type."
   (global-set-key (kbd "C-c a") 'dc-agenda-map))
 
 ;; Add functions to the C-c a keymap
-(define-key dc-agenda-map (kbd "x") 'dc/org-agenda-todo-view)
+(define-key dc-agenda-map (kbd "v") 'dc/org-agenda-todo-view)
 
 ;; Bind to org-agenda buffer also
 (with-eval-after-load 'org-agenda
-  (define-key org-agenda-mode-map (kbd "x") 'dc/org-agenda-todo-view))
+  (define-key org-agenda-mode-map (kbd "v") 'dc/org-agenda-todo-view))
 
-;;;; Org-roam
+;;;; org-roam
 
 ;;;;; Configuration
 
@@ -1150,8 +1118,8 @@ based on the system type."
   (global-set-key (kbd "C-c r") 'dc-roam-map))
 
 ;; Add functions to the C-c r keymap
-(define-key dc-roam-map (kbd "c") 'org-roam-dailies-find-date)
-(define-key dc-roam-map (kbd "d") 'org-roam-dailies-goto-today)
+(define-key dc-roam-map (kbd "d") 'org-roam-dailies-find-date)
+(define-key dc-roam-map (kbd "t") 'org-roam-dailies-goto-today)
 (define-key dc-roam-map (kbd "f") 'org-roam-node-find)
 (define-key dc-roam-map (kbd "i") 'org-roam-node-insert)
 
@@ -1281,9 +1249,9 @@ and when nil is returned the node will be filtered out."
   (global-set-key (kbd "C-c r") 'dc-roam-map))
 
 ;; Add functions to the C-c r keymap
-(define-key dc-roam-map (kbd "t") 'dc/org-roam-insert-nodes-by-tags)
+(define-key dc-roam-map (kbd "a") 'dc/org-roam-insert-nodes-by-tags)
 
-;;;; Alert
+;;;; alert
 
 ;;;;; Configuration
 
@@ -1318,7 +1286,7 @@ Android port."
 (alert-define-style 'android-notifications :title "Android Notifications"
                     :notifier #'dc/alert-android-notifications-notify)
 
-;;;; Org-alert
+;;;; org-alert
 
 ;;;;; Configuration
 
@@ -1403,7 +1371,7 @@ use filename."
 ;; Update to set up or remove advices based on dc-org-alert-title-type
 (dc/org-alert-update-advices)
 
-;;;; Org-tempo
+;;;; org-tempo
 
 ;;;;; Configuration
 
@@ -1411,7 +1379,7 @@ use filename."
   :after org
   )
 
-;;;; Org-analyzer
+;;;; org-analyzer
 
 ;;;;; Configuration
 
@@ -1423,7 +1391,21 @@ use filename."
   (setq org-analyzer-org-directory org-directory)
   )
 
-;;;; Websocket
+;;;;;; Keybindings
+
+;; Check if C-c o keymap exists, if not, create it
+(unless (keymapp (lookup-key global-map (kbd "C-c o")))
+  (define-prefix-command 'dc-org-map)
+  (global-set-key (kbd "C-c o") 'dc-org-map))
+
+;; Add functions to the C-c a keymap
+(define-key dc-org-map (kbd "h") 'org-analyzer-start)
+
+;; Bind to org-agenda buffer also
+(with-eval-after-load 'org-agenda
+  (define-key org-agenda-mode-map (kbd "h") 'org-analyzer-start))
+
+;;;; websocket
 
 ;;;;; Configuration
 
@@ -1432,7 +1414,7 @@ use filename."
   :ensure t
   )
 
-;;;; Org-roam-ui
+;;;; org-roam-ui
 
 ;;;;; Configuration
 
@@ -1441,7 +1423,17 @@ use filename."
   :ensure t
   )
 
-;;;; Org-transclusion
+;;;;;; Keybindings
+
+;; Check if C-c r keymap exists, if not, create it
+(unless (keymapp (lookup-key global-map (kbd "C-c r")))
+  (define-prefix-command 'dc-roam-map)
+  (global-set-key (kbd "C-c r") 'dc-roam-map))
+
+;; Add functions to the C-c r keymap
+(define-key dc-roam-map (kbd "u") 'org-roam-ui-open)
+
+;;;; org-transclusion
 
 ;;;;; Configuration
 
@@ -1472,7 +1464,7 @@ use filename."
 ;; Add functions to the C-c o keymap
 (define-key dc-org-map (kbd "z") 'dc/org-transclusion-insert-node)
 
-;;;; Org-attach
+;;;; org-attach
 
 ;;;;; Configuration
 
@@ -1508,7 +1500,7 @@ use filename."
 ;; Add functions to the C-c o keymap
 (define-key dc-org-map (kbd "k") 'org-attach-attach)
 
-;;;;; Functions - Attach and insert attachment at once
+;;;;; Functions - Attach and insert attachment as a link
 
 (defvar dc-preferred-directory ""
   "Preferred starting directory to search files to attach in Org mode.")
@@ -1544,7 +1536,7 @@ The attached file is copied to the attachment directory and a link is inserted a
 ;; Add functions to the C-c o keymap
 (define-key dc-org-map (kbd "j") 'dc/org-attach-file-and-insert-link)
 
-;;;; Org-download
+;;;; org-download
 
 ;;;;; Configuration
 
@@ -1567,7 +1559,7 @@ The attached file is copied to the attachment directory and a link is inserted a
   (global-set-key (kbd "C-c o") 'dc-org-map))
 
 ;; Add functions to the C-c o keymap
-(define-key dc-org-map (kbd "v") 'org-download-clipboard)
+(define-key dc-org-map (kbd "p") 'org-download-clipboard)
 
 ;;;;; Functions - Choose screenshot filename
 
@@ -1581,7 +1573,7 @@ The attached file is copied to the attachment directory and a link is inserted a
 
 (advice-add 'org-download-clipboard :around #'dc/org-download-clipboard--prompt-for-name-advice)
 
-;;;; Org-ref
+;;;; org-ref
 
 ;;;;; Configuration
 
@@ -1590,7 +1582,7 @@ The attached file is copied to the attachment directory and a link is inserted a
   :after org
   )
 
-;;;; Org-noter
+;;;; org-noter
 
 ;;;;; Configuration
 
@@ -1602,7 +1594,7 @@ The attached file is copied to the attachment directory and a link is inserted a
   (setq org-noter-notes-search-path '(org-directory))
   )
 
-;;;; Org-media-note
+;;;; org-media-note
 
 ;;;;; Configuration
 
@@ -1670,7 +1662,7 @@ am start -a android.intent.action.VIEW -t video/* -d file:///storage/emulated/0/
 
 ;;; Browsing & bookmarks
 
-;;;; Eww
+;;;; eww
 
 ;;;;; Configuration
 
@@ -1680,7 +1672,7 @@ am start -a android.intent.action.VIEW -t video/* -d file:///storage/emulated/0/
   (setq eww-bookmarks-directory (concat dc-documents-directory "Emacs/"))
   )
 
-;;;; Bookmark
+;;;; bookmark
 
 ;;;;; Configuration
 
@@ -1690,7 +1682,7 @@ am start -a android.intent.action.VIEW -t video/* -d file:///storage/emulated/0/
   (setq bookmark-default-file (concat dc-documents-directory "Emacs/bookmarks"))
   )
 
-;;;; Bookmark+
+;;;; bookmark+
 
 ;;;;; Configuration
 
@@ -1777,7 +1769,7 @@ am start -a android.intent.action.VIEW -t video/* -d file:///storage/emulated/0/
   "Override for `current-time' using `dc/time-adjust-time'."
   (or dc-adjusted-time (current-time)))
 
-;;;; Time-stamp
+;;;; time-stamp
 
 ;;;;; Configuration
 
@@ -1792,7 +1784,7 @@ am start -a android.intent.action.VIEW -t video/* -d file:///storage/emulated/0/
   (add-hook 'before-save-hook 'time-stamp)
   )
 
-;;;; Calendar
+;;;; calendar
 
 ;;;;; Configuration
 
@@ -1804,7 +1796,7 @@ am start -a android.intent.action.VIEW -t video/* -d file:///storage/emulated/0/
 
 ;;; Encryption & authentication
 
-;;;; Epa
+;;;; epa
 
 ;;;;; Configuration
 
@@ -1833,7 +1825,7 @@ am start -a android.intent.action.VIEW -t video/* -d file:///storage/emulated/0/
   (setq epa-pinentry-mode 'loopback)
   )
 
-;;;; Auth-source
+;;;; auth-source
 
 ;;;;; Configuration
 
