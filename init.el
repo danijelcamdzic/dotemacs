@@ -485,9 +485,6 @@
   ;; Set indentation for headings
   (setq org-startup-indented t)
 
-  ;; Fold all headings
-  (setq org-startup-folded t)
-
   ;; Set coloumn limit for a paragraph to 80 characters
   (add-hook 'org-mode-hook (lambda () (setq fill-column 80)))
 
@@ -695,7 +692,7 @@ or in an org file."
   "Change state of the current heading and log with a chosen date.
 Also reschedule as a TODO."
   (interactive)
-  (dc/org-todo-change-state-with-date)
+  (dc/org-todo-change-state-on-date)
   (if (eq major-mode 'org-agenda-mode)
       (org-agenda-todo "TODO")
     (org-todo "TODO"))
