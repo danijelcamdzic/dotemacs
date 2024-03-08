@@ -650,7 +650,7 @@ or in an org file."
 
 ;; Bind to org-agenda buffer also
 (with-eval-after-load 'org-agenda
-  (define-key org-agenda-mode-map (kbd "r") 'dc/org-add-schedule)
+  (define-key org-agenda-mode-map (kbd "a") 'dc/org-add-schedule)
   (define-key org-agenda-mode-map (kbd "r") 'dc/org-remove-schedule))
 
 ;;;;; Functions - Changing a TODO state
@@ -661,15 +661,6 @@ or in an org file."
   (if (eq major-mode 'org-agenda-mode)
       (org-agenda-todo)
     (org-todo)))
-
-(defun dc/org-todo-change-state-and-reschedule ()
-  "Change state of a current heading and reschedule it as a TODO."
-  (interactive)
-  (dc/org-todo-change-state)
-  (if (eq major-mode 'org-agenda-mode)
-      (org-agenda-todo "TODO")
-    (org-todo "TODO"))
-  (run-with-timer 0.1 nil 'dc/org-add-schedule))
 
 (defun dc/org-todo-change-state-on-date ()
   "Change state of the current heading and log with a chosen date."
@@ -687,16 +678,6 @@ or in an org file."
           (setq dc-adjusted-time nil)
           (setq dc-time-override-lock nil))
       (message "No date selected"))))
-
-(defun dc/org-todo-change-state-on-date-and-reschedule ()
-  "Change state of the current heading and log with a chosen date.
-Also reschedule as a TODO."
-  (interactive)
-  (dc/org-todo-change-state-on-date)
-  (if (eq major-mode 'org-agenda-mode)
-      (org-agenda-todo "TODO")
-    (org-todo "TODO"))
-  (run-with-timer 0.1 nil 'dc/org-add-schedule))
 
 (defun dc/org-todo-skip-overdue-tasks ()
   "Mark tasks scheduled for yesterday or earlier as SKIP and
@@ -732,16 +713,12 @@ current state is TODO."
 
 ;; Add functions to the C-c o keymap
 (define-key dc-org-map (kbd "t") 'dc/org-todo-change-state)
-(define-key dc-org-map (kbd "T") 'dc/org-todo-change-state-and-reschedule)
-(define-key dc-org-map (kbd "d") 'dc/org-todo-change-state-on-date)
-(define-key dc-org-map (kbd "D") 'dc/org-todo-change-state-on-date-and-reschedule)
+(define-key dc-org-map (kbd "T") 'dc/org-todo-change-state-on-date)
 
 ;; Bind to org-agenda buffer also
 (with-eval-after-load 'org-agenda
   (define-key org-agenda-mode-map (kbd "t") 'dc/org-todo-change-state)
-  (define-key org-agenda-mode-map (kbd "T") 'dc/org-todo-change-state-and-reschedule)
-  (define-key org-agenda-mode-map (kbd "d") 'dc/org-todo-change-state-on-date)
-  (define-key org-agenda-mode-map (kbd "D") 'dc/org-todo-change-state-on-date-and-reschedule))
+  (define-key org-agenda-mode-map (kbd "T") 'dc/org-todo-change-state-on-date))
 
 ;;;;; Functions - Adding notes
 
