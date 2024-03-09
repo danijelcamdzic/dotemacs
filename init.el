@@ -80,10 +80,10 @@
        (t dc-gnu-linux-home)))
 
 ;; Define variables which represent the home directory folders
+(defvar dc-audio-directory (concat dc-home-directory "Audio/"))  
 (defvar dc-books-directory (concat dc-home-directory "Books/"))
 (defvar dc-documents-directory (concat dc-home-directory "Documents/"))
-(defvar dc-download-directory (concat dc-home-directory "Download/")) 
-(defvar dc-music-directory (concat dc-home-directory "Music/"))         
+(defvar dc-download-directory (concat dc-home-directory "Download/"))        
 (defvar dc-notes-directory (concat dc-home-directory "Notes/"))
 (defvar dc-pictures-directory (concat dc-home-directory "Pictures/"))   
 (defvar dc-projects-directory (concat dc-home-directory "Projects/"))    
@@ -105,10 +105,10 @@
 (defun dc/open-folder-from-home-directory ()
   "Open a folder from home directory in dired."
   (interactive)
-  (let* ((directories '(("Books" . dc-books-directory)
+  (let* ((directories '(("Audio" . dc-audio-directory)
+                        ("Books" . dc-books-directory)
                         ("Documents" . dc-documents-directory)
                         ("Download" . dc-download-directory)
-                        ("Music" . dc-music-directory)
                         ("Notes" . dc-notes-directory)
                         ("Pictures" . dc-pictures-directory)
                         ("Projects" . dc-projects-directory)
@@ -556,16 +556,6 @@ the format YYYY-MM-DD Day H:M."
   (interactive)
   (insert (format-time-string "%Y-%m-%d %a %H:%M")))
 
-;;;;;; Keybindings
-
-;; Check if C-c o keymap exists, if not, create it
-(unless (keymapp (lookup-key global-map (kbd "C-c o")))
-  (define-prefix-command 'dc-org-map)
-  (global-set-key (kbd "C-c o") 'dc-org-map))
-
-;; Add functions to the C-c o keymap
-(define-key dc-org-map (kbd "q") 'dc/org-insert-current-date-time)
-
 ;;;;; Functions - Clocking in and clocking out
 
 (defun dc/org-clock-in ()
@@ -714,11 +704,13 @@ current state is TODO."
 ;; Add functions to the C-c o keymap
 (define-key dc-org-map (kbd "t") 'dc/org-todo-change-state)
 (define-key dc-org-map (kbd "T") 'dc/org-todo-change-state-on-date)
+(define-key dc-org-map (kbd "s") 'dc/org-todo-skip-overdue-tasks)
 
 ;; Bind to org-agenda buffer also
 (with-eval-after-load 'org-agenda
   (define-key org-agenda-mode-map (kbd "t") 'dc/org-todo-change-state)
-  (define-key org-agenda-mode-map (kbd "T") 'dc/org-todo-change-state-on-date))
+  (define-key org-agenda-mode-map (kbd "T") 'dc/org-todo-change-state-on-date)
+  (define-key org-agenda-mode-map (kbd "s") 'dc/org-todo-skip-overdue-tasks))
 
 ;;;;; Functions - Adding notes
 
@@ -1077,9 +1069,6 @@ based on the system type."
   ;; Set directories
   (setq org-roam-directory org-directory)
   (setq org-roam-dailies-directory (concat org-directory "dailies/"))
-  
-  ;; Exclude gpg encrypted files from being processed by org-roam
-  (setq org-roam-file-exclude-regexp "\\(\\.gpg\\)$")
 
   ;; Setup org-roam
   (org-roam-setup)
@@ -1366,20 +1355,6 @@ use filename."
   (setq org-analyzer-org-directory org-directory)
   )
 
-;;;;;; Keybindings
-
-;; Check if C-c o keymap exists, if not, create it
-(unless (keymapp (lookup-key global-map (kbd "C-c o")))
-  (define-prefix-command 'dc-org-map)
-  (global-set-key (kbd "C-c o") 'dc-org-map))
-
-;; Add functions to the C-c a keymap
-(define-key dc-org-map (kbd "h") 'org-analyzer-start)
-
-;; Bind to org-agenda buffer also
-(with-eval-after-load 'org-agenda
-  (define-key org-agenda-mode-map (kbd "h") 'org-analyzer-start))
-
 ;;;; websocket
 
 ;;;;; Configuration
@@ -1623,7 +1598,7 @@ am start -a android.intent.action.VIEW -t video/* -d file:///storage/emulated/0/
 
 (advice-add 'org-media-note--format-picture-file-name :around #'dc/org-media-note--format-picture-file-name--prepend-timestamp-advice)
 
-;;;;; Functions - Remove invalid characters (unsupported by syncthing)
+;;;;; Functions - Remove invalid characters (the ones unsupported by syncthing)
 
 (defun dc/remove-invalid-characters-from-filename (filename)
   "Remove invalid characters from filename in order for it to sync to Android using syncthing."
