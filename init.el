@@ -519,6 +519,10 @@
    '((python . t)    ; Enable Python
      (C . t)))       ; Enable C
 
+  ;; Set the minimal number or lines in org-babel output before
+  ;; they are stored in a code block
+  (setq org-babel-min-lines-for-block-output 20)
+
   ;; Set the command for executing Python code in Org Babel
   (setq org-babel-python-command "python3")
 
