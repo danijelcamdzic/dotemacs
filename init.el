@@ -3,11 +3,8 @@
 ;;; Code:
 
 ;;; Package managers
-
 ;;;; package
-
 ;;;;; Configuration
-
 (require 'package)
 
 ;; Temporarily disable signature checks
@@ -17,17 +14,13 @@
 (package-initialize)
 
 ;;;; melpa
-
 ;;;;; Configuration
-
 ;; Add melpa package archives
 (add-to-list 'package-archives
              '("melpa" . "http://melpa.org/packages/") t)
 
 ;;;; use-package
-
 ;;;;; Configuration
-
 ;; Install use-package
 (unless (package-installed-p 'use-package)
   (package-refresh-contents)
@@ -36,9 +29,7 @@
 (require 'use-package)
 
 ;;;; quelpa
-
 ;;;;; Configuration
-
 (use-package quelpa
   :ensure t
   :init
@@ -48,9 +39,7 @@
   )
 
 ;;;; quelpa-use-package
-
 ;;;;; Configuration
-
 (use-package quelpa-use-package
   :ensure t
   :after (quelpa)
@@ -60,13 +49,40 @@
   )
 
 ;;; User
-
 ;; User name and email
 (setq user-full-name "Danijel Camdzic")
 (setq user-mail-address "danijelcamdzic@tuta.com")
 
-;;; Directories
+;;;; Keybindings menus
+;; Add keybdinding menu for dired
+(define-prefix-command 'dc-dired-map)
+(global-set-key (kbd "C-c d") 'dc-dired-map)
 
+;; Add keybdinding menu for buffers
+(define-prefix-command 'dc-buffer-map)
+(global-set-key (kbd "C-c b") 'dc-buffer-map)
+
+;; Add keybdinding menu for GUI
+(define-prefix-command 'dc-gui-map)
+(global-set-key (kbd "C-c g") 'dc-gui-map)
+
+;; Add keybdinding menu for bookmarks
+(define-prefix-command 'dc-bookmark-map)
+(define-key dc-buffer-map (kbd "b") 'dc-bookmark-map)
+
+;; Add keybdinding menu for org
+(define-prefix-command 'dc-org-map)
+(global-set-key (kbd "C-c o") 'dc-org-map)
+
+;; Add keybdinding menu for agenda
+(define-prefix-command 'dc-agenda-map)
+(global-set-key (kbd "C-c a") 'dc-agenda-map)
+
+;; Add keybdinding menu for org-roam
+(define-prefix-command 'dc-roam-map)
+(global-set-key (kbd "C-c r") 'dc-roam-map)
+
+;;;; Directories
 ;; Define the home directories variables
 (defvar dc-android-home "/storage/emulated/0/")
 (defvar dc-gnu-linux-home "~/")
@@ -90,18 +106,7 @@
 (defvar dc-recordings-directory (concat dc-home-directory "Recordings/"))
 (defvar dc-videos-directory (concat dc-home-directory "Videos/"))
 
-;;;; Keybindings
-
-;; Check if C-c d keymap exists, if not, create it
-(unless (keymapp (lookup-key global-map (kbd "C-c d")))
-  (define-prefix-command 'dc-dired-map)
-  (global-set-key (kbd "C-c d") 'dc-dired-map))
-
-;; Add functions to the C-c d keymap
-(define-key dc-dired-map (kbd "g") 'rgrep)
-
-;;;; Functions - Open a folder or file from the home directory
-
+;;;;; Functions - Open a folder or file from the home directory
 (defun dc/open-folder-from-home-directory ()
   "Open a folder from home directory in dired."
   (interactive)
@@ -130,21 +135,12 @@
     (when choice
       (dired choice))))
 
-;;;;; Keybindings
-
-;; Check if C-c d keymap exists, if not, create it
-(unless (keymapp (lookup-key global-map (kbd "C-c d")))
-  (define-prefix-command 'dc-dired-map)
-  (global-set-key (kbd "C-c d") 'dc-dired-map))
-
-;; Add functions to the C-c d keymap
+;; Add keybindings
 (define-key dc-dired-map (kbd "h") 'dc/open-folder-from-home-directory)
 (define-key dc-dired-map (kbd "r") 'dc/ropen-folder-from-home-directory)
 
-;;;; dired-sidebar
-
-;;;;; Configuration
-
+;;;;; dired-sidebar
+;;;;;; Configuration
 (use-package dired-sidebar
   :ensure t
   :config
@@ -152,25 +148,16 @@
   (setq dired-sidebar-window-fixed nil)
   )
 
-;;;;; Functions - Toggle dired-sidebar
-
+;;;;;; Functions - Toggle dired-sidebar
 (defun dc/dired-sidebar-toggle ()
   "Toggle `dired-sidebar'."
   (interactive)
   (dired-sidebar-toggle-sidebar))
 
-;;;;;; Keybindings
-
-;; Check if C-c d keymap exists, if not, create it
-(unless (keymapp (lookup-key global-map (kbd "C-c d")))
-  (define-prefix-command 'dc-dired-map)
-  (global-set-key (kbd "C-c d") 'dc-dired-map))
-
-;; Add functions to the C-c d keymap
+;; Add keybindings
 (define-key dc-dired-map (kbd "s") 'dc/dired-sidebar-toggle)
 
 ;;; Theme
-
 ;; Install gruvbox-theme
 (use-package gruvbox-theme
   :ensure t
@@ -180,7 +167,6 @@
 (load-theme 'gruvbox-dark-hard t)
 
 ;;; Buffers
-
 ;; Disable backup and lock files
 (setq create-lockfiles nil
       auto-save-default nil
@@ -233,7 +219,6 @@
               )))
 
 ;;;; Functions - Killing all buffers
-
 (defun dc/kill-background-buffers ()
   "Kill all buffers that are not currently visible in any window, except the *Messages*, *Org Agenda*,
 *scratch* and today's Org Roam daily buffer."
@@ -248,63 +233,36 @@
                   (string= (buffer-name buffer) today-daily-file))
         (kill-buffer buffer)))))
 
-;;;;; Keybindings
-
-;; Check if C-c b keymap exists, if not, create it
-(unless (keymapp (lookup-key global-map (kbd "C-c b")))
-  (define-prefix-command 'dc-buffer-map)
-  (global-set-key (kbd "C-c b") 'dc-buffer-map))
-
-;; Add functions to the C-c b keymap
+;; Set keybindings
 (define-key dc-buffer-map (kbd "k") 'dc/kill-background-buffers)
 
 ;;;; ibuffer
-
 ;;;;; Configuration
-
 (use-package ibuffer-sidebar
   :ensure t
   :config
   )
 
 ;;;;; Functions - Toggle ibuffer-sidebar
-
 (defun dc/ibuffer-sidebar-toggle ()
   "Toggle `ibuffer-sidebar'."
   (interactive)
   (ibuffer-sidebar-toggle-sidebar))
 
-;;;;;; Keybindings
-
-;; Check if C-c b keymap exists, if not, create it
-(unless (keymapp (lookup-key global-map (kbd "C-c b")))
-  (define-prefix-command 'dc-buffer-map)
-  (global-set-key (kbd "C-c b") 'dc-buffer-map))
-
-;; Add functions to the C-c b keymap
+;; Set keybindings
 (define-key dc-buffer-map (kbd "s") 'dc/ibuffer-sidebar-toggle)
 
 ;;;; imenu-list
-
 ;;;;; Configuration
-
 (use-package imenu-list
   :ensure t
   :config
   )
 
-;;;;;; Keybindings
-
-;; Check if C-c b keymap exists, if not, create it
-(unless (keymapp (lookup-key global-map (kbd "C-c b")))
-  (define-prefix-command 'dc-buffer-map)
-  (global-set-key (kbd "C-c b") 'dc-buffer-map))
-
-;; Add functions to the C-c b keymap
+;; Set keybindings
 (define-key dc-buffer-map (kbd "l") 'imenu-list-smart-toggle)
 
 ;;; Editor
-
 ;; Indentation
 (setq-default indent-tabs-mode nil
               tab-width 4
@@ -319,15 +277,12 @@
 ;; Disable line numbers
 (global-display-line-numbers-mode 0)
 
-;;;; Visual
-
+;;;; Look & feel
 ;; Enable outline-minor-mode as soon as .el file is opened
 (add-hook 'emacs-lisp-mode-hook 'outline-minor-mode)
 
 ;;;;; outline-minor-faces
-
 ;;;;;; Configuration
-
 (use-package outline-minor-faces
   :ensure t
   :after outline
@@ -336,17 +291,13 @@
   )
 
 ;;;;; pretty-hydra
-
 ;;;;;; Configuration
-
 (use-package pretty-hydra
   :ensure t
   )
 
 ;;;;; which-key
-
 ;;;;;; Configuration
-
 (use-package which-key
   :ensure t
   :config
@@ -355,16 +306,12 @@
   )
 
 ;;;;; doc-view
-
 ;; Set higher resolution for viewing documents
 (setq doc-view-resolution 400)
 
 ;;;; Completion
-
 ;;;;; company
-
 ;;;;;; Configuration
-
 (use-package company
   :ensure t
   :config
@@ -376,17 +323,13 @@
   )
 
 ;;;;; orderless
-
 ;;;;;; Configuration
-
 (use-package orderless
   :ensure t
   )
 
 ;;;;; vertico
-
 ;;;;;; Configuration
-
 (use-package vertico
   :after orderless
   :ensure t
@@ -401,9 +344,7 @@
   )
 
 ;;;; Programming
-
 ;;;;; C/Cpp
-
 (defun dc/setup-c-cpp-mode ()
   "Set basic c and cpp offset."
   (setq c-basic-offset 4))
@@ -415,7 +356,6 @@
 (add-hook 'c-mode-common-hook 'dc/setup-c-cpp-mode)
 
 ;;;;; Python
-
 ;; Set the indentation level for Python code
 (setq python-indent-offset 4)
 
@@ -423,19 +363,14 @@
 (add-hook 'python-mode-hook (lambda () (display-line-numbers-mode 1)))
 
 ;;;; Version control
-
 ;;;;; magit
-
 ;;;;;; Configuration
-
 (use-package magit
   :ensure t
   )
 
 ;;; GUI
-
 ;;;; Functions - GUI display modes
-
 (defun dc/gui-hide-all-bars ()
   "Disable scroll bar, menu bar, and tool bar."
   (interactive)
@@ -458,24 +393,14 @@
 ;; Start Emacs without scroll bar
 (dc/gui-scrolless-mode)
 
-;;;;; Keybindings
-
-;; Check if C-c g keymap exists, if not, create it
-(unless (keymapp (lookup-key global-map (kbd "C-c g")))
-  (define-prefix-command 'dc-gui-map)
-  (global-set-key (kbd "C-c g") 'dc-gui-map))
-
-;; Add functions to the C-c g keymap
+;; Add keybindings
 (define-key dc-gui-map (kbd "a") 'dc/gui-show-all-bars)
 (define-key dc-gui-map (kbd "h") 'dc/gui-hide-all-bars)
 (define-key dc-gui-map (kbd "s") 'dc/gui-scrolless-mode)
 
 ;;; Org
-
 ;;;; org-mode
-
 ;;;;; Configuration
-
 (use-package org
   :ensure t
   :config
@@ -497,8 +422,8 @@
   ;; Fold all drawers in a buffer
   (add-hook 'org-mode-hook 'org-hide-drawer-all)
 
-  ;; Add new line before each heading
-  (setf org-blank-before-new-entry '((heading . t)))
+  ;; Don't add new lines before headings
+  (setq org-blank-before-new-entry '((heading . nil) (plain-list-item . nil)))
 
   ;; Display inline images on startup
   (setq org-startup-with-inline-images t)
@@ -521,7 +446,7 @@
 
   ;; Set the minimal number or lines in org-babel output before
   ;; they are stored in a code block
-  (setq org-babel-min-lines-for-block-output 20)
+  (setq org-babel-min-lines-for-block-output 100)
 
   ;; Set the command for executing Python code in Org Babel
   (setq org-babel-python-command "python3")
@@ -542,18 +467,10 @@
    '(org-scheduled-today ((t (:foreground "grey")))))
   )
 
-;;;;;; Keybindings
-
-;; Check if C-c o keymap exists, if not, create it
-(unless (keymapp (lookup-key global-map (kbd "C-c o")))
-  (define-prefix-command 'dc-org-map)
-  (global-set-key (kbd "C-c o") 'dc-org-map))
-
-;; Add functions to the C-c o keymap
+;; Add keybindings
 (define-key dc-org-map (kbd "l") 'org-insert-link)
 
-;;;;; Functions - Inserting datetime into an org file
-
+;;;;; Functions - Inserting datetime string
 (defun dc/org-insert-current-date-time ()
   "Insert the current date and time along with the three-letter weekday name in
 the format YYYY-MM-DD Day H:M."
@@ -561,7 +478,6 @@ the format YYYY-MM-DD Day H:M."
   (insert (format-time-string "%Y-%m-%d %a %H:%M")))
 
 ;;;;; Functions - Clocking in and clocking out
-
 (defun dc/org-clock-in ()
   "Clock in the current org heading."
   (interactive)
@@ -576,24 +492,16 @@ the format YYYY-MM-DD Day H:M."
       (org-agenda-clock-out)
     (org-clock-out)))
 
-;;;;;; Keybindings
-
-;; Check if C-c o keymap exists, if not, create it
-(unless (keymapp (lookup-key global-map (kbd "C-c o")))
-  (define-prefix-command 'dc-org-map)
-  (global-set-key (kbd "C-c o") 'dc-org-map))
-
-;; Add functions to the C-c o keymap
+;; Add keybindings
 (define-key dc-org-map (kbd "i") 'dc/org-clock-in)
 (define-key dc-org-map (kbd "o") 'dc/org-clock-out)
 
-;; Bind to org-agenda buffer also
+;; Add org-agenda keybindings
 (with-eval-after-load 'org-agenda
   (define-key org-agenda-mode-map (kbd "i") 'dc/org-clock-in)
   (define-key org-agenda-mode-map (kbd "o") 'dc/org-clock-out))
 
 ;;;;; Functions - Adding and removing a schedule
-
 (defun dc/org-add-schedule ()
   "Add a scheduling timestamp to the current item in the Org Agenda or in
 an org file."
@@ -631,24 +539,16 @@ or in an org file."
         (org-back-to-heading t)
         (org-schedule '(4))))))
 
-;;;;;; Keybindings
-
-;; Check if C-c o keymap exists, if not, create it
-(unless (keymapp (lookup-key global-map (kbd "C-c o")))
-  (define-prefix-command 'dc-org-map)
-  (global-set-key (kbd "C-c o") 'dc-org-map))
-
-;; Add functions to the C-c o keymap
+;; Add keybindings
 (define-key dc-org-map (kbd "a") 'dc/org-add-schedule)
 (define-key dc-org-map (kbd "r") 'dc/org-remove-schedule)
 
-;; Bind to org-agenda buffer also
+;; Add org-agenda keybindings
 (with-eval-after-load 'org-agenda
   (define-key org-agenda-mode-map (kbd "a") 'dc/org-add-schedule)
   (define-key org-agenda-mode-map (kbd "r") 'dc/org-remove-schedule))
 
 ;;;;; Functions - Changing a TODO state
-
 (defun dc/org-todo-change-state ()
   "Change state of a current heading."
   (interactive)
@@ -698,26 +598,14 @@ current state is TODO."
                 (setq dc-adjusted-time nil)
                 (setq dc-time-override-lock nil)))))))))
 
-;;;;;; Keybindings
-
-;; Check if C-c o keymap exists, if not, create it
-(unless (keymapp (lookup-key global-map (kbd "C-c o")))
-  (define-prefix-command 'dc-org-map)
-  (global-set-key (kbd "C-c o") 'dc-org-map))
-
-;; Add functions to the C-c o keymap
+;; Add keybindings
 (define-key dc-org-map (kbd "t") 'dc/org-todo-change-state)
-(define-key dc-org-map (kbd "T") 'dc/org-todo-change-state-on-date)
-(define-key dc-org-map (kbd "s") 'dc/org-todo-skip-overdue-tasks)
 
-;; Bind to org-agenda buffer also
+;; Add org-agenda keybindings
 (with-eval-after-load 'org-agenda
-  (define-key org-agenda-mode-map (kbd "t") 'dc/org-todo-change-state)
-  (define-key org-agenda-mode-map (kbd "T") 'dc/org-todo-change-state-on-date)
-  (define-key org-agenda-mode-map (kbd "s") 'dc/org-todo-skip-overdue-tasks))
+  (define-key org-agenda-mode-map (kbd "t") 'dc/org-todo-change-state))
 
 ;;;;; Functions - Adding notes
-
 (defun dc/org-add-note ()
   "Add a note to an org heading."
   (interactive)
@@ -725,22 +613,31 @@ current state is TODO."
       (org-agenda-add-note)
     (org-add-note)))
 
-;;;;;; Keybindings
+(defun dc/org-add-note-on-date ()
+  "Change state of the current heading and log with a chosen date."
+  (interactive)
+  (let ((selected-date (org-read-date nil t nil "Select Date:")))
+    (if selected-date
+        (progn
+          (setq dc-time-override-lock t)
+          (dc/time-adjust-time (format-time-string "<%Y-%m-%d %a>" selected-date))
+          (advice-add 'current-time :override #'dc/time-override-current-time)
+          (if (eq major-mode 'org-agenda-mode)
+              (org-agenda-add-note)
+            (org-add-note))
+          (advice-remove 'current-time #'dc/time-override-current-time)
+          (setq dc-adjusted-time nil)
+          (setq dc-time-override-lock nil))
+      (message "No date selected"))))
 
-;; Check if C-c o keymap exists, if not, create it
-(unless (keymapp (lookup-key global-map (kbd "C-c o")))
-  (define-prefix-command 'dc-org-map)
-  (global-set-key (kbd "C-c o") 'dc-org-map))
-
-;; Add functions to the C-c o keymap
+;; Add keybindings
 (define-key dc-org-map (kbd "n") 'dc/org-add-note)
 
-;; Bind to org-agenda buffer also
+;; Add org-agenda keybindings
 (with-eval-after-load 'org-agenda
   (define-key org-agenda-mode-map (kbd "n") 'dc/org-add-note))
 
 ;;;;; Functions - Display logbook states and notes on a calendar
-
 (defun dc/org-logbook--parse-logbook-states (logbook beg buffer)
   "Parse a logbook string and return a list of entries with states."
   (let ((lines (split-string logbook "\n" t))
@@ -893,26 +790,17 @@ org file on the year calendar."
   ;; Bind GUI emacs "Enter" clicks
   (define-key calendar-mode-map (kbd "<return>") 'dc/org-logbook--goto-entry))
 
-;;;;;; Keybindings
-
-;; Check if C-c o keymap exists, if not, create it
-(unless (keymapp (lookup-key global-map (kbd "C-c o")))
-  (define-prefix-command 'dc-org-map)
-  (global-set-key (kbd "C-c o") 'dc-org-map))
-
-;; Add functions to the C-c o keymap
+;; Add keybindings
 (define-key dc-org-map (kbd "S") 'dc/org-logbook-display-states-on-calendar)
 (define-key dc-org-map (kbd "N") 'dc/org-logbook-display-notes-on-calendar)
 
-;; Bind to org-agenda buffer also
+;; Add org-agenda keybindings
 (with-eval-after-load 'org-agenda
   (define-key org-agenda-mode-map (kbd "S") 'dc/org-logbook-display-states-on-calendar)
   (define-key org-agenda-mode-map (kbd "N") 'dc/org-logbook-display-notes-on-calendar))
 
 ;;;; org-agenda
-
 ;;;;; Configuration
-
 (use-package org-agenda
   :after org
   :config  
@@ -948,7 +836,6 @@ org file on the year calendar."
   )
 
 ;;;;; Functions - Using org-agenda-files across Linux and Android
-
 (defun dc/org-agenda-adjust-org-agenda-files-paths ()
   "Adjust the paths in `org-agenda-files` based on the system type.
 The function reads the org-agenda-files list and adjusts the paths
@@ -966,7 +853,6 @@ based on the system type."
 (dc/org-agenda-adjust-org-agenda-files-paths)
 
 ;;;;; Functions - Change agenda buffer views
-
 (defun dc/org-agenda--switch-to-view (view-fn)
   "Switch to the given Org Agenda view function VIEW-FN and insert timeline."
   (if (eq major-mode 'org-agenda-mode)
@@ -993,28 +879,19 @@ based on the system type."
   (interactive)
   (dc/org-agenda--switch-to-view 'org-agenda-year-view))
 
-;;;;;; Keybindings
-
-;; Check if C-c a keymap exists, if not, create it
-(unless (keymapp (lookup-key global-map (kbd "C-c a")))
-  (define-prefix-command 'dc-agenda-map)
-  (global-set-key (kbd "C-c a") 'dc-agenda-map))
-
-;; Add functions to the C-c a keymap
+;; Add keybindings
 (define-key dc-agenda-map (kbd "d") 'dc/org-agenda-day-view)
 (define-key dc-agenda-map (kbd "w") 'dc/org-agenda-week-view)
 (define-key dc-agenda-map (kbd "y") 'dc/org-agenda-year-view)
 
-;; Bind to org-agenda buffer also
+;; Add org-agenda keybindings
 (with-eval-after-load 'org-agenda
   (define-key org-agenda-mode-map (kbd "d") 'dc/org-agenda-day-view)
   (define-key org-agenda-mode-map (kbd "w") 'dc/org-agenda-week-view)
   (define-key org-agenda-mode-map (kbd "y") 'dc/org-agenda-year-view))
 
 ;;;; org-super-agenda
-
 ;;;;; Configuration
-
 (use-package org-super-agenda
   :after org-agenda
   :ensure t
@@ -1024,7 +901,6 @@ based on the system type."
   )
 
 ;;;;; Functions - Get TODO parent name automatically
-
 (defun dc/org-super-agenda-get-todo-parent (item)
   "Get the parent heading of ITEM, or if none, the file title or filename."
   (org-super-agenda--when-with-marker-buffer (org-super-agenda--get-marker item)
@@ -1039,7 +915,6 @@ based on the system type."
   :key-form (dc/org-super-agenda-get-todo-parent item))
 
 ;;;;; Functions - Change to all TODOs view in agenda buffer
-
 (defun dc/org-agenda-todo-view ()
   "Open Org Agenda in the todos view mode with super agenda. Use file title as groups"
   (interactive)
@@ -1048,24 +923,15 @@ based on the system type."
     (org-agenda nil "t")
     (setq org-super-agenda-groups '())))
 
-;;;;;; Keybindings
-
-;; Check if C-c a keymap exists, if not, create it
-(unless (keymapp (lookup-key global-map (kbd "C-c a")))
-  (define-prefix-command 'dc-agenda-map)
-  (global-set-key (kbd "C-c a") 'dc-agenda-map))
-
-;; Add functions to the C-c a keymap
+;; Add keybindings
 (define-key dc-agenda-map (kbd "v") 'dc/org-agenda-todo-view)
 
-;; Bind to org-agenda buffer also
+;; Add org-agenda keybindings
 (with-eval-after-load 'org-agenda
   (define-key org-agenda-mode-map (kbd "v") 'dc/org-agenda-todo-view))
 
 ;;;; org-roam
-
 ;;;;; Configuration
-
 (use-package org-roam
   :after org
   :ensure t
@@ -1078,21 +944,13 @@ based on the system type."
   (org-roam-setup)
   )
 
-;;;;;; Keybindings
-
-;; Check if C-c r keymap exists, if not, create it
-(unless (keymapp (lookup-key global-map (kbd "C-c r")))
-  (define-prefix-command 'dc-roam-map)
-  (global-set-key (kbd "C-c r") 'dc-roam-map))
-
-;; Add functions to the C-c r keymap
+;; Add keybindings
 (define-key dc-roam-map (kbd "d") 'org-roam-dailies-find-date)
 (define-key dc-roam-map (kbd "t") 'org-roam-dailies-goto-today)
 (define-key dc-roam-map (kbd "f") 'org-roam-node-find)
 (define-key dc-roam-map (kbd "i") 'org-roam-node-insert)
 
 ;;;;; Functions - Get current node hierarchy
-
 (defun dc/org-roam--get-node-heirarchy (node)
   "Get the hierarchy of NODE as a list of titles, excluding non-node headings.
 The hierarchy includes the NODE title and its ancestor node titles."
@@ -1112,7 +970,6 @@ The hierarchy includes the NODE title and its ancestor node titles."
     (nreverse titles)))
 
 ;;;;; Functions - Display of nodes in org-roam search
-
 (defvar dc-org-roam-hierarchy-display-separator
   (propertize "->" 'face '(shadow))
   "Separator for org-roam hierarchy displaying.")
@@ -1152,10 +1009,17 @@ The hierarchy includes the NODE title and its ancestor node titles."
       (concat "${hierarchy}" "${node-type}" (propertize "${colon-tags}" 'face 'org-tag)))
 
 ;;;;; Functions - Inserting nodes by tags
-
 (defvar dc-org-roam-hierarchy-insert-separator
   (propertize "->" 'face '(shadow))
   "Separator for org-roam hierarchy insertion.")
+
+(defvar dc-org-roam-link-prefix ""
+  "Prefix to be added to org-roam links before insertion.")
+
+(defun dc/org-roam-reset-link-prefix ()
+  "Sets the dc-org-roam-link-prefix to an empty string."
+  (interactive)
+  (setq dc-org-roam-link-prefix ""))
 
 (defun dc/org-roam-insert-nodes-by-tags(keywords exclude-keywords &optional filter-fn)
   "Inserts all Org-roam nodes connected to the provided keywords and not connected to the exclude keywords.
@@ -1202,27 +1066,58 @@ and when nil is returned the node will be filtered out."
                                     (mapconcat #'identity hierarchy dc-org-roam-hierarchy-insert-separator)
                                   (org-roam-node-title node)))
                    (link (org-link-make-string (concat "id:" id) arrow-chain)))
-              (insert link)
+              (insert (concat dc-org-roam-link-prefix link))
               (insert "\n")
               (run-hook-with-args 'org-roam-post-node-insert-hook
                                   id
                                   arrow-chain))))))
   (deactivate-mark))
 
-;;;;;; Keybindings
-
-;; Check if C-c r keymap exists, if not, create it
-(unless (keymapp (lookup-key global-map (kbd "C-c r")))
-  (define-prefix-command 'dc-roam-map)
-  (global-set-key (kbd "C-c r") 'dc-roam-map))
-
-;; Add functions to the C-c r keymap
+;; Add keybindings
 (define-key dc-roam-map (kbd "a") 'dc/org-roam-insert-nodes-by-tags)
 
-;;;; alert
-
+;;;; websocket
 ;;;;; Configuration
+(use-package websocket
+  :after org-roam
+  :ensure t
+  )
 
+;;;; org-roam-ui
+;;;;; Configuration
+(use-package org-roam-ui
+  :after org-roam
+  :ensure t
+  )
+
+;;;; org-transclusion
+;;;;; Configuration
+(use-package org-transclusion
+  :after org
+  :ensure t
+  )
+
+;;;;; Functions - Insertion of transcluded nodes
+(defun dc/org-transclude-set-link-prefix ()
+  "Sets the dc-org-roam-link-prefix to #+transclude: ."
+  (interactive)
+  (setq dc-org-roam-link-prefix "#+transclude: "))
+
+(defun dc/org-transclusion-insert-node ()
+  "Insert a transcluded link to an org-roam node."
+  (interactive)
+  (let ((node (org-roam-node-read)))
+    (when node
+      (let ((link (format "#+transclude: [[id:%s][%s]]"
+                          (org-roam-node-id node)
+                          (org-roam-node-title node))))
+        (insert link)))))
+
+;; Add keybindings
+(define-key dc-org-map (kbd "z") 'dc/org-transclusion-insert-node)
+
+;;;; alert
+;;;;; Configuration
 (use-package alert
   :ensure t
   :config
@@ -1233,7 +1128,6 @@ and when nil is returned the node will be filtered out."
   )
 
 ;;;;; Functions - Support Android notifications
-
 (defun dc/alert-android-notifications-notify (info)
   "Send notifications using `android-notifications-notify'.
 `android-notifications-notify' is a built-in function in the native Emacs
@@ -1255,9 +1149,7 @@ Android port."
                     :notifier #'dc/alert-android-notifications-notify)
 
 ;;;; org-alert
-
 ;;;;; Configuration
-
 (use-package org-alert
   :ensure t
   :after org
@@ -1284,7 +1176,6 @@ Android port."
   )
 
 ;;;;; Functions - Change title of notifications
-
 (defvar dc-org-alert-title-type 'custom
   "Control the title type for `org-alert' notifications.
   /home/danijelcamdzic/Projects/dotemacs/ Possible values are:
@@ -1340,17 +1231,13 @@ use filename."
 (dc/org-alert-update-advices)
 
 ;;;; org-tempo
-
 ;;;;; Configuration
-
 (use-package org-tempo
   :after org
   )
 
 ;;;; org-analyzer
-
 ;;;;; Configuration
-
 (use-package org-analyzer
   :after org
   :ensure t
@@ -1359,69 +1246,8 @@ use filename."
   (setq org-analyzer-org-directory org-directory)
   )
 
-;;;; websocket
-
-;;;;; Configuration
-
-(use-package websocket
-  :after org-roam
-  :ensure t
-  )
-
-;;;; org-roam-ui
-
-;;;;; Configuration
-
-(use-package org-roam-ui
-  :after org-roam
-  :ensure t
-  )
-
-;;;;;; Keybindings
-
-;; Check if C-c r keymap exists, if not, create it
-(unless (keymapp (lookup-key global-map (kbd "C-c r")))
-  (define-prefix-command 'dc-roam-map)
-  (global-set-key (kbd "C-c r") 'dc-roam-map))
-
-;; Add functions to the C-c r keymap
-(define-key dc-roam-map (kbd "u") 'org-roam-ui-open)
-
-;;;; org-transclusion
-
-;;;;; Configuration
-
-(use-package org-transclusion
-  :after org
-  :ensure t
-  )
-
-;;;;; Functions - Insertion of transcluded nodes
-
-(defun dc/org-transclusion-insert-node ()
-  "Insert a transcluded link to an org-roam node."
-  (interactive)
-  (let ((node (org-roam-node-read)))
-    (when node
-      (let ((link (format "#+transclude: [[id:%s][%s]]"
-                          (org-roam-node-id node)
-                          (org-roam-node-title node))))
-        (insert link)))))
-
-;;;;;; Keybindings
-
-;; Check if C-c o keymap exists, if not, create it
-(unless (keymapp (lookup-key global-map (kbd "C-c o")))
-  (define-prefix-command 'dc-org-map)
-  (global-set-key (kbd "C-c o") 'dc-org-map))
-
-;; Add functions to the C-c o keymap
-(define-key dc-org-map (kbd "z") 'dc/org-transclusion-insert-node)
-
 ;;;; org-attach
-
 ;;;;; Configuration
-
 (use-package org-attach
   :after org
   :config
@@ -1444,18 +1270,10 @@ use filename."
   (setq org-attach-method 'cp)
   )
 
-;;;;;; Keybindings
-
-;; Check if C-c o keymap exists, if not, create it
-(unless (keymapp (lookup-key global-map (kbd "C-c o")))
-  (define-prefix-command 'dc-org-map)
-  (global-set-key (kbd "C-c o") 'dc-org-map))
-
-;; Add functions to the C-c o keymap
+;; Add keybindings
 (define-key dc-org-map (kbd "k") 'org-attach-attach)
 
 ;;;;; Functions - Attach and insert attachment as a link
-
 (defvar dc-preferred-directory ""
   "Preferred starting directory to search files to attach in Org mode.")
 
@@ -1480,20 +1298,11 @@ The attached file is copied to the attachment directory and a link is inserted a
     (org-attach-attach file nil 'cp)
     (insert (format "[[attachment:%s]]" (file-name-nondirectory file)))))
 
-;;;;;; Keybindings
-
-;; Check if C-c o keymap exists, if not, create it
-(unless (keymapp (lookup-key global-map (kbd "C-c o")))
-  (define-prefix-command 'dc-org-map)
-  (global-set-key (kbd "C-c o") 'dc-org-map))
-
-;; Add functions to the C-c o keymap
+;; Add keybindings
 (define-key dc-org-map (kbd "j") 'dc/org-attach-file-and-insert-link)
 
 ;;;; org-download
-
 ;;;;; Configuration
-
 (use-package org-download
   :ensure t
   :after org
@@ -1505,18 +1314,10 @@ The attached file is copied to the attachment directory and a link is inserted a
   (setq-default org-download-heading-lvl nil)
   )
 
-;;;;;; Keybindings
-
-;; Check if C-c o keymap exists, if not, create it
-(unless (keymapp (lookup-key global-map (kbd "C-c o")))
-  (define-prefix-command 'dc-org-map)
-  (global-set-key (kbd "C-c o") 'dc-org-map))
-
-;; Add functions to the C-c o keymap
+;; Add keybindings
 (define-key dc-org-map (kbd "p") 'org-download-clipboard)
 
 ;;;;; Functions - Choose screenshot filename
-
 (defun dc/org-download-clipboard--prompt-for-name-advice (orig-fun &optional basename)
   "Advice to prompt for a basename before calling `org-download-clipboard'."
   (message "Calling advice function")
@@ -1528,18 +1329,14 @@ The attached file is copied to the attachment directory and a link is inserted a
 (advice-add 'org-download-clipboard :around #'dc/org-download-clipboard--prompt-for-name-advice)
 
 ;;;; org-ref
-
 ;;;;; Configuration
-
 (use-package org-ref
   :ensure t
   :after org
   )
 
 ;;;; org-noter
-
 ;;;;; Configuration
-
 (use-package org-noter
   :ensure t  
   :after org 
@@ -1549,9 +1346,7 @@ The attached file is copied to the attachment directory and a link is inserted a
   )
 
 ;;;; org-media-note
-
 ;;;;; Configuration
-
 (use-package org-media-note
   :quelpa (org-media-note :fetcher github :repo "yuchen-lea/org-media-note")
   :hook (org-mode .  org-media-note-mode)
@@ -1563,7 +1358,6 @@ The attached file is copied to the attachment directory and a link is inserted a
   )
 
 ;;;;; Functions - Enable mpv-android support on Android
-
 ;; This should only be done on Android
 (when (eq system-type 'android)
   (defun dc/mpv-start--android-advice (orig-fun &rest args)
@@ -1593,7 +1387,6 @@ am start -a android.intent.action.VIEW -t video/* -d file:///storage/emulated/0/
   (advice-add 'mpv-start :around #'dc/mpv-start--android-advice))
 
 ;;;;; Functions - Prepend timestamp to screenshot
-
 (defun dc/org-media-note--format-picture-file-name--prepend-timestamp-advice (orig-func &rest args)
   "Advice to prepend the current timestamp to the filename created by `org-media-note--format-picture-file-name'."
   (let ((original-filename (apply orig-func args))
@@ -1603,7 +1396,6 @@ am start -a android.intent.action.VIEW -t video/* -d file:///storage/emulated/0/
 (advice-add 'org-media-note--format-picture-file-name :around #'dc/org-media-note--format-picture-file-name--prepend-timestamp-advice)
 
 ;;;;; Functions - Remove invalid characters (the ones unsupported by syncthing)
-
 (defun dc/remove-invalid-characters-from-filename (filename)
   "Remove invalid characters from filename in order for it to sync to Android using syncthing."
   (replace-regexp-in-string "[/*\":<>?|]" "" filename))
@@ -1615,11 +1407,8 @@ am start -a android.intent.action.VIEW -t video/* -d file:///storage/emulated/0/
 (advice-add 'org-media-note--format-picture-file-name :around #'dc/org-media-note--format-picture-file-name--remove-invalid-characters-from-filename-advice)
 
 ;;; Browsing & bookmarks
-
 ;;;; eww
-
 ;;;;; Configuration
-
 (use-package eww
   :config
   ;; Set default eww-bookmarks directory
@@ -1627,9 +1416,7 @@ am start -a android.intent.action.VIEW -t video/* -d file:///storage/emulated/0/
   )
 
 ;;;; bookmark
-
 ;;;;; Configuration
-
 (use-package bookmark
   :config
   ;; Set default bookmark file
@@ -1637,9 +1424,7 @@ am start -a android.intent.action.VIEW -t video/* -d file:///storage/emulated/0/
   )
 
 ;;;; bookmark+
-
 ;;;;; Configuration
-
 (use-package bookmark+
   :quelpa (bookmark+ :fetcher github :repo "emacsmirror/bookmark-plus")
   :config
@@ -1650,19 +1435,7 @@ am start -a android.intent.action.VIEW -t video/* -d file:///storage/emulated/0/
   (setq bmkp-bmenu-commands-file (expand-file-name ".emacs-bmk-bmenu-commands.el" user-emacs-directory))
   )
 
-;;;;;; Keybindings
-
-;; Check if C-c b keymap exists, if not, create it
-(unless (keymapp (lookup-key global-map (kbd "C-c b")))
-  (define-prefix-command 'dc-buffer-map)
-  (global-set-key (kbd "C-c b") 'dc-buffer-map))
-
-;; Check if C-c b b keymap exists, if not, create it
-(unless (keymapp (lookup-key dc-buffer-map (kbd "b")))
-  (define-prefix-command 'dc-bookmark-map)
-  (define-key dc-buffer-map (kbd "b") 'dc-bookmark-map))
-
-;; Add functions to the C-c b b keymap
+;; Add keybindings
 (define-key dc-bookmark-map (kbd "l") 'list-bookmarks)
 (define-key dc-bookmark-map (kbd "s") 'bookmark-set)
 (define-key dc-bookmark-map (kbd "d") 'bmkp-bmenu-delete-marked)
@@ -1670,7 +1443,6 @@ am start -a android.intent.action.VIEW -t video/* -d file:///storage/emulated/0/
 (define-key dc-bookmark-map (kbd "t") 'bmkp-bmenu-filter-tags-incrementally)
 
 ;;;;; Functions - Opening bookmarks on both Linux and Android
-
 (defun dc/bookmark-jump--modify-bookmark-path-advice (orig-fun &rest args)
   "Modify the bookmark filename and directory based on system type before opening."
   (let* ((bookmark (car args))
@@ -1706,9 +1478,7 @@ am start -a android.intent.action.VIEW -t video/* -d file:///storage/emulated/0/
 (advice-add 'bookmark-jump :around #'dc/bookmark-jump--modify-bookmark-path-advice)
 
 ;;; Date & time
-
 ;;;; Functions - Time adjustment
-
 (defvar dc-adjusted-time nil
   "Adjusted time. This time will replace current time.")
 
@@ -1724,9 +1494,7 @@ am start -a android.intent.action.VIEW -t video/* -d file:///storage/emulated/0/
   (or dc-adjusted-time (current-time)))
 
 ;;;; time-stamp
-
 ;;;;; Configuration
-
 (use-package time-stamp
   :config
   ;; Set up time-stamp format
@@ -1739,9 +1507,7 @@ am start -a android.intent.action.VIEW -t video/* -d file:///storage/emulated/0/
   )
 
 ;;;; calendar
-
 ;;;;; Configuration
-
 (use-package calendar
   :config
   ;; Set calendar to start on Monday
@@ -1749,11 +1515,8 @@ am start -a android.intent.action.VIEW -t video/* -d file:///storage/emulated/0/
   )
 
 ;;; Encryption & authentication
-
 ;;;; epa
-
 ;;;;; Configuration
-
 (use-package epa
   :ensure t
   :config
@@ -1780,9 +1543,7 @@ am start -a android.intent.action.VIEW -t video/* -d file:///storage/emulated/0/
   )
 
 ;;;; auth-source
-
 ;;;;; Configuration
-
 (use-package auth-source
   :ensure t
   :config
@@ -1799,7 +1560,6 @@ am start -a android.intent.action.VIEW -t video/* -d file:///storage/emulated/0/
   )
 
 ;;;;; Functions - TOTP
-
 (require 'bindat)
 (require 'gnutls)
 (require 'hexl)
@@ -1850,8 +1610,9 @@ DIGITS is tre  number of pin digits and defaults to 6."
                      #x7fffffff)
              (expt 10 digits)))))
 
-(defun dc/totp-display (auth)
-  "Select a TOTP AUTH from `auth-sources', display its TOTP, and show remaining valid time."
+(defun dc/totp-display-all (auth)
+  "Select a TOTP AUTH from `auth-sources', display its TOTP, and show remaining valid time.
+Function decrypts all auth-source files and lets you search through them to find the TOTP."
   (interactive
    (list
     (let ((candidates (mapcar
@@ -1867,6 +1628,7 @@ DIGITS is tre  number of pin digits and defaults to 6."
          (time-step 30)
          (time-remaining (- time-step (mod current-time time-step)))
          (code (totp (funcall (plist-get auth :secret)))))
+    ;; Temporarily disable logging in *Messages* buffer
     (let ((message-log-max nil))
       (message "Your TOTP for '%s' is: %s (valid for %d more seconds)"
                (propertize (plist-get auth :host) 'face 'font-lock-keyword-face)
@@ -1874,10 +1636,38 @@ DIGITS is tre  number of pin digits and defaults to 6."
                time-remaining))
     code))
 
-;;;;; Functions - Passwords
+(defun dc/totp-display-one ()
+  "Select a TOTP AUTH from `auth-sources', display its TOTP, and show remaining valid time.
+Function decrypts only the chosen auth-source file and lets you search through it to find the TOTP."
+  (interactive)
+  (let* ((gpg-files (mapcar (lambda (source) (plist-get source :source)) auth-sources))
+         (selected-file (completing-read "Select an auth-source file: " gpg-files))
+         (candidates (mapcar
+                      (lambda (auth)
+                        (cons (format "User '%s' on %s"
+                                      (propertize (plist-get auth :user) 'face 'font-lock-keyword-face)
+                                      (propertize (plist-get auth :host) 'face 'font-lock-string-face))
+                              auth))
+                      (seq-filter (lambda (auth) (string-prefix-p "TOTP:" (plist-get auth :host)))
+                                  (auth-source-search :max 10000 :source selected-file)))))
+    (let* ((selected-entry (completing-read "Pick a TOTP> " candidates))
+           (auth (cdr (assoc selected-entry candidates)))
+           (current-time (time-to-seconds))
+           (time-step 30)
+           (time-remaining (- time-step (mod current-time time-step)))
+           (code (totp (funcall (plist-get auth :secret)))))
+      ;; Temporarily disable logging in *Messages* buffer
+      (let ((message-log-max nil))
+        (message "Your TOTP for '%s' is: %s (valid for %d more seconds)"
+                 (propertize (plist-get auth :host) 'face 'font-lock-keyword-face)
+                 (propertize code 'face 'font-lock-string-face)
+                 time-remaining))
+      code)))
 
-(defun dc/password-display (auth)
-  "Select a password entry (PASS) from `auth-sources', and briefly display its password."
+;;;;; Functions - Passwords
+(defun dc/password-display-all (auth)
+  "Select a password entry (PASS) from `auth-sources', and briefly display its password.
+Function decrypts all auth-source files and lets you search through them to find the PASS."
   (interactive
    (list
     (let ((candidates (mapcar
@@ -1896,4 +1686,29 @@ DIGITS is tre  number of pin digits and defaults to 6."
                (propertize (plist-get auth :host) 'face 'font-lock-keyword-face)
                (propertize password 'face 'font-lock-string-face)))))
 
+(defun dc/password-display-one ()
+  "Select a .gpg file from `auth-sources`, then select a password entry from that file, and briefly display its password.
+Function decrypts only the chosen auth-source file and lets you search through it to find the PASS."
+  (interactive)
+  (let* ((gpg-files (mapcar (lambda (source) (plist-get source :source)) auth-sources))
+         (selected-file (completing-read "Select an auth-source file: " gpg-files))
+         (candidates (mapcar
+                      (lambda (auth)
+                        (cons (format "User '%s' on %s"
+                                      (propertize (plist-get auth :user) 'face 'font-lock-keyword-face)
+                                      (propertize (plist-get auth :host) 'face 'font-lock-string-face))
+                              auth))
+                      (seq-filter (lambda (auth) (string-prefix-p "PASS:" (plist-get auth :host)))
+                                  (auth-source-search :max 10000 :source selected-file)))))
+    (let* ((selected-entry (completing-read "Pick a PASS entry> " candidates))
+           (auth (cdr (assoc selected-entry candidates)))
+           (password (funcall (plist-get auth :secret))))
+      ;; Temporarily disable logging in *Messages* buffer
+      (let ((message-log-max nil))
+        (message "Your password for '%s' is: %s"
+                 (propertize (plist-get auth :host) 'face 'font-lock-keyword-face)
+                 (propertize password 'face 'font-lock-string-face))))))
+
 ;;; init.el ends here
+
+
