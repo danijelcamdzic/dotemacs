@@ -3,7 +3,7 @@
 ;;; Code:
 
 ;;; Package managers
-;;;; package
+;;;; Package - package
 ;;;;; Configuration
 (require 'package)
 
@@ -13,13 +13,13 @@
 ;; Initialize packages
 (package-initialize)
 
-;;;; melpa
+;;;; Archive - melpa
 ;;;;; Configuration
 ;; Add melpa package archives
 (add-to-list 'package-archives
              '("melpa" . "http://melpa.org/packages/") t)
 
-;;;; use-package
+;;;; Package - use-package
 ;;;;; Configuration
 ;; Install use-package
 (unless (package-installed-p 'use-package)
@@ -28,7 +28,7 @@
 
 (require 'use-package)
 
-;;;; quelpa
+;;;; Package - quelpa
 ;;;;; Configuration
 (use-package quelpa
   :ensure t
@@ -38,7 +38,7 @@
   (setq quelpa-update-melpa-p nil)
   )
 
-;;;; quelpa-use-package
+;;;; Package - quelpa-use-package
 ;;;;; Configuration
 (use-package quelpa-use-package
   :ensure t
@@ -106,7 +106,7 @@
 (defvar dc-recordings-directory (concat dc-home-directory "Recordings/"))
 (defvar dc-videos-directory (concat dc-home-directory "Videos/"))
 
-;;;;; Functions - Opening directories in dired
+;;;;; Function - Opening home directories in dired
 (defun dc/open-folder-from-home-directory ()
   "Open a folder from home directory in dired."
   (interactive)
@@ -139,7 +139,7 @@
 (define-key dc-dired-map (kbd "h") 'dc/open-folder-from-home-directory)
 (define-key dc-dired-map (kbd "r") 'dc/regex-open-folder-from-home-directory)
 
-;;;;; dired-sidebar
+;;;;; Package - dired-sidebar
 ;;;;;; Configuration
 (use-package dired-sidebar
   :ensure t
@@ -148,7 +148,7 @@
   (setq dired-sidebar-window-fixed nil)
   )
 
-;;;;;; Functions - Toggle dired-sidebar
+;;;;;; Function - Toggling dired-sidebar
 (defun dc/dired-sidebar-toggle ()
   "Toggle `dired-sidebar'."
   (interactive)
@@ -218,7 +218,7 @@
               (dc/org-agenda-day-view)
               )))
 
-;;;; Functions - Killing all buffers
+;;;; Function - Killing all buffers
 (defun dc/kill-background-buffers ()
   "Kill all buffers that are not currently visible in any window, except the *Messages*, *Org Agenda*,
 *scratch* and today's Org Roam daily buffer."
@@ -236,14 +236,14 @@
 ;; Set keybindings
 (define-key dc-buffer-map (kbd "k") 'dc/kill-background-buffers)
 
-;;;; ibuffer
+;;;; Package - ibuffer
 ;;;;; Configuration
 (use-package ibuffer-sidebar
   :ensure t
   :config
   )
 
-;;;;; Functions - Toggle ibuffer-sidebar
+;;;;; Function - Toggling ibuffer-sidebar
 (defun dc/ibuffer-sidebar-toggle ()
   "Toggle `ibuffer-sidebar'."
   (interactive)
@@ -252,7 +252,7 @@
 ;; Set keybindings
 (define-key dc-buffer-map (kbd "s") 'dc/ibuffer-sidebar-toggle)
 
-;;;; imenu-list
+;;;; Package - imenu-list
 ;;;;; Configuration
 (use-package imenu-list
   :ensure t
@@ -281,7 +281,7 @@
 ;; Enable outline-minor-mode as soon as .el file is opened
 (add-hook 'emacs-lisp-mode-hook 'outline-minor-mode)
 
-;;;;; outline-minor-faces
+;;;;; Package - outline-minor-faces
 ;;;;;; Configuration
 (use-package outline-minor-faces
   :ensure t
@@ -290,13 +290,13 @@
                     #'outline-minor-faces-mode)
   )
 
-;;;;; pretty-hydra
+;;;;; Package - pretty-hydra
 ;;;;;; Configuration
 (use-package pretty-hydra
   :ensure t
   )
 
-;;;;; which-key
+;;;;; Package - which-key
 ;;;;;; Configuration
 (use-package which-key
   :ensure t
@@ -305,12 +305,12 @@
   (which-key-mode)
   )
 
-;;;;; doc-view
+;;;;; Package - doc-view
 ;; Set higher resolution for viewing documents
 (setq doc-view-resolution 400)
 
 ;;;; Completion
-;;;;; company
+;;;;; Package - company
 ;;;;;; Configuration
 (use-package company
   :ensure t
@@ -322,13 +322,13 @@
   (add-hook 'after-init-hook 'global-company-mode)
   )
 
-;;;;; orderless
+;;;;; Package - orderless
 ;;;;;; Configuration
 (use-package orderless
   :ensure t
   )
 
-;;;;; vertico
+;;;;; Package - vertico
 ;;;;;; Configuration
 (use-package vertico
   :after orderless
@@ -363,14 +363,14 @@
 (add-hook 'python-mode-hook (lambda () (display-line-numbers-mode 1)))
 
 ;;;; Version control
-;;;;; magit
+;;;;; Package - magit
 ;;;;;; Configuration
 (use-package magit
   :ensure t
   )
 
 ;;; GUI
-;;;; Functions - GUI display modes
+;;;; Function - Manipulating GUI display modes
 (defun dc/gui-hide-all-bars ()
   "Disable scroll bar, menu bar, and tool bar."
   (interactive)
@@ -398,8 +398,8 @@
 (define-key dc-gui-map (kbd "h") 'dc/gui-hide-all-bars)
 (define-key dc-gui-map (kbd "s") 'dc/gui-scrolless-mode)
 
-;;; Org
-;;;; org-mode
+;;; Org-mode
+;;;; Package - org
 ;;;;; Configuration
 (use-package org
   :ensure t
@@ -470,14 +470,14 @@
 ;; Add keybindings
 (define-key dc-org-map (kbd "l") 'org-insert-link)
 
-;;;;; Functions - Inserting datetime string
+;;;;; Function - Inserting datetime string
 (defun dc/org-insert-current-date-time ()
   "Insert the current date and time along with the three-letter weekday name in
 the format YYYY-MM-DD Day H:M."
   (interactive)
   (insert (format-time-string "%Y-%m-%d %a %H:%M")))
 
-;;;;; Functions - Clocking in and clocking out
+;;;;; Function - Clocking in and clocking out
 (defun dc/org-clock-in ()
   "Clock in the current org heading."
   (interactive)
@@ -501,7 +501,7 @@ the format YYYY-MM-DD Day H:M."
   (define-key org-agenda-mode-map (kbd "i") 'dc/org-clock-in)
   (define-key org-agenda-mode-map (kbd "o") 'dc/org-clock-out))
 
-;;;;; Functions - Adding and removing a schedule
+;;;;; Function - Adding and removing a schedule
 (defun dc/org-add-schedule ()
   "Add a scheduling timestamp to the current item in the Org Agenda or in
 an org file."
@@ -548,7 +548,7 @@ or in an org file."
   (define-key org-agenda-mode-map (kbd "a") 'dc/org-add-schedule)
   (define-key org-agenda-mode-map (kbd "r") 'dc/org-remove-schedule))
 
-;;;;; Functions - Changing a TODO state
+;;;;; Function - Changing a TODO state
 (defun dc/org-todo-change-state ()
   "Change state of a current heading."
   (interactive)
@@ -605,7 +605,7 @@ current state is TODO."
 (with-eval-after-load 'org-agenda
   (define-key org-agenda-mode-map (kbd "t") 'dc/org-todo-change-state))
 
-;;;;; Functions - Adding notes
+;;;;; Function - Adding notes
 (defun dc/org-add-note ()
   "Add a note to an org heading."
   (interactive)
@@ -637,7 +637,7 @@ current state is TODO."
 (with-eval-after-load 'org-agenda
   (define-key org-agenda-mode-map (kbd "n") 'dc/org-add-note))
 
-;;;;; Functions - Display logbook states and notes on a calendar
+;;;;; Function - Visualizing logbook on calendar for notes and TODOs
 (defun dc/org-logbook--parse-logbook-states (logbook beg buffer)
   "Parse a logbook string and return a list of entries with states."
   (let ((lines (split-string logbook "\n" t))
@@ -799,7 +799,7 @@ org file on the year calendar."
   (define-key org-agenda-mode-map (kbd "S") 'dc/org-logbook-display-states-on-calendar)
   (define-key org-agenda-mode-map (kbd "N") 'dc/org-logbook-display-notes-on-calendar))
 
-;;;; org-agenda
+;;;; Package - org-agenda
 ;;;;; Configuration
 (use-package org-agenda
   :after org
@@ -835,7 +835,7 @@ org file on the year calendar."
           "......" "----------------"))
   )
 
-;;;;; Functions - Using org-agenda-files across Linux and Android
+;;;;; Function - Integrating org-agenda-files between Android and Linux
 (defun dc/org-agenda-adjust-org-agenda-files-paths ()
   "Adjust the paths in `org-agenda-files` based on the system type.
 The function reads the org-agenda-files list and adjusts the paths
@@ -852,7 +852,7 @@ based on the system type."
 ;; Call the function to adjust the paths
 (dc/org-agenda-adjust-org-agenda-files-paths)
 
-;;;;; Functions - Change agenda buffer views
+;;;;; Function - Changing org-agenda TODO views
 (defun dc/org-agenda--switch-to-view (view-fn)
   "Switch to the given Org Agenda view function VIEW-FN and insert timeline."
   (if (eq major-mode 'org-agenda-mode)
@@ -890,7 +890,7 @@ based on the system type."
   (define-key org-agenda-mode-map (kbd "w") 'dc/org-agenda-week-view)
   (define-key org-agenda-mode-map (kbd "y") 'dc/org-agenda-year-view))
 
-;;;; org-super-agenda
+;;;; Package - org-super-agenda
 ;;;;; Configuration
 (use-package org-super-agenda
   :after org-agenda
@@ -900,7 +900,7 @@ based on the system type."
   (org-super-agenda-mode)
   )
 
-;;;;; Functions - Get TODO parent name automatically
+;;;;; Function - Getting TODO parent name automatically
 (defun dc/org-super-agenda-get-todo-parent (item)
   "Get the parent heading of ITEM, or if none, the file title or filename."
   (org-super-agenda--when-with-marker-buffer (org-super-agenda--get-marker item)
@@ -914,7 +914,7 @@ based on the system type."
 (org-super-agenda--def-auto-group parent "their parent heading or file title/filename"
   :key-form (dc/org-super-agenda-get-todo-parent item))
 
-;;;;; Functions - Change to all TODOs view in agenda buffer
+;;;;; Function - Changing to all TODOs view
 (defun dc/org-agenda-todo-view ()
   "Open Org Agenda in the todos view mode with super agenda. Use file title as groups"
   (interactive)
@@ -930,7 +930,7 @@ based on the system type."
 (with-eval-after-load 'org-agenda
   (define-key org-agenda-mode-map (kbd "v") 'dc/org-agenda-todo-view))
 
-;;;; org-roam
+;;;; Package - org-roam
 ;;;;; Configuration
 (use-package org-roam
   :after org
@@ -950,7 +950,7 @@ based on the system type."
 (define-key dc-roam-map (kbd "f") 'org-roam-node-find)
 (define-key dc-roam-map (kbd "i") 'org-roam-node-insert)
 
-;;;;; Functions - Get node hierarchy
+;;;;; Function - Getting node hierarchy
 (defun dc/org-roam--get-node-heirarchy (node)
   "Get the hierarchy of NODE as a list of titles, excluding non-node headings.
 The hierarchy includes the NODE title and its ancestor node titles."
@@ -969,7 +969,7 @@ The hierarchy includes the NODE title and its ancestor node titles."
     (push title titles)
     (nreverse titles)))
 
-;;;;; Functions - Display of nodes in org-roam search
+;;;;; Function - Displaying nodes in org-roam search
 (defvar dc-org-roam-hierarchy-display-separator
   (propertize "->" 'face '(shadow))
   "Separator for org-roam hierarchy displaying.")
@@ -1008,7 +1008,7 @@ The hierarchy includes the NODE title and its ancestor node titles."
 (setq org-roam-node-display-template
       (concat "${hierarchy}" "${node-type}" (propertize "${colon-tags}" 'face 'org-tag)))
 
-;;;;; Functions - Inserting nodes by tags
+;;;;; Function - Inserting nodes by tags
 (defvar dc-org-roam-hierarchy-insert-separator
   (propertize "->" 'face '(shadow))
   "Separator for org-roam hierarchy insertion.")
@@ -1081,7 +1081,7 @@ and when nil is returned the node will be filtered out."
 ;; Add keybindings
 (define-key dc-roam-map (kbd "a") 'dc/org-roam-insert-nodes-by-tags)
 
-;;;; org-attach
+;;;; Package - org-attach
 ;;;;; Configuration
 (use-package org-attach
   :after org
@@ -1108,7 +1108,7 @@ and when nil is returned the node will be filtered out."
 ;; Add keybindings
 (define-key dc-org-map (kbd "k") 'org-attach-attach)
 
-;;;;; Functions - Attach and insert attachment as a link
+;;;;; Function - Attaching and inserting attachment as a link
 (defvar dc-org-attach-search-starting-directory ""
   "Preferred starting directory to search files to attach in Org mode.")
 
@@ -1136,7 +1136,7 @@ The attached file is copied to the attachment directory and a link is inserted a
 ;; Add keybindings
 (define-key dc-org-map (kbd "j") 'dc/org-attach-file-and-insert-link)
 
-;;;;; Functions - Copying/moving attachments between org-roam nodes
+;;;;; Function - Copying/moving attachments between org-roam nodes
 (defvar dc-org-attach-source-node nil
   "Temporary variable to store the source node for attachment copying.")
 
@@ -1226,28 +1226,28 @@ id[0:1]/id[2:] rule."
               (other-window 1))
           (message "No attachment directory found for node '%s'." (org-roam-node-title source-node)))))))
 
-;;;; websocket
+;;;; Package - websocket
 ;;;;; Configuration
 (use-package websocket
   :after org-roam
   :ensure t
   )
 
-;;;; org-roam-ui
+;;;; Package - org-roam-ui
 ;;;;; Configuration
 (use-package org-roam-ui
   :after org-roam
   :ensure t
   )
 
-;;;; org-transclusion
+;;;; Package - org-transclusion
 ;;;;; Configuration
 (use-package org-transclusion
   :after org
   :ensure t
   )
 
-;;;;; Functions - Insertion of transcluded nodes
+;;;;; Function - Inserting of transcluded nodes
 (defun dc/org-transclude-set-link-prefix ()
   "Sets the dc-org-roam-link-prefix to #+transclude: .
 Used to add a prefix to the function which inserts org-roam
@@ -1268,7 +1268,7 @@ nodes based on tags."
 ;; Add keybindings
 (define-key dc-org-map (kbd "z") 'dc/org-transclusion-insert-node)
 
-;;;; alert
+;;;; Package - alert
 ;;;;; Configuration
 (use-package alert
   :ensure t
@@ -1279,7 +1279,7 @@ nodes based on tags."
     (setq alert-default-icon "ic_popup_reminder"))
   )
 
-;;;;; Functions - Support Android notifications
+;;;;; Function - Supporting Android notifications
 (defun dc/alert-android-notifications-notify (info)
   "Send notifications using `android-notifications-notify'.
 `android-notifications-notify' is a built-in function in the native Emacs
@@ -1300,7 +1300,7 @@ Android port."
 (alert-define-style 'android-notifications :title "Android Notifications"
                     :notifier #'dc/alert-android-notifications-notify)
 
-;;;; org-alert
+;;;; Package - org-alert
 ;;;;; Configuration
 (use-package org-alert
   :ensure t
@@ -1327,7 +1327,7 @@ Android port."
   (org-alert-enable)
   )
 
-;;;;; Functions - Change title of notifications
+;;;;; Function - Changing title of notifications
 (defvar dc-org-alert-title-type 'custom
   "Control the title type for `org-alert' notifications.
   /home/danijelcamdzic/Projects/dotemacs/ Possible values are:
@@ -1382,13 +1382,13 @@ use filename."
 ;; Update to set up or remove advices based on dc-org-alert-title-type
 (dc/org-alert-update-advices)
 
-;;;; org-tempo
+;;;; Package - org-tempo
 ;;;;; Configuration
 (use-package org-tempo
   :after org
   )
 
-;;;; org-analyzer
+;;;; Package - org-analyzer
 ;;;;; Configuration
 (use-package org-analyzer
   :after org
@@ -1398,7 +1398,7 @@ use filename."
   (setq org-analyzer-org-directory org-directory)
   )
 
-;;;; org-download
+;;;; Package - org-download
 ;;;;; Configuration
 (use-package org-download
   :ensure t
@@ -1414,7 +1414,7 @@ use filename."
 ;; Add keybindings
 (define-key dc-org-map (kbd "p") 'org-download-clipboard)
 
-;;;;; Functions - Choose screenshot filename
+;;;;; Function - Prompting for screenshot filename
 (defun dc/org-download-clipboard--prompt-for-name-advice (orig-fun &optional basename)
   "Advice to prompt for a basename before calling `org-download-clipboard'."
   (message "Calling advice function")
@@ -1425,14 +1425,14 @@ use filename."
 
 (advice-add 'org-download-clipboard :around #'dc/org-download-clipboard--prompt-for-name-advice)
 
-;;;; org-ref
+;;;; Package - org-ref
 ;;;;; Configuration
 (use-package org-ref
   :ensure t
   :after org
   )
 
-;;;; org-noter
+;;;; Package - org-noter
 ;;;;; Configuration
 (use-package org-noter
   :ensure t  
@@ -1442,7 +1442,7 @@ use filename."
   (setq org-noter-notes-search-path '(org-directory))
   )
 
-;;;; org-media-note
+;;;; Package - org-media-note
 ;;;;; Configuration
 (use-package org-media-note
   :quelpa (org-media-note :fetcher github :repo "yuchen-lea/org-media-note")
@@ -1454,7 +1454,7 @@ use filename."
   (setq org-media-note-screenshot-link-type-when-save-in-attach-dir 'attach)
   )
 
-;;;;; Functions - Enable mpv-android support on Android
+;;;;; Function - Enabling mpv-android support on Android
 ;; This should only be done on Android
 (when (eq system-type 'android)
   (defun dc/mpv-start--android-advice (orig-fun &rest args)
@@ -1483,7 +1483,7 @@ am start -a android.intent.action.VIEW -t video/* -d file:///storage/emulated/0/
   ;; Add advice to mpv-start so it open the correct player each time
   (advice-add 'mpv-start :around #'dc/mpv-start--android-advice))
 
-;;;;; Functions - Prepend timestamp to screenshot
+;;;;; Function - Prepending timestamp to screenshot filename
 (defun dc/org-media-note--format-picture-file-name--prepend-timestamp-advice (orig-func &rest args)
   "Advice to prepend the current timestamp to the filename created by `org-media-note--format-picture-file-name'."
   (let ((original-filename (apply orig-func args))
@@ -1492,7 +1492,7 @@ am start -a android.intent.action.VIEW -t video/* -d file:///storage/emulated/0/
 
 (advice-add 'org-media-note--format-picture-file-name :around #'dc/org-media-note--format-picture-file-name--prepend-timestamp-advice)
 
-;;;;; Functions - Remove invalid characters (the ones unsupported by syncthing)
+;;;;; Function - Removing invalid characters from filename
 (defun dc/remove-invalid-characters-from-filename (filename)
   "Remove invalid characters from filename in order for it to sync to Android using syncthing."
   (replace-regexp-in-string "[/*\":<>?|]" "" filename))
@@ -1504,7 +1504,7 @@ am start -a android.intent.action.VIEW -t video/* -d file:///storage/emulated/0/
 (advice-add 'org-media-note--format-picture-file-name :around #'dc/org-media-note--format-picture-file-name--remove-invalid-characters-from-filename-advice)
 
 ;;; Browsing & bookmarks
-;;;; eww
+;;;; Package - eww
 ;;;;; Configuration
 (use-package eww
   :config
@@ -1512,7 +1512,7 @@ am start -a android.intent.action.VIEW -t video/* -d file:///storage/emulated/0/
   (setq eww-bookmarks-directory (concat dc-documents-directory "Emacs/"))
   )
 
-;;;; bookmark
+;;;; Package - bookmark
 ;;;;; Configuration
 (use-package bookmark
   :config
@@ -1520,7 +1520,7 @@ am start -a android.intent.action.VIEW -t video/* -d file:///storage/emulated/0/
   (setq bookmark-default-file (concat dc-documents-directory "Emacs/bookmarks"))
   )
 
-;;;; bookmark+
+;;;; Package - bookmark+
 ;;;;; Configuration
 (use-package bookmark+
   :quelpa (bookmark+ :fetcher github :repo "emacsmirror/bookmark-plus")
@@ -1539,7 +1539,7 @@ am start -a android.intent.action.VIEW -t video/* -d file:///storage/emulated/0/
 (define-key dc-bookmark-map (kbd "n") 'bmkp-bmenu-filter-bookmark-name-incrementally)
 (define-key dc-bookmark-map (kbd "t") 'bmkp-bmenu-filter-tags-incrementally)
 
-;;;;; Functions - Opening bookmarks on both Linux and Android
+;;;;; Function - Integrating bookmarks between Android and Linux
 (defun dc/bookmark-jump--modify-bookmark-path-advice (orig-fun &rest args)
   "Modify the bookmark filename and directory based on system type before opening."
   (let* ((bookmark (car args))
@@ -1575,7 +1575,7 @@ am start -a android.intent.action.VIEW -t video/* -d file:///storage/emulated/0/
 (advice-add 'bookmark-jump :around #'dc/bookmark-jump--modify-bookmark-path-advice)
 
 ;;; Date & time
-;;;; Functions - Time adjustment
+;;;; Function - Overriding current time
 (defvar dc-adjusted-time nil
   "Adjusted time. This time will replace current time.")
 
@@ -1590,7 +1590,7 @@ am start -a android.intent.action.VIEW -t video/* -d file:///storage/emulated/0/
   "Override for `current-time' using `dc/time-adjust-time'."
   (or dc-adjusted-time (current-time)))
 
-;;;; time-stamp
+;;;; Package - time-stamp
 ;;;;; Configuration
 (use-package time-stamp
   :config
@@ -1603,7 +1603,7 @@ am start -a android.intent.action.VIEW -t video/* -d file:///storage/emulated/0/
   (add-hook 'before-save-hook 'time-stamp)
   )
 
-;;;; calendar
+;;;; Package - calendar
 ;;;;; Configuration
 (use-package calendar
   :config
@@ -1612,7 +1612,7 @@ am start -a android.intent.action.VIEW -t video/* -d file:///storage/emulated/0/
   )
 
 ;;; Encryption & authentication
-;;;; epa
+;;;; Package - epa
 ;;;;; Configuration
 (use-package epa
   :ensure t
@@ -1639,7 +1639,7 @@ am start -a android.intent.action.VIEW -t video/* -d file:///storage/emulated/0/
   (setq epa-pinentry-mode 'loopback)
   )
 
-;;;; auth-source
+;;;; Package - auth-source
 ;;;;; Configuration
 (use-package auth-source
   :ensure t
@@ -1656,7 +1656,63 @@ am start -a android.intent.action.VIEW -t video/* -d file:///storage/emulated/0/
   (add-hook 'buffer-list-update-hook 'auth-source-forget-all-cached)
   )
 
-;;;;; Functions - TOTP
+;;;;; Function - Getting auth-source secrets
+(defun dc/auth-display-all (search-string)
+  "Select an authentication entry based on SEARCH-STRING from `auth-sources', and briefly display its value.
+Function decrypts all auth-source files and lets you search through them to find the SEARCH-STRING."
+  (interactive "sEnter authentication type: ")
+  (let* ((candidates (mapcar
+                      (lambda (auth)
+                        (cons (format "User '%s' on %s"
+                                      (propertize (plist-get auth :user) 'face 'font-lock-keyword-face)
+                                      (propertize (plist-get auth :host) 'face 'font-lock-string-face))
+                              auth))
+                      (seq-filter (lambda (auth) (string-prefix-p search-string (plist-get auth :host)))
+                                  (auth-source-search :max 10000))))
+         (selected-auth (cdr (assoc (completing-read (format "Pick an entry for '%s'> " search-string) candidates) candidates)))
+         (password (funcall (plist-get selected-auth :secret))))
+    ;; Temporarily disable logging in *Messages* buffer
+    (let ((message-log-max nil))
+      (message "Your authentication secret for '%s' is: %s"
+               (propertize (plist-get selected-auth :host) 'face 'font-lock-keyword-face)
+               (propertize password 'face 'font-lock-string-face)))))
+
+(defun dc/auth-search (search-string)
+  "Select a .gpg file from `auth-sources`, then select an authentication entry from that file, and briefly display its value.
+Function decrypts only the chosen auth-source file and lets you search through it to find the SEARCH-STRING."
+  (interactive "sEnter authentication type: ")
+  (let* ((gpg-files (mapcar (lambda (source) (plist-get source :source)) auth-sources))
+         (selected-file (completing-read "Select an auth-source file: " gpg-files))
+         (candidates (mapcar
+                      (lambda (auth)
+                        (cons (format "User '%s' on %s"
+                                      (propertize (plist-get auth :user) 'face 'font-lock-keyword-face)
+                                      (propertize (plist-get auth :host) 'face 'font-lock-string-face))
+                              auth))
+                      (seq-filter (lambda (auth) (string-prefix-p search-string (plist-get auth :host)))
+                                  (auth-source-search :max 10000 :source selected-file)))))
+    (let* ((selected-entry (completing-read "Pick an entry> " candidates))
+           (auth (cdr (assoc selected-entry candidates)))
+           (password (funcall (plist-get auth :secret))))
+      ;; Temporarily disable logging in *Messages* buffer
+      (let ((message-log-max nil))
+        (message "Your authentication secret for '%s' is: %s"
+                 (propertize (plist-get auth :host) 'face 'font-lock-keyword-face)
+                 (propertize password 'face 'font-lock-string-face))))))
+
+;;;;; Function - Getting passwords
+(defun dc/password-display-all ()
+  "Uses `dc/auth-get-secret-all' function to retrieve the passwords from all files in `auth-sources' by searching for PASS string."
+  (interactive)
+  (dc/auth-display-all "PASS:"))
+
+(defun dc/password-search ()
+  "Uses `dc/auth-get-secret-one' function to retrieve the passwords from the chosen `.gpg' files in `auth-sources'
+by searching for PASS string."
+  (interactive)
+  (dc/auth-search "PASS:"))
+
+;;;;; Function - Getting TOTP
 (require 'bindat)
 (require 'gnutls)
 (require 'hexl)
@@ -1760,61 +1816,5 @@ Function decrypts only the chosen auth-source file and lets you search through i
                  (propertize code 'face 'font-lock-string-face)
                  time-remaining))
       code)))
-
-;;;;; Functions - Authentication secret
-(defun dc/auth-display-all (search-string)
-  "Select an authentication entry based on SEARCH-STRING from `auth-sources', and briefly display its value.
-Function decrypts all auth-source files and lets you search through them to find the SEARCH-STRING."
-  (interactive "sEnter authentication type: ")
-  (let* ((candidates (mapcar
-                      (lambda (auth)
-                        (cons (format "User '%s' on %s"
-                                      (propertize (plist-get auth :user) 'face 'font-lock-keyword-face)
-                                      (propertize (plist-get auth :host) 'face 'font-lock-string-face))
-                              auth))
-                      (seq-filter (lambda (auth) (string-prefix-p search-string (plist-get auth :host)))
-                                  (auth-source-search :max 10000))))
-         (selected-auth (cdr (assoc (completing-read (format "Pick an entry for '%s'> " search-string) candidates) candidates)))
-         (password (funcall (plist-get selected-auth :secret))))
-    ;; Temporarily disable logging in *Messages* buffer
-    (let ((message-log-max nil))
-      (message "Your authentication secret for '%s' is: %s"
-               (propertize (plist-get selected-auth :host) 'face 'font-lock-keyword-face)
-               (propertize password 'face 'font-lock-string-face)))))
-
-(defun dc/auth-search (search-string)
-  "Select a .gpg file from `auth-sources`, then select an authentication entry from that file, and briefly display its value.
-Function decrypts only the chosen auth-source file and lets you search through it to find the SEARCH-STRING."
-  (interactive "sEnter authentication type: ")
-  (let* ((gpg-files (mapcar (lambda (source) (plist-get source :source)) auth-sources))
-         (selected-file (completing-read "Select an auth-source file: " gpg-files))
-         (candidates (mapcar
-                      (lambda (auth)
-                        (cons (format "User '%s' on %s"
-                                      (propertize (plist-get auth :user) 'face 'font-lock-keyword-face)
-                                      (propertize (plist-get auth :host) 'face 'font-lock-string-face))
-                              auth))
-                      (seq-filter (lambda (auth) (string-prefix-p search-string (plist-get auth :host)))
-                                  (auth-source-search :max 10000 :source selected-file)))))
-    (let* ((selected-entry (completing-read "Pick an entry> " candidates))
-           (auth (cdr (assoc selected-entry candidates)))
-           (password (funcall (plist-get auth :secret))))
-      ;; Temporarily disable logging in *Messages* buffer
-      (let ((message-log-max nil))
-        (message "Your authentication secret for '%s' is: %s"
-                 (propertize (plist-get auth :host) 'face 'font-lock-keyword-face)
-                 (propertize password 'face 'font-lock-string-face))))))
-
-;;;;; Functions - Passwords
-(defun dc/password-display-all ()
-  "Uses `dc/auth-get-secret-all' function to retrieve the passwords from all files in `auth-sources' by searching for PASS string."
-  (interactive)
-  (dc/auth-display-all "PASS:"))
-
-(defun dc/password-search ()
-  "Uses `dc/auth-get-secret-one' function to retrieve the passwords from the chosen `.gpg' files in `auth-sources'
-by searching for PASS string."
-  (interactive)
-  (dc/auth-search "PASS:"))
 
 ;;; init.el ends here
