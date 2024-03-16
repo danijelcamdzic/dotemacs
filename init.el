@@ -106,7 +106,7 @@
 (defvar dc-recordings-directory (concat dc-home-directory "Recordings/"))
 (defvar dc-videos-directory (concat dc-home-directory "Videos/"))
 
-;;;;; Functions - Open a folder or file from the home directory
+;;;;; Functions - Opening directories in dired
 (defun dc/open-folder-from-home-directory ()
   "Open a folder from home directory in dired."
   (interactive)
@@ -124,7 +124,7 @@
          (directory (symbol-value directory-symbol)))
     (dired directory)))
 
-(defun dc/ropen-folder-from-home-directory ()
+(defun dc/regex-open-folder-from-home-directory ()
   "Open a folder from home directory in dired using regex search."
   (interactive)
   (let* ((search-term (read-string "Enter search term: "))
@@ -137,7 +137,7 @@
 
 ;; Add keybindings
 (define-key dc-dired-map (kbd "h") 'dc/open-folder-from-home-directory)
-(define-key dc-dired-map (kbd "r") 'dc/ropen-folder-from-home-directory)
+(define-key dc-dired-map (kbd "r") 'dc/regex-open-folder-from-home-directory)
 
 ;;;;; dired-sidebar
 ;;;;;; Configuration
@@ -277,7 +277,7 @@
 ;; Disable line numbers
 (global-display-line-numbers-mode 0)
 
-;;;; Look & feel
+;;;; Visual
 ;; Enable outline-minor-mode as soon as .el file is opened
 (add-hook 'emacs-lisp-mode-hook 'outline-minor-mode)
 
@@ -950,7 +950,7 @@ based on the system type."
 (define-key dc-roam-map (kbd "f") 'org-roam-node-find)
 (define-key dc-roam-map (kbd "i") 'org-roam-node-insert)
 
-;;;;; Functions - Get current node hierarchy
+;;;;; Functions - Get node hierarchy
 (defun dc/org-roam--get-node-heirarchy (node)
   "Get the hierarchy of NODE as a list of titles, excluding non-node headings.
 The hierarchy includes the NODE title and its ancestor node titles."
@@ -1021,6 +1021,11 @@ The hierarchy includes the NODE title and its ancestor node titles."
   (interactive)
   (setq dc-org-roam-link-prefix ""))
 
+(defun dc/org-roam-set-link-prefix (prefix-string)
+  "Sets the dc-org-roam-link-prefix to prefix-string."
+  (interactive)
+  (setq dc-org-roam-link-prefix prefix-string))
+
 (defun dc/org-roam-insert-nodes-by-tags(keywords exclude-keywords &optional filter-fn)
   "Inserts all Org-roam nodes connected to the provided keywords and not connected to the exclude keywords.
 KEYWORDS is a space-separated list of keywords to find the connected nodes.
@@ -1076,6 +1081,151 @@ and when nil is returned the node will be filtered out."
 ;; Add keybindings
 (define-key dc-roam-map (kbd "a") 'dc/org-roam-insert-nodes-by-tags)
 
+;;;; org-attach
+;;;;; Configuration
+(use-package org-attach
+  :after org
+  :config
+  ;; Set attach directory
+  (setq org-attach-id-dir (concat org-directory "data/"))
+  
+  ;; Use relative directories
+  (setq org-attach-dir-relative t)
+  
+  ;; Store links in place where file is attached
+  (setq org-attach-store-link-p 'attached)
+  
+  ;; Use inheritance
+  (setq org-attach-use-inheritance t)
+  
+  ;; Remove default tag for attachments
+  (setq org-attach-auto-tag nil)
+  
+  ;; Set default attachment method to copy
+  (setq org-attach-method 'cp)
+  )
+
+;; Add keybindings
+(define-key dc-org-map (kbd "k") 'org-attach-attach)
+
+;;;;; Functions - Attach and insert attachment as a link
+(defvar dc-org-attach-search-starting-directory ""
+  "Preferred starting directory to search files to attach in Org mode.")
+
+(defun dc/org-attach-set-starting-directory (dir)
+  "Set the `dc-org-attach-search-starting-directory'."
+  (interactive "DSet starting directory: ")
+  (setq dc-org-attach-search-starting-directory dir))
+
+(defun dc/org-attach-reset-starting-directory ()
+  "Reset the `dc-org-attach-search-starting-directory'."
+  (interactive)
+  (setq dc-org-attach-search-starting-directory ""))
+
+(defun dc/org-attach-file-and-insert-link ()
+  "Attach a file to the current Org entry and insert a link to it.
+The attached file is copied to the attachment directory and a link is inserted at point."
+  (interactive)
+  (let* ((search-directory (if (string-empty-p dc-org-attach-search-starting-directory)
+                               default-directory
+                             dc-org-attach-search-starting-directory))
+         (file (read-file-name "Select file to attach: " search-directory)))
+    (org-attach-attach file nil 'cp)
+    (insert (format "[[attachment:%s]]" (file-name-nondirectory file)))))
+
+;; Add keybindings
+(define-key dc-org-map (kbd "j") 'dc/org-attach-file-and-insert-link)
+
+;;;;; Functions - Copying/moving attachments between org-roam nodes
+(defvar dc-org-attach-source-node nil
+  "Temporary variable to store the source node for attachment copying.")
+
+(defun dc/org-attach-copy-attachments-from-node-to-node ()
+  "Copy marked attachments from one org-roam node to another using dired.
+Function presumes that the attachments directories are made according to
+id[0:1]/id[2:] rule."
+  (interactive)
+  (let ((source-node (org-roam-node-read)))
+    (when source-node
+      (let* ((source-node-id (org-roam-node-id source-node))
+             (first-two (substring source-node-id 0 2))
+             (rest-id (substring source-node-id 2))
+             (source-attach-dir (expand-file-name (concat first-two "/" rest-id) org-attach-id-dir)))
+        (if (file-exists-p source-attach-dir)
+            (progn
+              (setq dc-org-attach-source-node source-node)
+              (dired source-attach-dir)
+              (message "Mark attachments to copy with 'm', then press 't' to proceed.")
+              (let ((copy-fn (lambda ()
+                               (interactive)
+                               (let ((marked-files (dired-get-marked-files))
+                                     (source-node dc-org-attach-source-node))
+                                 (setq dc-org-attach-source-node nil)
+                                 (if marked-files
+                                     (let ((target-node (org-roam-node-read)))
+                                       (when target-node
+                                         (let* ((target-node-id (org-roam-node-id target-node))
+                                                (target-first-two (substring target-node-id 0 2))
+                                                (target-rest-id (substring target-node-id 2))
+                                                (target-attach-dir (expand-file-name (concat target-first-two "/" target-rest-id) org-attach-id-dir)))
+                                           (unless (file-exists-p target-attach-dir)
+                                             (make-directory target-attach-dir t))
+                                           (dolist (file marked-files)
+                                             (let ((target-file (expand-file-name (file-name-nondirectory file) target-attach-dir)))
+                                               (copy-file file target-file t)))
+                                           (message "Copied %d attachments from '%s' to '%s'."
+                                                    (length marked-files)
+                                                    (org-roam-node-title source-node)
+                                                    (org-roam-node-title target-node)))))
+                                   (message "No attachments marked for copying."))
+                                 (kill-buffer (current-buffer))))))
+                (local-set-key (kbd "t") copy-fn))
+              (other-window 1))
+          (message "No attachment directory found for node '%s'." (org-roam-node-title source-node)))))))
+
+(defun dc/org-attach-move-attachments-from-node-to-node ()
+  "Move marked attachments from one org-roam node to another using dired.
+Function presumes that the attachments directories are made according to
+id[0:1]/id[2:] rule."
+  (interactive)
+  (let ((source-node (org-roam-node-read)))
+    (when source-node
+      (let* ((source-node-id (org-roam-node-id source-node))
+             (first-two (substring source-node-id 0 2))
+             (rest-id (substring source-node-id 2))
+             (source-attach-dir (expand-file-name (concat first-two "/" rest-id) org-attach-id-dir)))
+        (if (file-exists-p source-attach-dir)
+            (progn
+              (setq dc-org-attach-source-node source-node)
+              (dired source-attach-dir)
+              (message "Mark attachments to move with 'm', then press 't' to proceed.")
+              (let ((move-fn (lambda ()
+                               (interactive)
+                               (let ((marked-files (dired-get-marked-files))
+                                     (source-node dc-org-attach-source-node))
+                                 (setq dc-org-attach-source-node nil)
+                                 (if marked-files
+                                     (let ((target-node (org-roam-node-read)))
+                                       (when target-node
+                                         (let* ((target-node-id (org-roam-node-id target-node))
+                                                (target-first-two (substring target-node-id 0 2))
+                                                (target-rest-id (substring target-node-id 2))
+                                                (target-attach-dir (expand-file-name (concat target-first-two "/" target-rest-id) org-attach-id-dir)))
+                                           (unless (file-exists-p target-attach-dir)
+                                             (make-directory target-attach-dir t))
+                                           (dolist (file marked-files)
+                                             (let ((target-file (expand-file-name (file-name-nondirectory file) target-attach-dir)))
+                                               (rename-file file target-file t)))
+                                           (message "Moved %d attachments from '%s' to '%s'."
+                                                    (length marked-files)
+                                                    (org-roam-node-title source-node)
+                                                    (org-roam-node-title target-node)))))
+                                   (message "No attachments marked for moving."))
+                                 (kill-buffer (current-buffer))))))
+                (local-set-key (kbd "t") move-fn))
+              (other-window 1))
+          (message "No attachment directory found for node '%s'." (org-roam-node-title source-node)))))))
+
 ;;;; websocket
 ;;;;; Configuration
 (use-package websocket
@@ -1099,7 +1249,9 @@ and when nil is returned the node will be filtered out."
 
 ;;;;; Functions - Insertion of transcluded nodes
 (defun dc/org-transclude-set-link-prefix ()
-  "Sets the dc-org-roam-link-prefix to #+transclude: ."
+  "Sets the dc-org-roam-link-prefix to #+transclude: .
+Used to add a prefix to the function which inserts org-roam
+nodes based on tags."
   (interactive)
   (setq dc-org-roam-link-prefix "#+transclude: "))
 
@@ -1245,151 +1397,6 @@ use filename."
   ;; Set up directory
   (setq org-analyzer-org-directory org-directory)
   )
-
-;;;; org-attach
-;;;;; Configuration
-(use-package org-attach
-  :after org
-  :config
-  ;; Set attach directory
-  (setq org-attach-id-dir (concat org-directory "data/"))
-  
-  ;; Use relative directories
-  (setq org-attach-dir-relative t)
-  
-  ;; Store links in place where file is attached
-  (setq org-attach-store-link-p 'attached)
-  
-  ;; Use inheritance
-  (setq org-attach-use-inheritance t)
-  
-  ;; Remove default tag for attachments
-  (setq org-attach-auto-tag nil)
-  
-  ;; Set default attachment method to copy
-  (setq org-attach-method 'cp)
-  )
-
-;; Add keybindings
-(define-key dc-org-map (kbd "k") 'org-attach-attach)
-
-;;;;; Functions - Attach and insert attachment as a link
-(defvar dc-preferred-directory ""
-  "Preferred starting directory to search files to attach in Org mode.")
-
-(defun dc/set-preferred-directory (dir)
-  "Set the preferred directory."
-  (interactive "DSet preferred directory: ")
-  (setq dc-preferred-directory dir))
-
-(defun dc/reset-preferred-directory ()
-  "Reset the preferred directory."
-  (interactive)
-  (setq dc-preferred-directory ""))
-
-(defun dc/org-attach-file-and-insert-link ()
-  "Attach a file to the current Org entry and insert a link to it.
-The attached file is copied to the attachment directory and a link is inserted at point."
-  (interactive)
-  (let* ((search-directory (if (string-empty-p dc-preferred-directory)
-                               default-directory
-                             dc-preferred-directory))
-         (file (read-file-name "Select file to attach: " search-directory)))
-    (org-attach-attach file nil 'cp)
-    (insert (format "[[attachment:%s]]" (file-name-nondirectory file)))))
-
-;; Add keybindings
-(define-key dc-org-map (kbd "j") 'dc/org-attach-file-and-insert-link)
-
-;;;;; Testing
-(defvar dc-org-attach-source-node nil
-  "Temporary variable to store the source node for attachment copying.")
-
-(defun dc/org-attach-copy-attachments-from-node-to-node ()
-  "Copy marked attachments from one org-roam node to another using dired.
-Function presumes that the attachments directories are made according to
-id[0:1]/id[2:] rule."
-  (interactive)
-  (let ((source-node (org-roam-node-read)))
-    (when source-node
-      (let* ((source-node-id (org-roam-node-id source-node))
-             (first-two (substring source-node-id 0 2))
-             (rest-id (substring source-node-id 2))
-             (source-attach-dir (expand-file-name (concat first-two "/" rest-id) org-attach-id-dir)))
-        (if (file-exists-p source-attach-dir)
-            (progn
-              (setq dc-org-attach-source-node source-node)
-              (dired source-attach-dir)
-              (message "Mark attachments to copy with 'm', then press 't' to proceed.")
-              (let ((copy-fn (lambda ()
-                               (interactive)
-                               (let ((marked-files (dired-get-marked-files))
-                                     (source-node dc-org-attach-source-node))
-                                 (setq dc-org-attach-source-node nil)
-                                 (if marked-files
-                                     (let ((target-node (org-roam-node-read)))
-                                       (when target-node
-                                         (let* ((target-node-id (org-roam-node-id target-node))
-                                                (target-first-two (substring target-node-id 0 2))
-                                                (target-rest-id (substring target-node-id 2))
-                                                (target-attach-dir (expand-file-name (concat target-first-two "/" target-rest-id) org-attach-id-dir)))
-                                           (unless (file-exists-p target-attach-dir)
-                                             (make-directory target-attach-dir t))
-                                           (dolist (file marked-files)
-                                             (let ((target-file (expand-file-name (file-name-nondirectory file) target-attach-dir)))
-                                               (copy-file file target-file t)))
-                                           (message "Copied %d attachments from '%s' to '%s'."
-                                                    (length marked-files)
-                                                    (org-roam-node-title source-node)
-                                                    (org-roam-node-title target-node)))))
-                                   (message "No attachments marked for copying."))
-                                 (kill-buffer (current-buffer))))))
-                (local-set-key (kbd "t") copy-fn))
-              (other-window 1))
-          (message "No attachment directory found for node '%s'." (org-roam-node-title source-node)))))))
-
-(defun dc/org-attach-move-attachments-from-node-to-node ()
-  "Move marked attachments from one org-roam node to another using dired.
-Function presumes that the attachments directories are made according to
-id[0:1]/id[2:] rule."
-  (interactive)
-  (let ((source-node (org-roam-node-read)))
-    (when source-node
-      (let* ((source-node-id (org-roam-node-id source-node))
-             (first-two (substring source-node-id 0 2))
-             (rest-id (substring source-node-id 2))
-             (source-attach-dir (expand-file-name (concat first-two "/" rest-id) org-attach-id-dir)))
-        (if (file-exists-p source-attach-dir)
-            (progn
-              (setq dc-org-attach-source-node source-node)
-              (dired source-attach-dir)
-              (message "Mark attachments to move with 'm', then press 't' to proceed.")
-              (let ((move-fn (lambda ()
-                               (interactive)
-                               (let ((marked-files (dired-get-marked-files))
-                                     (source-node dc-org-attach-source-node))
-                                 (setq dc-org-attach-source-node nil)
-                                 (if marked-files
-                                     (let ((target-node (org-roam-node-read)))
-                                       (when target-node
-                                         (let* ((target-node-id (org-roam-node-id target-node))
-                                                (target-first-two (substring target-node-id 0 2))
-                                                (target-rest-id (substring target-node-id 2))
-                                                (target-attach-dir (expand-file-name (concat target-first-two "/" target-rest-id) org-attach-id-dir)))
-                                           (unless (file-exists-p target-attach-dir)
-                                             (make-directory target-attach-dir t))
-                                           (dolist (file marked-files)
-                                             (let ((target-file (expand-file-name (file-name-nondirectory file) target-attach-dir)))
-                                               (rename-file file target-file t)))
-                                           (message "Moved %d attachments from '%s' to '%s'."
-                                                    (length marked-files)
-                                                    (org-roam-node-title source-node)
-                                                    (org-roam-node-title target-node)))))
-                                   (message "No attachments marked for moving."))
-                                 (kill-buffer (current-buffer))))))
-                (local-set-key (kbd "t") move-fn))
-              (other-window 1))
-          (message "No attachment directory found for node '%s'." (org-roam-node-title source-node)))))))
 
 ;;;; org-download
 ;;;;; Configuration
@@ -1726,7 +1733,7 @@ Function decrypts all auth-source files and lets you search through them to find
                time-remaining))
     code))
 
-(defun dc/totp-display-one ()
+(defun dc/totp-search ()
   "Select a TOTP AUTH from `auth-sources', display its TOTP, and show remaining valid time.
 Function decrypts only the chosen auth-source file and lets you search through it to find the TOTP."
   (interactive)
@@ -1755,7 +1762,7 @@ Function decrypts only the chosen auth-source file and lets you search through i
       code)))
 
 ;;;;; Functions - Authentication secret
-(defun dc/auth-get-secret-all (search-string)
+(defun dc/auth-display-all (search-string)
   "Select an authentication entry based on SEARCH-STRING from `auth-sources', and briefly display its value.
 Function decrypts all auth-source files and lets you search through them to find the SEARCH-STRING."
   (interactive "sEnter authentication type: ")
@@ -1775,7 +1782,7 @@ Function decrypts all auth-source files and lets you search through them to find
                (propertize (plist-get selected-auth :host) 'face 'font-lock-keyword-face)
                (propertize password 'face 'font-lock-string-face)))))
 
-(defun dc/auth-get-secret-one (search-string)
+(defun dc/auth-search (search-string)
   "Select a .gpg file from `auth-sources`, then select an authentication entry from that file, and briefly display its value.
 Function decrypts only the chosen auth-source file and lets you search through it to find the SEARCH-STRING."
   (interactive "sEnter authentication type: ")
@@ -1802,14 +1809,12 @@ Function decrypts only the chosen auth-source file and lets you search through i
 (defun dc/password-display-all ()
   "Uses `dc/auth-get-secret-all' function to retrieve the passwords from all files in `auth-sources' by searching for PASS string."
   (interactive)
-  (dc/auth-get-secret-all "PASS:"))
+  (dc/auth-display-all "PASS:"))
 
-(defun dc/password-display-one ()
+(defun dc/password-search ()
   "Uses `dc/auth-get-secret-one' function to retrieve the passwords from the chosen `.gpg' files in `auth-sources'
 by searching for PASS string."
   (interactive)
-  (dc/auth-get-secret-one "PASS:"))
+  (dc/auth-search "PASS:"))
 
 ;;; init.el ends here
-
-
