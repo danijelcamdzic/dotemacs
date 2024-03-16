@@ -7,12 +7,10 @@ installation process and the explanation of some of the more exciting features
 which I use in my workflow are presented in this README file.
 
 * Installation
-
 You can use this configuration on both Android and Linux/Windows without any
 modifications except for the user credentials and folder names.
 
 ** Installation on Android
-
 To install GUI Emacs port on Android, follow the tutorial on
 https://sourceforge.net/projects/android-ports-for-gnu-emacs/. You will need to
 download their signed version of =Termux= as well as download their Emacs =.apk=
@@ -61,7 +59,6 @@ From here:
 4. Start Emacs and wait for all the packages to be downloaded.
 
 ** Installation on Linux
-
 To install Emacs on Linux, the process is much more straightforward.
 
 1. Download Emacs (Vanilla one, not Doom or Spacemacs) on your machine depending on your operating system.
@@ -72,13 +69,11 @@ To install Emacs on Linux, the process is much more straightforward.
 Note that =early-init.el= is not necessary for Linux cases.
 
 * Syncing
-
 I use the https://syncthing.net/ app to sync folders from my home directory. It is a simple
 and a powerful app available on both Android and Linux/Windows. I use it
 primarely to sync my =~/Notes/= and my =~/Documents/= folder.
 
 * My init.el
-
 I have decided to use one large =init.el= file. There are options to split this
 file into smaller =.el= files and manage the configuration that way but I find
 it cumbersome to find stuff that way. I also don't like literate configs because
@@ -105,7 +100,6 @@ make it more useful.
 [[assets/android-emacs.png]]
 
 ** User
-
 This section contains the user information which includes the user credentials and
 directory information.
 
@@ -120,7 +114,6 @@ For Linux both =~/= and =/home/user= are used but for Android we use
 Here you can add more of your information.
 
 ** Editor
-
 This section contains various editor related configurations, ranging from the theme
 set up to the sidebar configuration.
 
@@ -128,7 +121,6 @@ I use =dired-sidebar= and =ibuffer-sidebar= and have created wrapper functions w
 I use to seamlessly transition to using them.
 
 *** Android editor
-
 The most important part of this configuration section is the following:
 
 #+begin_src emacs-lisp
@@ -146,7 +138,6 @@ Android is not meant to be shared between buffers due to its size. Also, I
 enable the keyboard to display even on read-only buffers.
 
 ** Dashboard
-
 *UPDATE* 2024-01-16 Tue 15:11 I no longer use the =dashboard= package but all
 the functions and configuration are available from this commit:
 https://github.com/danijelcamdzic/dotemacs/tree/4410ef98602937a285ddae8ec2abbdd8cbdbc27b
@@ -156,7 +147,6 @@ package as well as some custom functions which improve how the dashboard
 looks. This is mainly related to how the agenda items appear in the dashboard.
 
 *** Relative vs absolute dates in dashboard-agenda
-
 In the original version, the agenda items would appear and be shown with their
 scheduled dates. I didn't like seeing the dates as they are, and preffered to see
 them written in a more personal manner by using the relative date terms like
@@ -169,7 +159,6 @@ This functionality is added as an advice and can be removed with only one line
 if you don't find this useful.
 
 ** GUI
-
 *Update*: 2024-01-15 Mon 15:18 I have removed most of GUI options from my workflow
 in order to change some stuff out. The last commit that had all of it in there
 is
@@ -185,7 +174,6 @@ it. You can remove the line which calls the =dc/gui-hide-bars= function if you d
 want this.
 
 *** Android GUI shortcuts
-
 In Android case, I like to see some options appear in the tool-bar menu and
 those include the =zoom-in=, =zoom-out=, =org-cycle= and =org-ctrl-c-ctrl-c=
 options. They are cumbersome to search for otherwise.
@@ -199,7 +187,6 @@ are in the ="Tools"= menu.
 I use [[https://mpv.io/][mpv]] player on both Linux and Android.
 
 *** Linux installation
-
 To install it on Linux, it is pretty straightforward, you just install it with
 your package manager. Here is an example using Arch Linux:
 
@@ -215,7 +202,6 @@ purpose :).
 You can use this package even without Emacs, as it is simply a very powerful media player.
 
 *** Android installation
-
 The installation process on Android involves installing an app called
 [[https://github.com/mpv-android/mpv-android][mpv-android]]. The Github repository offers the =.apk= file in the releases.
 
@@ -227,7 +213,6 @@ this version of the app exists and serves that purpose :).
 You can use this app even without Emacs, as it is simply a very powerful media player.
 
 *** Usage
-
 Now that you have installed Linux and Android MPV clients, you can integrate
 them into your Emacs and use them.
 
@@ -235,7 +220,6 @@ There is an emacs package called [[https://github.com/kljohann/mpv.el][mpv.el]] 
 local and remote media using MPV.
 
 **** Usage on Linux
-
 If you are using Linux, than there is no other configuratio necessary. You can
 use commands:
 
@@ -247,7 +231,6 @@ mpv-play-url
 and they work without problems.
 
 **** Usage on Android
-
 Android in my case had a problem of playing a media through MPV using the above
 methods. I got errors saying:
 
@@ -311,7 +294,6 @@ Here is an example of me using Emacs on Android to play a video through the
 [[assets/mpv-android.gif]]
 
 ** org-mode
-
 This is the biggest part of my configuration and contains numerous functions.
 
 In this section, the main parts of the configuration concern the general =org-mode=,
@@ -320,7 +302,6 @@ In this section, the main parts of the configuration concern the general =org-mo
 I will showcase a few here.
 
 *** Calendar display of states and notes
-
 I wanted to have a way to visualize how my =TODO= (or any heading) changed
 throughout its existance. I want to see when I marked it as =DONE=, when as =FAIL=
 and when I was =DOING= it. I wanted to see this visually on my calendar.
@@ -364,7 +345,6 @@ You can even go to the place where the =STATE= or =NOTE= was added by clicking o
 the calendar date.
 
 *** org-roam nodes with tag insertion
-
 There is a function called =dc/org-roam-insert-nodes-by-tags=, which enables you to
 insert in the org file all nodes that have certain tags but do not have other
 tags you specify.
@@ -380,7 +360,6 @@ There are also in here many functions which serve as a wrapper so they can be
 called in either the =org-agenda= buffer or the =org= file.
 
 *** org-alert notifications on both Android and Linux
-
 I use =org-alert= package for notifications. My usual configuration is rather
 simple:
 
@@ -454,7 +433,6 @@ Here is an example of how it will look like on Android:
 [[assets/android-org-alert.png]]
 
 *** org-alert notification titles
-
 I really like how =org-super-agenda= package is able to group TODOs together
 based on the =auto-parent= property. This groups the TODOs based on their
 immediate parent heading. Just a sidenote, I have expanded on this in my
@@ -540,10 +518,21 @@ And this works on Android btw! Without any changes from your side, it will
 detect that you are running Android and give you the notification!
 
 [[assets/org-alert-title-android.png]]
+
+*** org-attach
+I have always found it to be tedious to manually move or copy the attachments
+from one node to another in case I want to make a subheading a node itself and
+move its attachments (from parent node) to the new node.
+
+For this I created two functions
+=dc/org-attach-copy-attachments-from-node-to-node=
+and =dc/org-attach-move-attachments-from-node-to-node= which let you pick the
+source and destination nodes and either copy or move attachments from one to
+another in an easy way by marking the atachment files in the dired window with
+=m=.
+
 ** Bookmarks
-
 *** Seamless bookmark management on Android and Linux
-
 This section contains bookmark related configuration. I use =bookmark+= package and have a
 unified bookmark file which works on both Linux and Android. To be able to work
 on both Linux and Android I have created custom function which advises the
@@ -554,7 +543,6 @@ This way syncthing app can be used to sync the bookmark file and the bookmarks
 will be opened seamlessly on both types of systems.
 
 ** TOTP and password manager
-
 This section contains two package configurations which include =auth-sources= and
 =epa=.
 
