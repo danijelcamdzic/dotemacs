@@ -1301,6 +1301,96 @@ The attached file is copied to the attachment directory and a link is inserted a
 ;; Add keybindings
 (define-key dc-org-map (kbd "j") 'dc/org-attach-file-and-insert-link)
 
+;;;;; Testing
+(defvar dc-org-attach-source-node nil
+  "Temporary variable to store the source node for attachment copying.")
+
+(defun dc/org-attach-copy-attachments-from-node-to-node ()
+  "Copy marked attachments from one org-roam node to another using dired.
+Function presumes that the attachments directories are made according to
+id[0:1]/id[2:] rule."
+  (interactive)
+  (let ((source-node (org-roam-node-read)))
+    (when source-node
+      (let* ((source-node-id (org-roam-node-id source-node))
+             (first-two (substring source-node-id 0 2))
+             (rest-id (substring source-node-id 2))
+             (source-attach-dir (expand-file-name (concat first-two "/" rest-id) org-attach-id-dir)))
+        (if (file-exists-p source-attach-dir)
+            (progn
+              (setq dc-org-attach-source-node source-node)
+              (dired source-attach-dir)
+              (message "Mark attachments to copy with 'm', then press 't' to proceed.")
+              (let ((copy-fn (lambda ()
+                               (interactive)
+                               (let ((marked-files (dired-get-marked-files))
+                                     (source-node dc-org-attach-source-node))
+                                 (setq dc-org-attach-source-node nil)
+                                 (if marked-files
+                                     (let ((target-node (org-roam-node-read)))
+                                       (when target-node
+                                         (let* ((target-node-id (org-roam-node-id target-node))
+                                                (target-first-two (substring target-node-id 0 2))
+                                                (target-rest-id (substring target-node-id 2))
+                                                (target-attach-dir (expand-file-name (concat target-first-two "/" target-rest-id) org-attach-id-dir)))
+                                           (unless (file-exists-p target-attach-dir)
+                                             (make-directory target-attach-dir t))
+                                           (dolist (file marked-files)
+                                             (let ((target-file (expand-file-name (file-name-nondirectory file) target-attach-dir)))
+                                               (copy-file file target-file t)))
+                                           (message "Copied %d attachments from '%s' to '%s'."
+                                                    (length marked-files)
+                                                    (org-roam-node-title source-node)
+                                                    (org-roam-node-title target-node)))))
+                                   (message "No attachments marked for copying."))
+                                 (kill-buffer (current-buffer))))))
+                (local-set-key (kbd "t") copy-fn))
+              (other-window 1))
+          (message "No attachment directory found for node '%s'." (org-roam-node-title source-node)))))))
+
+(defun dc/org-attach-move-attachments-from-node-to-node ()
+  "Move marked attachments from one org-roam node to another using dired.
+Function presumes that the attachments directories are made according to
+id[0:1]/id[2:] rule."
+  (interactive)
+  (let ((source-node (org-roam-node-read)))
+    (when source-node
+      (let* ((source-node-id (org-roam-node-id source-node))
+             (first-two (substring source-node-id 0 2))
+             (rest-id (substring source-node-id 2))
+             (source-attach-dir (expand-file-name (concat first-two "/" rest-id) org-attach-id-dir)))
+        (if (file-exists-p source-attach-dir)
+            (progn
+              (setq dc-org-attach-source-node source-node)
+              (dired source-attach-dir)
+              (message "Mark attachments to move with 'm', then press 't' to proceed.")
+              (let ((move-fn (lambda ()
+                               (interactive)
+                               (let ((marked-files (dired-get-marked-files))
+                                     (source-node dc-org-attach-source-node))
+                                 (setq dc-org-attach-source-node nil)
+                                 (if marked-files
+                                     (let ((target-node (org-roam-node-read)))
+                                       (when target-node
+                                         (let* ((target-node-id (org-roam-node-id target-node))
+                                                (target-first-two (substring target-node-id 0 2))
+                                                (target-rest-id (substring target-node-id 2))
+                                                (target-attach-dir (expand-file-name (concat target-first-two "/" target-rest-id) org-attach-id-dir)))
+                                           (unless (file-exists-p target-attach-dir)
+                                             (make-directory target-attach-dir t))
+                                           (dolist (file marked-files)
+                                             (let ((target-file (expand-file-name (file-name-nondirectory file) target-attach-dir)))
+                                               (rename-file file target-file t)))
+                                           (message "Moved %d attachments from '%s' to '%s'."
+                                                    (length marked-files)
+                                                    (org-roam-node-title source-node)
+                                                    (org-roam-node-title target-node)))))
+                                   (message "No attachments marked for moving."))
+                                 (kill-buffer (current-buffer))))))
+                (local-set-key (kbd "t") move-fn))
+              (other-window 1))
+          (message "No attachment directory found for node '%s'." (org-roam-node-title source-node)))))))
+
 ;;;; org-download
 ;;;;; Configuration
 (use-package org-download
@@ -1664,32 +1754,31 @@ Function decrypts only the chosen auth-source file and lets you search through i
                  time-remaining))
       code)))
 
-;;;;; Functions - Passwords
-(defun dc/password-display-all (auth)
-  "Select a password entry (PASS) from `auth-sources', and briefly display its password.
-Function decrypts all auth-source files and lets you search through them to find the PASS."
-  (interactive
-   (list
-    (let ((candidates (mapcar
-                       (lambda (auth)
-                         (cons (format "User '%s' on %s"
-                                       (propertize (plist-get auth :user) 'face 'font-lock-keyword-face)
-                                       (propertize (plist-get auth :host) 'face 'font-lock-string-face))
-                               auth))
-                       (seq-filter (lambda (auth) (string-prefix-p "PASS:" (plist-get auth :host)))
-                                   (auth-source-search :max 10000)))))
-      (cdr (assoc (completing-read "Pick a PASS entry> " candidates) candidates)))))
-  (let ((password (funcall (plist-get auth :secret))))
+;;;;; Functions - Authentication secret
+(defun dc/auth-get-secret-all (search-string)
+  "Select an authentication entry based on SEARCH-STRING from `auth-sources', and briefly display its value.
+Function decrypts all auth-source files and lets you search through them to find the SEARCH-STRING."
+  (interactive "sEnter authentication type: ")
+  (let* ((candidates (mapcar
+                      (lambda (auth)
+                        (cons (format "User '%s' on %s"
+                                      (propertize (plist-get auth :user) 'face 'font-lock-keyword-face)
+                                      (propertize (plist-get auth :host) 'face 'font-lock-string-face))
+                              auth))
+                      (seq-filter (lambda (auth) (string-prefix-p search-string (plist-get auth :host)))
+                                  (auth-source-search :max 10000))))
+         (selected-auth (cdr (assoc (completing-read (format "Pick an entry for '%s'> " search-string) candidates) candidates)))
+         (password (funcall (plist-get selected-auth :secret))))
     ;; Temporarily disable logging in *Messages* buffer
     (let ((message-log-max nil))
-      (message "Your password for '%s' is: %s"
-               (propertize (plist-get auth :host) 'face 'font-lock-keyword-face)
+      (message "Your authentication secret for '%s' is: %s"
+               (propertize (plist-get selected-auth :host) 'face 'font-lock-keyword-face)
                (propertize password 'face 'font-lock-string-face)))))
 
-(defun dc/password-display-one ()
-  "Select a .gpg file from `auth-sources`, then select a password entry from that file, and briefly display its password.
-Function decrypts only the chosen auth-source file and lets you search through it to find the PASS."
-  (interactive)
+(defun dc/auth-get-secret-one (search-string)
+  "Select a .gpg file from `auth-sources`, then select an authentication entry from that file, and briefly display its value.
+Function decrypts only the chosen auth-source file and lets you search through it to find the SEARCH-STRING."
+  (interactive "sEnter authentication type: ")
   (let* ((gpg-files (mapcar (lambda (source) (plist-get source :source)) auth-sources))
          (selected-file (completing-read "Select an auth-source file: " gpg-files))
          (candidates (mapcar
@@ -1698,16 +1787,28 @@ Function decrypts only the chosen auth-source file and lets you search through i
                                       (propertize (plist-get auth :user) 'face 'font-lock-keyword-face)
                                       (propertize (plist-get auth :host) 'face 'font-lock-string-face))
                               auth))
-                      (seq-filter (lambda (auth) (string-prefix-p "PASS:" (plist-get auth :host)))
+                      (seq-filter (lambda (auth) (string-prefix-p search-string (plist-get auth :host)))
                                   (auth-source-search :max 10000 :source selected-file)))))
-    (let* ((selected-entry (completing-read "Pick a PASS entry> " candidates))
+    (let* ((selected-entry (completing-read "Pick an entry> " candidates))
            (auth (cdr (assoc selected-entry candidates)))
            (password (funcall (plist-get auth :secret))))
       ;; Temporarily disable logging in *Messages* buffer
       (let ((message-log-max nil))
-        (message "Your password for '%s' is: %s"
+        (message "Your authentication secret for '%s' is: %s"
                  (propertize (plist-get auth :host) 'face 'font-lock-keyword-face)
                  (propertize password 'face 'font-lock-string-face))))))
+
+;;;;; Functions - Passwords
+(defun dc/password-display-all ()
+  "Uses `dc/auth-get-secret-all' function to retrieve the passwords from all files in `auth-sources' by searching for PASS string."
+  (interactive)
+  (dc/auth-get-secret-all "PASS:"))
+
+(defun dc/password-display-one ()
+  "Uses `dc/auth-get-secret-one' function to retrieve the passwords from the chosen `.gpg' files in `auth-sources'
+by searching for PASS string."
+  (interactive)
+  (dc/auth-get-secret-one "PASS:"))
 
 ;;; init.el ends here
 
