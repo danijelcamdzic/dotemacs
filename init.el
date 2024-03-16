@@ -90,10 +90,10 @@
 
 ;; Set the home directory based on system type
 (defvar dc-home-directory
-      (cond
-       ((eq system-type 'gnu/linux) dc-gnu-linux-home-extended)
-       ((eq system-type 'android) dc-android-home)
-       (t dc-gnu-linux-home)))
+  (cond
+   ((eq system-type 'gnu/linux) dc-gnu-linux-home-extended)
+   ((eq system-type 'android) dc-android-home)
+   (t dc-gnu-linux-home)))
 
 ;; Define variables which represent the home directory folders
 (defvar dc-audio-directory (concat dc-home-directory "Audio/"))  
