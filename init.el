@@ -1136,7 +1136,7 @@ The attached file is copied to the attachment directory and a link is inserted a
 ;; Add keybindings
 (define-key dc-org-map (kbd "j") 'dc/org-attach-file-and-insert-link)
 
-;;;;; Function - Copying/moving attachments between org-roam nodes
+;;;;; Function - Copying attachments between org-roam nodes
 (defvar dc-org-attach-source-node nil
   "Temporary variable to store the source node for attachment copying.")
 
@@ -1183,6 +1183,7 @@ id[0:1]/id[2:] rule."
               (other-window 1))
           (message "No attachment directory found for node '%s'." (org-roam-node-title source-node)))))))
 
+;;;;; Function - Moving attachments between org-roam nodes
 (defun dc/org-attach-move-attachments-from-node-to-node ()
   "Move marked attachments from one org-roam node to another using dired.
 Function presumes that the attachments directories are made according to
@@ -1223,6 +1224,41 @@ id[0:1]/id[2:] rule."
                                    (message "No attachments marked for moving."))
                                  (kill-buffer (current-buffer))))))
                 (local-set-key (kbd "t") move-fn))
+              (other-window 1))
+          (message "No attachment directory found for node '%s'." (org-roam-node-title source-node)))))))
+
+;;;;; Function - Delete attachments from node
+(defun dc/org-attach-delete-attachments-from-node ()
+  "Delete marked attachments from an org-roam node using dired.
+Function presumes that the attachments directories are made according to
+id[0:1]/id[2:] rule."
+  (interactive)
+  (let ((source-node (org-roam-node-read)))
+    (when source-node
+      (let* ((source-node-id (org-roam-node-id source-node))
+             (first-two (substring source-node-id 0 2))
+             (rest-id (substring source-node-id 2))
+             (source-attach-dir (expand-file-name (concat first-two "/" rest-id) org-attach-id-dir)))
+        (if (file-exists-p source-attach-dir)
+            (progn
+              (setq dc-org-attach-source-node source-node)
+              (dired source-attach-dir)
+              (message "Mark attachments to delete with 'm', then press 'd' to proceed.")
+              (let ((delete-fn (lambda ()
+                                 (interactive)
+                                 (let ((marked-files (dired-get-marked-files))
+                                       (source-node dc-org-attach-source-node))
+                                   (setq dc-org-attach-source-node nil)
+                                   (if marked-files
+                                       (progn
+                                         (dolist (file marked-files)
+                                           (delete-file file))
+                                         (message "Deleted %d attachments from '%s'."
+                                                  (length marked-files)
+                                                  (org-roam-node-title source-node)))
+                                     (message "No attachments marked for deletion."))
+                                   (kill-buffer (current-buffer))))))
+                (local-set-key (kbd "d") delete-fn))
               (other-window 1))
           (message "No attachment directory found for node '%s'." (org-roam-node-title source-node)))))))
 
