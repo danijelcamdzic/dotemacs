@@ -54,31 +54,31 @@
 (setq user-mail-address "danijelcamdzic@tuta.com")
 
 ;;;; Keybindings menus
-;; Add keybdinding menu for dired
+;; Add keybinding menu for dired
 (define-prefix-command 'dc-dired-map)
 (global-set-key (kbd "C-c d") 'dc-dired-map)
 
-;; Add keybdinding menu for buffers
+;; Add keybinding menu for buffers
 (define-prefix-command 'dc-buffer-map)
 (global-set-key (kbd "C-c b") 'dc-buffer-map)
 
-;; Add keybdinding menu for GUI
+;; Add keybinding menu for GUI
 (define-prefix-command 'dc-gui-map)
 (global-set-key (kbd "C-c g") 'dc-gui-map)
 
-;; Add keybdinding menu for bookmarks
+;; Add keybinding menu for bookmarks
 (define-prefix-command 'dc-bookmark-map)
 (define-key dc-buffer-map (kbd "b") 'dc-bookmark-map)
 
-;; Add keybdinding menu for org
+;; Add keybinding menu for org
 (define-prefix-command 'dc-org-map)
 (global-set-key (kbd "C-c o") 'dc-org-map)
 
-;; Add keybdinding menu for agenda
+;; Add keybinding menu for agenda
 (define-prefix-command 'dc-agenda-map)
 (global-set-key (kbd "C-c a") 'dc-agenda-map)
 
-;; Add keybdinding menu for org-roam
+;; Add keybinding menu for org-roam
 (define-prefix-command 'dc-roam-map)
 (global-set-key (kbd "C-c r") 'dc-roam-map)
 
