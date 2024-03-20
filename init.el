@@ -422,8 +422,8 @@
   ;; Fold all drawers in a buffer
   (add-hook 'org-mode-hook 'org-hide-drawer-all)
 
-  ;; Don't add new lines before headings
-  (setq org-blank-before-new-entry '((heading . nil) (plain-list-item . nil)))
+  ;; Add new lines before headings but not in lists
+  (setq org-blank-before-new-entry '((heading . t) (plain-list-item . nil)))
 
   ;; Display inline images on startup
   (setq org-startup-with-inline-images t)
