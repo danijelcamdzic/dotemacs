@@ -236,6 +236,10 @@
 ;; Set keybindings
 (define-key dc-buffer-map (kbd "k") 'dc/kill-background-buffers)
 
+;; Add org-agenda keybindings
+(with-eval-after-load 'org-agenda
+  (define-key org-agenda-mode-map (kbd "k") 'dc/kill-background-buffers))
+
 ;;;; Package - ibuffer
 ;;;;; Configuration
 (use-package ibuffer-sidebar
