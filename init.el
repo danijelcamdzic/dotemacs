@@ -53,7 +53,7 @@
 (setq user-full-name "Danijel Camdzic")
 (setq user-mail-address "danijelcamdzic@tuta.com")
 
-;;;; Keybindings menus
+;;;; Keybinding menus
 ;; Add keybinding menu for dired
 (define-prefix-command 'dc-dired-map)
 (global-set-key (kbd "C-c d") 'dc-dired-map)
@@ -427,7 +427,7 @@
   (add-hook 'org-mode-hook 'org-hide-drawer-all)
 
   ;; Add new lines before headings but not in lists
-  (setq org-blank-before-new-entry '((heading . t) (plain-list-item . nil)))
+  (setq org-blank-before-new-entry '((heading . auto) (plain-list-item . auto)))
 
   ;; Display inline images on startup
   (setq org-startup-with-inline-images t)
