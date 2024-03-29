@@ -582,7 +582,7 @@ or in an org file."
 log them as changed on their scheduled date, but only if their
 current state is TODO."
   (interactive)
-  (dolist (file (directory-files org-directory t "\\.org$"))
+  (dolist (file (org-agenda-files))
     (with-current-buffer (find-file-noselect file)
       (save-excursion
         (goto-char (point-min))
