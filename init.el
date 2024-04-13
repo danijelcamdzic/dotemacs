@@ -839,23 +839,6 @@ org file on the year calendar."
           "......" "----------------"))
   )
 
-;;;;; Function - Integrating org-agenda-files between Android and Linux
-(defun dc/org-agenda-adjust-org-agenda-files-paths ()
-  "Adjust the paths in `org-agenda-files` based on the system type.
-The function reads the org-agenda-files list and adjusts the paths
-based on the system type."
-  (setq org-agenda-files
-        (mapcar (lambda (file)
-                  (cond ((eq system-type 'android)
-                         (replace-regexp-in-string (regexp-quote dc-gnu-linux-home) dc-android-home
-                                                   (replace-regexp-in-string (regexp-quote dc-gnu-linux-home-extended) dc-android-home file)))
-                        (t
-                         (replace-regexp-in-string (regexp-quote dc-android-home) dc-gnu-linux-home file))))
-                org-agenda-files)))
-
-;; Call the function to adjust the paths
-(dc/org-agenda-adjust-org-agenda-files-paths)
-
 ;;;;; Function - Changing org-agenda TODO views
 (defun dc/org-agenda--switch-to-view (view-fn)
   "Switch to the given Org Agenda view function VIEW-FN and insert timeline."
@@ -893,6 +876,23 @@ based on the system type."
   (define-key org-agenda-mode-map (kbd "d") 'dc/org-agenda-day-view)
   (define-key org-agenda-mode-map (kbd "w") 'dc/org-agenda-week-view)
   (define-key org-agenda-mode-map (kbd "y") 'dc/org-agenda-year-view))
+
+;;;;; Function - Integrating org-agenda-files between Android and Linux
+(defun dc/org-agenda-adjust-org-agenda-files-paths ()
+  "Adjust the paths in `org-agenda-files` based on the system type.
+The function reads the org-agenda-files list and adjusts the paths
+based on the system type."
+  (setq org-agenda-files
+        (mapcar (lambda (file)
+                  (cond ((eq system-type 'android)
+                         (replace-regexp-in-string (regexp-quote dc-gnu-linux-home) dc-android-home
+                                                   (replace-regexp-in-string (regexp-quote dc-gnu-linux-home-extended) dc-android-home file)))
+                        (t
+                         (replace-regexp-in-string (regexp-quote dc-android-home) dc-gnu-linux-home file))))
+                org-agenda-files)))
+
+;; Call the function to adjust the paths
+(dc/org-agenda-adjust-org-agenda-files-paths)
 
 ;;;; Package - org-super-agenda
 ;;;;; Configuration
@@ -1231,7 +1231,7 @@ id[0:1]/id[2:] rule."
               (other-window 1))
           (message "No attachment directory found for node '%s'." (org-roam-node-title source-node)))))))
 
-;;;;; Function - Delete attachments from node
+;;;;; Function - Deleting attachments from node
 (defun dc/org-attach-delete-attachments-from-node ()
   "Delete marked attachments from an org-roam node using dired.
 Function presumes that the attachments directories are made according to
