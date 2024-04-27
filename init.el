@@ -1266,6 +1266,38 @@ id[0:1]/id[2:] rule."
               (other-window 1))
           (message "No attachment directory found for node '%s'." (org-roam-node-title source-node)))))))
 
+;;;;; Function - Deleting unlinked attachment folders
+(defun dc/org-attach-delete-unlinked-folders ()
+  "Find and display Org-attach directories that do not correspond to an existing Org-roam node and optionally delete them."
+  (interactive)
+  (let ((id-list (mapcar (lambda (row) (car row))
+                         (org-roam-db-query "SELECT id FROM nodes")))
+        (known-directories '())
+        (actual-directories '()))
+    (dolist (id id-list)
+      (let ((first-two (substring id 0 2))
+            (rest-id (substring id 2)))
+        (push (expand-file-name (concat first-two "/" rest-id) org-attach-id-dir) known-directories)))
+    (dolist (entry (directory-files org-attach-id-dir t))
+      (when (and (file-directory-p entry) (not (member (file-name-nondirectory entry) '("." ".."))))
+        (dolist (subdir (directory-files entry t))
+          (when (and (file-directory-p subdir) (not (member (file-name-nondirectory subdir) '("." ".."))))
+            (push subdir actual-directories)))))
+    (let ((unlinked-directories (cl-set-difference actual-directories known-directories :test 'string=)))
+      (if unlinked-directories
+          (progn
+            (with-current-buffer (get-buffer-create "*Unlinked Org-Attach Directories*")
+              (erase-buffer)
+              (dolist (dir unlinked-directories)
+                (insert dir "\n"))
+              (display-buffer (current-buffer)))
+            (if (yes-or-no-p "Unlinked directories found. Delete them?")
+                (dolist (dir unlinked-directories)
+                  (delete-directory dir t)
+                  (message "Deleted directory: %s" dir))
+              (message "No directories were deleted.")))
+        (message "All attachment directories are linked to nodes.")))))
+
 ;;;; Package - websocket
 ;;;;; Configuration
 (use-package websocket
