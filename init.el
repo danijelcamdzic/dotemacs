@@ -106,7 +106,7 @@
 (defvar dc-recordings-directory (concat dc-home-directory "Recordings/"))
 (defvar dc-videos-directory (concat dc-home-directory "Videos/"))
 
-;;;;; Function - Opening home directories in dired
+;;;;; Function - Open home directories in dired
 (defun dc/open-folder-from-home-directory ()
   "Open a folder from home directory in dired."
   (interactive)
@@ -148,7 +148,7 @@
   (setq dired-sidebar-window-fixed nil)
   )
 
-;;;;;; Function - Toggling dired-sidebar
+;;;;;; Function - Toggle dired-sidebar
 (defun dc/dired-sidebar-toggle ()
   "Toggle `dired-sidebar'."
   (interactive)
@@ -218,7 +218,7 @@
               (dc/org-agenda-day-view)
               )))
 
-;;;; Function - Killing all buffers
+;;;; Function - Kill all buffers
 (defun dc/kill-background-buffers ()
   "Kill all buffers that are not currently visible in any window, except the *Messages*, *Org Agenda*,
 *scratch* and today's Org Roam daily buffer."
@@ -247,7 +247,7 @@
   :config
   )
 
-;;;;; Function - Toggling ibuffer-sidebar
+;;;;; Function - Toggle ibuffer-sidebar
 (defun dc/ibuffer-sidebar-toggle ()
   "Toggle `ibuffer-sidebar'."
   (interactive)
@@ -374,7 +374,7 @@
   )
 
 ;;; GUI
-;;;; Function - Manipulating GUI display modes
+;;;; Function - Manipulate GUI display modes
 (defun dc/gui-hide-all-bars ()
   "Disable scroll bar, menu bar, and tool bar."
   (interactive)
@@ -474,14 +474,14 @@
 ;; Add keybindings
 (define-key dc-org-map (kbd "l") 'org-insert-link)
 
-;;;;; Function - Inserting datetime string
+;;;;; Function - Insert datetime string
 (defun dc/org-insert-current-date-time ()
   "Insert the current date and time along with the three-letter weekday name in
 the format YYYY-MM-DD Day H:M."
   (interactive)
   (insert (format-time-string "%Y-%m-%d %a %H:%M")))
 
-;;;;; Function - Clocking in and clocking out
+;;;;; Function - Clock in and clock out
 (defun dc/org-clock-in ()
   "Clock in the current org heading."
   (interactive)
@@ -505,7 +505,7 @@ the format YYYY-MM-DD Day H:M."
   (define-key org-agenda-mode-map (kbd "i") 'dc/org-clock-in)
   (define-key org-agenda-mode-map (kbd "o") 'dc/org-clock-out))
 
-;;;;; Function - Adding and removing a schedule
+;;;;; Function - Add and remove a schedule
 (defun dc/org-add-schedule ()
   "Add a scheduling timestamp to the current item in the Org Agenda or in
 an org file."
@@ -552,7 +552,7 @@ or in an org file."
   (define-key org-agenda-mode-map (kbd "a") 'dc/org-add-schedule)
   (define-key org-agenda-mode-map (kbd "r") 'dc/org-remove-schedule))
 
-;;;;; Function - Changing a TODO state
+;;;;; Function - Change a TODO state
 (defun dc/org-todo-change-state ()
   "Change state of a current heading."
   (interactive)
@@ -609,7 +609,7 @@ current state is TODO."
 (with-eval-after-load 'org-agenda
   (define-key org-agenda-mode-map (kbd "t") 'dc/org-todo-change-state))
 
-;;;;; Function - Adding notes
+;;;;; Function - Add notes
 (defun dc/org-add-note ()
   "Add a note to an org heading."
   (interactive)
@@ -641,7 +641,7 @@ current state is TODO."
 (with-eval-after-load 'org-agenda
   (define-key org-agenda-mode-map (kbd "n") 'dc/org-add-note))
 
-;;;;; Function - Visualizing logbook on calendar for notes and TODOs
+;;;;; Function - Vsualize logbook on calendar for notes and TODOs
 (defun dc/org-logbook--parse-logbook-states (logbook beg buffer)
   "Parse a logbook string and return a list of entries with states."
   (let ((lines (split-string logbook "\n" t))
@@ -839,7 +839,7 @@ org file on the year calendar."
           "......" "----------------"))
   )
 
-;;;;; Function - Changing org-agenda TODO views
+;;;;; Function - Change org-agenda TODO views
 (defun dc/org-agenda--switch-to-view (view-fn)
   "Switch to the given Org Agenda view function VIEW-FN and insert timeline."
   (if (eq major-mode 'org-agenda-mode)
@@ -877,7 +877,7 @@ org file on the year calendar."
   (define-key org-agenda-mode-map (kbd "w") 'dc/org-agenda-week-view)
   (define-key org-agenda-mode-map (kbd "y") 'dc/org-agenda-year-view))
 
-;;;;; Function - Integrating org-agenda-files between Android and Linux
+;;;;; Function - Integrate org-agenda-files between Android and Linux
 (defun dc/org-agenda-adjust-org-agenda-files-paths ()
   "Adjust the paths in `org-agenda-files` based on the system type.
 The function reads the org-agenda-files list and adjusts the paths
@@ -904,7 +904,7 @@ based on the system type."
   (org-super-agenda-mode)
   )
 
-;;;;; Function - Getting TODO parent name automatically
+;;;;; Function - Get TODO parent name automatically
 (defun dc/org-super-agenda-get-todo-parent (item)
   "Get the parent heading of ITEM, or if none, the file title or filename."
   (org-super-agenda--when-with-marker-buffer (org-super-agenda--get-marker item)
@@ -918,7 +918,7 @@ based on the system type."
 (org-super-agenda--def-auto-group parent "their parent heading or file title/filename"
   :key-form (dc/org-super-agenda-get-todo-parent item))
 
-;;;;; Function - Changing to all TODOs view
+;;;;; Function - Change to all TODOs view
 (defun dc/org-agenda-todo-view ()
   "Open Org Agenda in the todos view mode with super agenda. Use file title as groups"
   (interactive)
@@ -954,7 +954,7 @@ based on the system type."
 (define-key dc-roam-map (kbd "f") 'org-roam-node-find)
 (define-key dc-roam-map (kbd "i") 'org-roam-node-insert)
 
-;;;;; Function - Getting node hierarchy
+;;;;; Function - Get node hierarchy
 (defun dc/org-roam--get-node-heirarchy (node)
   "Get the hierarchy of NODE as a list of titles, excluding non-node headings.
 The hierarchy includes the NODE title and its ancestor node titles."
@@ -973,7 +973,7 @@ The hierarchy includes the NODE title and its ancestor node titles."
     (push title titles)
     (nreverse titles)))
 
-;;;;; Function - Displaying nodes in org-roam search
+;;;;; Function - Display nodes in org-roam search
 (defvar dc-org-roam-hierarchy-display-separator
   (propertize "->" 'face '(shadow))
   "Separator for org-roam hierarchy displaying.")
@@ -1012,7 +1012,7 @@ The hierarchy includes the NODE title and its ancestor node titles."
 (setq org-roam-node-display-template
       (concat "${hierarchy}" "${node-type}" (propertize "${colon-tags}" 'face 'org-tag)))
 
-;;;;; Function - Inserting nodes by tags
+;;;;; Function - Insert nodes by tags
 (defvar dc-org-roam-hierarchy-insert-separator
   (propertize "->" 'face '(shadow))
   "Separator for org-roam hierarchy insertion.")
@@ -1112,7 +1112,7 @@ and when nil is returned the node will be filtered out."
 ;; Add keybindings
 (define-key dc-org-map (kbd "k") 'org-attach-attach)
 
-;;;;; Function - Attaching and inserting attachment as a link
+;;;;; Function - Attach and insert attachment as a link
 (defvar dc-org-attach-search-starting-directory ""
   "Preferred starting directory to search files to attach in Org mode.")
 
@@ -1140,7 +1140,7 @@ The attached file is copied to the attachment directory and a link is inserted a
 ;; Add keybindings
 (define-key dc-org-map (kbd "j") 'dc/org-attach-file-and-insert-link)
 
-;;;;; Function - Copying attachments between org-roam nodes
+;;;;; Function - Copy attachments between org-roam nodes
 (defvar dc-org-attach-source-node nil
   "Temporary variable to store the source node for attachment copying.")
 
@@ -1187,7 +1187,7 @@ id[0:1]/id[2:] rule."
               (other-window 1))
           (message "No attachment directory found for node '%s'." (org-roam-node-title source-node)))))))
 
-;;;;; Function - Moving attachments between org-roam nodes
+;;;;; Function - Move attachments between org-roam nodes
 (defun dc/org-attach-move-attachments-from-node-to-node ()
   "Move marked attachments from one org-roam node to another using dired.
 Function presumes that the attachments directories are made according to
@@ -1231,7 +1231,7 @@ id[0:1]/id[2:] rule."
               (other-window 1))
           (message "No attachment directory found for node '%s'." (org-roam-node-title source-node)))))))
 
-;;;;; Function - Deleting attachments from node
+;;;;; Function - Delete attachments from node
 (defun dc/org-attach-delete-attachments-from-node ()
   "Delete marked attachments from an org-roam node using dired.
 Function presumes that the attachments directories are made according to
@@ -1266,7 +1266,7 @@ id[0:1]/id[2:] rule."
               (other-window 1))
           (message "No attachment directory found for node '%s'." (org-roam-node-title source-node)))))))
 
-;;;;; Function - Deleting unlinked attachment folders
+;;;;; Function - Delete unlinked attachment folders
 (defun dc/org-attach-delete-unlinked-folders ()
   "Find and display Org-attach directories that do not correspond to an existing Org-roam node and optionally delete them."
   (interactive)
@@ -1319,7 +1319,7 @@ id[0:1]/id[2:] rule."
   :ensure t
   )
 
-;;;;; Function - Inserting of transcluded nodes
+;;;;; Function - Insert transcluded nodes
 (defun dc/org-tranclusion-set-link-prefix ()
   "Sets the dc-org-roam-link-prefix to #+transclude: .
 Used to add a prefix to the function which inserts org-roam
@@ -1351,7 +1351,7 @@ nodes based on tags."
     (setq alert-default-icon "ic_popup_reminder"))
   )
 
-;;;;; Function - Supporting Android notifications
+;;;;; Function - Support Android notifications
 (defun dc/alert-android-notifications-notify (info)
   "Send notifications using `android-notifications-notify'.
 `android-notifications-notify' is a built-in function in the native Emacs
@@ -1399,7 +1399,7 @@ Android port."
   (org-alert-enable)
   )
 
-;;;;; Function - Changing title of notifications
+;;;;; Function - Change title of notifications
 (defvar dc-org-alert-title-type 'custom
   "Control the title type for `org-alert' notifications.
   /home/danijelcamdzic/Projects/dotemacs/ Possible values are:
@@ -1486,7 +1486,7 @@ use filename."
 ;; Add keybindings
 (define-key dc-org-map (kbd "p") 'org-download-clipboard)
 
-;;;;; Function - Prompting for screenshot filename
+;;;;; Function - Prompt for screenshot filename
 (defun dc/org-download-clipboard--prompt-for-name-advice (orig-fun &optional basename)
   "Advice to prompt for a basename before calling `org-download-clipboard'."
   (message "Calling advice function")
@@ -1526,7 +1526,7 @@ use filename."
   (setq org-media-note-screenshot-link-type-when-save-in-attach-dir 'attach)
   )
 
-;;;;; Function - Enabling mpv-android support on Android
+;;;;; Function - Enable mpv-android support on Android
 ;; This should only be done on Android
 (when (eq system-type 'android)
   (defun dc/mpv-start--android-advice (orig-fun &rest args)
@@ -1555,7 +1555,7 @@ am start -a android.intent.action.VIEW -t video/* -d file:///storage/emulated/0/
   ;; Add advice to mpv-start so it open the correct player each time
   (advice-add 'mpv-start :around #'dc/mpv-start--android-advice))
 
-;;;;; Function - Prepending timestamp to screenshot filename
+;;;;; Function - Prepend timestamp to screenshot filename
 (defun dc/org-media-note--format-picture-file-name--prepend-timestamp-advice (orig-func &rest args)
   "Advice to prepend the current timestamp to the filename created by `org-media-note--format-picture-file-name'."
   (let ((original-filename (apply orig-func args))
@@ -1564,7 +1564,7 @@ am start -a android.intent.action.VIEW -t video/* -d file:///storage/emulated/0/
 
 (advice-add 'org-media-note--format-picture-file-name :around #'dc/org-media-note--format-picture-file-name--prepend-timestamp-advice)
 
-;;;;; Function - Removing invalid characters from filename
+;;;;; Function - Remove invalid characters from filename
 (defun dc/remove-invalid-characters-from-filename (filename)
   "Remove invalid characters from filename in order for it to sync to Android using syncthing."
   (replace-regexp-in-string "[/*\":<>?|]" "" filename))
@@ -1611,7 +1611,7 @@ am start -a android.intent.action.VIEW -t video/* -d file:///storage/emulated/0/
 (define-key dc-bookmark-map (kbd "n") 'bmkp-bmenu-filter-bookmark-name-incrementally)
 (define-key dc-bookmark-map (kbd "t") 'bmkp-bmenu-filter-tags-incrementally)
 
-;;;;; Function - Integrating bookmarks between Android and Linux
+;;;;; Function - Integrate bookmarks between Android and Linux
 (defun dc/bookmark-jump--modify-bookmark-path-advice (orig-fun &rest args)
   "Modify the bookmark filename and directory based on system type before opening."
   (let* ((bookmark (car args))
@@ -1647,7 +1647,7 @@ am start -a android.intent.action.VIEW -t video/* -d file:///storage/emulated/0/
 (advice-add 'bookmark-jump :around #'dc/bookmark-jump--modify-bookmark-path-advice)
 
 ;;; Date & time
-;;;; Function - Overriding current time
+;;;; Function - Override current time
 (defvar dc-adjusted-time nil
   "Adjusted time. This time will replace current time.")
 
@@ -1728,7 +1728,7 @@ am start -a android.intent.action.VIEW -t video/* -d file:///storage/emulated/0/
   (add-hook 'buffer-list-update-hook 'auth-source-forget-all-cached)
   )
 
-;;;;; Function - Getting auth-source secrets
+;;;;; Function - Get auth-source secrets
 (defun dc/auth-display-all (search-string)
   "Select an authentication entry based on SEARCH-STRING from `auth-sources', and briefly display its value.
 Function decrypts all auth-source files and lets you search through them to find the SEARCH-STRING."
@@ -1772,7 +1772,7 @@ Function decrypts only the chosen auth-source file and lets you search through i
                  (propertize (plist-get auth :host) 'face 'font-lock-keyword-face)
                  (propertize password 'face 'font-lock-string-face))))))
 
-;;;;; Function - Getting passwords
+;;;;; Function - Get passwords
 (defun dc/password-display-all ()
   "Uses `dc/auth-get-secret-all' function to retrieve the passwords from all files in `auth-sources' by searching for PASS string."
   (interactive)
@@ -1784,7 +1784,7 @@ by searching for PASS string."
   (interactive)
   (dc/auth-search "PASS:"))
 
-;;;;; Function - Getting TOTP
+;;;;; Function - Get TOTP
 (require 'bindat)
 (require 'gnutls)
 (require 'hexl)
