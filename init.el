@@ -1081,45 +1081,8 @@ and when nil is returned the node will be filtered out."
                                   arrow-chain))))))
   (deactivate-mark))
 
-(defun dc/org-roam-insert-nodes-by-property (property-name property-value &optional filter-fn)
-  "Inserts all Org-roam nodes with a specific property.
-PROPERTY-NAME is the name of the property.
-PROPERTY-VALUE is the value of the property to filter nodes.
-FILTER-FN is a function to further filter nodes: it takes an `org-roam-node',
-and when nil is returned the node will be filtered out."
-  (interactive "sProperty Name: \nsProperty Value: ")
-  (unwind-protect
-      (atomic-change-group
-        (let* ((all-nodes (org-roam-node-list))
-               (filtered-nodes (cl-remove-if-not
-                                (lambda (node)
-                                  (let ((prop-pair (assoc property-name (org-roam-node-properties node))))
-                                    (and prop-pair
-                                         (string= (cdr prop-pair) property-value)
-                                         (or (not filter-fn) (funcall filter-fn node)))))
-                                all-nodes))
-               (sorted-nodes (sort filtered-nodes
-                                   (lambda (a b)
-                                     (let ((hierarchy-a (mapconcat #'identity (dc/org-roam--get-node-heirarchy a) dc-org-roam-hierarchy-insert-separator))
-                                           (hierarchy-b (mapconcat #'identity (dc/org-roam--get-node-heirarchy b) dc-org-roam-hierarchy-insert-separator)))
-                                       (string< hierarchy-a hierarchy-b))))))
-          (dolist (node sorted-nodes)
-            (let* ((id (org-roam-node-id node))
-                   (hierarchy (dc/org-roam--get-node-heirarchy node))
-                   (arrow-chain (if (> (length hierarchy) 1)
-                                    (mapconcat #'identity hierarchy dc-org-roam-hierarchy-insert-separator)
-                                  (org-roam-node-title node)))
-                   (link (org-link-make-string (concat "id:" id) arrow-chain)))
-              (insert (concat dc-org-roam-link-prefix link))
-              (insert "\n")
-              (run-hook-with-args 'org-roam-post-node-insert-hook
-                                  id
-                                  arrow-chain))))))
-  (deactivate-mark))
-
 ;; Add keybindings
 (define-key dc-roam-map (kbd "a") 'dc/org-roam-insert-nodes-by-tags)
-(define-key dc-roam-map (kbd "p") 'dc/org-roam-insert-nodes-by-property)
 
 ;;;; Package - org-attach
 ;;;;; Configuration
