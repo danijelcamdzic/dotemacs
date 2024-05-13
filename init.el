@@ -1119,6 +1119,7 @@ and when nil is returned the node will be filtered out."
 
 ;; Add keybindings
 (define-key dc-roam-map (kbd "a") 'dc/org-roam-insert-nodes-by-tags)
+(define-key dc-roam-map (kbd "p") 'dc/org-roam-insert-nodes-by-property)
 
 ;;;; Package - org-attach
 ;;;;; Configuration
