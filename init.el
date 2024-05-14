@@ -1030,43 +1030,61 @@ The hierarchy includes the NODE title and its ancestor node titles."
   (interactive)
   (setq dc-org-roam-link-prefix prefix-string))
 
-(defun dc/org-roam-insert-nodes-by-tags(keywords exclude-keywords &optional filter-fn)
-  "Inserts all Org-roam nodes connected to the provided keywords and not connected to the exclude keywords.
-KEYWORDS is a space-separated list of keywords to find the connected nodes.
-EXCLUDE-KEYWORDS is a space-separated list of keywords to exclude nodes.
-FILTER-FN is a function to filter out nodes: it takes an `org-roam-node',
-and when nil is returned the node will be filtered out."
-  (interactive "sKeywords: \nsExclude Keywords: ")
-  (unwind-protect
-      (atomic-change-group
-        (let* ((all-nodes (org-roam-node-list))
-               (keywords-list (if (string= keywords "") '() (split-string keywords " ")))
-               (exclude-keywords-list (if (string= exclude-keywords "") '() (split-string exclude-keywords " ")))
-               (filtered-nodes (cl-remove-if-not
-                                (lambda (node)
-                                  (and (if keywords-list
-                                           (cl-every (lambda (keyword)
-                                                       (or (string-match-p (regexp-quote keyword) (org-roam-node-title node))
-                                                           (cl-some (lambda (tag)
-                                                                      (string-match-p (regexp-quote keyword) tag))
-                                                                    (org-roam-node-tags node))))
-                                                     keywords-list)
-                                         t)
-                                       (if exclude-keywords-list
-                                           (cl-notany (lambda (exclude-keyword)
-                                                        (or (string-match-p (regexp-quote exclude-keyword) (org-roam-node-title node))
-                                                            (cl-some (lambda (tag)
-                                                                       (string-match-p (regexp-quote exclude-keyword) tag))
-                                                                     (org-roam-node-tags node))))
-                                                      exclude-keywords-list)
-                                         t)
-                                       (or (not filter-fn) (funcall filter-fn node))))
-                                all-nodes))
-               (sorted-nodes (sort filtered-nodes
-                                   (lambda (a b)
-                                     (let ((hierarchy-a (mapconcat #'identity (dc/org-roam--get-node-heirarchy a) dc-org-roam-hierarchy-insert-separator))
-                                           (hierarchy-b (mapconcat #'identity (dc/org-roam--get-node-heirarchy b) dc-org-roam-hierarchy-insert-separator)))
-                                       (string< hierarchy-a hierarchy-b))))))
+(defun dc/org-roam-insert-nodes-by-attributes ()
+  "Interactive function to insert Org-roam nodes filtered by keywords and/or properties into the current buffer.
+This function allows the user to choose between filtering nodes based on keywords or properties, or both.
+For keywords, the user can specify keywords to include and exclude.
+For properties, the user specifies the property name and value to match.
+The nodes are then inserted with their hierarchy and linked using Org-roam's ID scheme."
+  (interactive)
+  (let ((use-keywords (yes-or-no-p "Filter by keywords? "))
+        keywords exclude-keywords
+        (use-properties)
+        property-name property-value
+        all-nodes filtered-nodes sorted-nodes)
+    (when use-keywords
+      (setq keywords (read-string "Include keywords: "))
+      (setq exclude-keywords (read-string "Exclude keywords: ")))
+    (setq use-properties (yes-or-no-p "Filter by property? "))
+    (when use-properties
+      (setq property-name (read-string "Property name: "))
+      (setq property-value (read-string "Property value: ")))
+    (unwind-protect
+        (atomic-change-group
+          (setq all-nodes (org-roam-node-list))
+          (setq filtered-nodes
+                (cl-remove-if-not
+                 (lambda (node)
+                   (and (if use-keywords
+                            (let ((keywords-list (if (string= keywords "") '() (split-string keywords " ")))
+                                  (exclude-keywords-list (if (string= exclude-keywords "") '() (split-string exclude-keywords " "))))
+                              (and (or (null keywords-list) ;; Check included keywords
+                                       (cl-some (lambda (keyword)
+                                                  (or (string-match-p (regexp-quote keyword) (org-roam-node-title node))
+                                                      (cl-some (lambda (tag)
+                                                                 (string-match-p (regexp-quote keyword) tag))
+                                                               (org-roam-node-tags node))))
+                                                keywords-list))
+                                   (or (null exclude-keywords-list) ;; Check excluded keywords
+                                       (cl-notany (lambda (exclude-keyword)
+                                                    (or (string-match-p (regexp-quote exclude-keyword) (org-roam-node-title node))
+                                                        (cl-some (lambda (tag)
+                                                                   (string-match-p (regexp-quote exclude-keyword) tag))
+                                                                 (org-roam-node-tags node))))
+                                                  exclude-keywords-list))))
+                          t)
+                        (if use-properties
+                            (let ((prop-pair (assoc property-name (org-roam-node-properties node))))
+                              (and prop-pair
+                                   (string= (cdr prop-pair) property-value)))
+                          t)))
+                 all-nodes))
+          (setq sorted-nodes
+                (sort filtered-nodes
+                      (lambda (a b)
+                        (let ((hierarchy-a (mapconcat #'identity (dc/org-roam--get-node-heirarchy a) dc-org-roam-hierarchy-insert-separator))
+                              (hierarchy-b (mapconcat #'identity (dc/org-roam--get-node-heirarchy b) dc-org-roam-hierarchy-insert-separator)))
+                          (string< hierarchy-a hierarchy-b)))))
           (dolist (node sorted-nodes)
             (let* ((id (org-roam-node-id node))
                    (hierarchy (dc/org-roam--get-node-heirarchy node))
@@ -1074,15 +1092,12 @@ and when nil is returned the node will be filtered out."
                                     (mapconcat #'identity hierarchy dc-org-roam-hierarchy-insert-separator)
                                   (org-roam-node-title node)))
                    (link (org-link-make-string (concat "id:" id) arrow-chain)))
-              (insert (concat dc-org-roam-link-prefix link))
-              (insert "\n")
-              (run-hook-with-args 'org-roam-post-node-insert-hook
-                                  id
-                                  arrow-chain))))))
-  (deactivate-mark))
+              (insert (concat dc-org-roam-link-prefix link "\n"))
+              (run-hook-with-args 'org-roam-post-node-insert-hook id arrow-chain))))
+      (deactivate-mark))))
 
 ;; Add keybindings
-(define-key dc-roam-map (kbd "a") 'dc/org-roam-insert-nodes-by-tags)
+(define-key dc-roam-map (kbd "a") 'dc/org-roam-insert-nodes-by-attributes)
 
 ;;;; Package - org-attach
 ;;;;; Configuration
