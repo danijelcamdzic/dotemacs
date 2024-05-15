@@ -1031,53 +1031,72 @@ The hierarchy includes the NODE title and its ancestor node titles."
   (setq dc-org-roam-link-prefix prefix-string))
 
 (defun dc/org-roam-insert-nodes-by-attributes ()
-  "Interactive function to insert Org-roam nodes filtered by keywords and/or properties into the current buffer.
-This function allows the user to choose between filtering nodes based on keywords or properties, or both.
-For keywords, the user can specify keywords to include and exclude.
-For properties, the user specifies the property name and value to match.
-The nodes are then inserted with their hierarchy and linked using Org-roam's ID scheme."
+  "Interactive function to insert Org-roam nodes filtered by titles, tags, and properties into the current buffer.
+This function allows the user to choose between filtering nodes based on titles, tags, or properties, individually or in combination.
+For titles and tags, the user can specify keywords to include and exclude.
+The user can continuously add different properties to filter by, specifying the property name and value for each.
+Nodes that match all specified criteria are then inserted with their hierarchy and linked using Org-roam's ID scheme."
   (interactive)
-  (let ((use-keywords (yes-or-no-p "Filter by keywords? "))
-        keywords exclude-keywords
-        (use-properties)
-        property-name property-value
+  (let ((use-titles (y-or-n-p "Filter by title? "))
+        title-keywords title-exclude-keywords
+        (use-tags)
+        tag-keywords tag-exclude-keywords
+        property-list
         all-nodes filtered-nodes sorted-nodes)
-    (when use-keywords
-      (setq keywords (read-string "Include keywords: "))
-      (setq exclude-keywords (read-string "Exclude keywords: ")))
-    (setq use-properties (yes-or-no-p "Filter by property? "))
-    (when use-properties
-      (setq property-name (read-string "Property name: "))
-      (setq property-value (read-string "Property value: ")))
+    
+    (when use-titles
+      (setq title-keywords (read-string "Include title keywords: "))
+      (setq title-exclude-keywords (read-string "Exclude title keywords: ")))
+    
+    (setq use-tags (y-or-n-p "Filter by tags? "))
+    (when use-tags
+      (setq tag-keywords (read-string "Include tags: "))
+      (setq tag-exclude-keywords (read-string "Exclude tags: ")))
+    
+    (while (y-or-n-p "Filter by a property? ")
+      (let ((property-name (read-string "Property name: "))
+            (property-value (read-string "Property value: ")))
+        (push (cons property-name property-value) property-list)))
+
     (unwind-protect
         (atomic-change-group
           (setq all-nodes (org-roam-node-list))
           (setq filtered-nodes
                 (cl-remove-if-not
                  (lambda (node)
-                   (and (if use-keywords
-                            (let ((keywords-list (if (string= keywords "") '() (split-string keywords " ")))
-                                  (exclude-keywords-list (if (string= exclude-keywords "") '() (split-string exclude-keywords " "))))
-                              (and (or (null keywords-list) ;; Check included keywords
+                   (and (if use-titles
+                            (let ((title-include-list (if (string= title-keywords "") '() (split-string title-keywords " ")))
+                                  (title-exclude-list (if (string= title-exclude-keywords "") '() (split-string title-exclude-keywords " "))))
+                              (and (or (null title-include-list)
                                        (cl-some (lambda (keyword)
-                                                  (or (string-match-p (regexp-quote keyword) (org-roam-node-title node))
-                                                      (cl-some (lambda (tag)
-                                                                 (string-match-p (regexp-quote keyword) tag))
-                                                               (org-roam-node-tags node))))
-                                                keywords-list))
-                                   (or (null exclude-keywords-list) ;; Check excluded keywords
+                                                  (string-match-p (regexp-quote keyword) (org-roam-node-title node)))
+                                                title-include-list))
+                                   (or (null title-exclude-list)
                                        (cl-notany (lambda (exclude-keyword)
-                                                    (or (string-match-p (regexp-quote exclude-keyword) (org-roam-node-title node))
-                                                        (cl-some (lambda (tag)
-                                                                   (string-match-p (regexp-quote exclude-keyword) tag))
-                                                                 (org-roam-node-tags node))))
-                                                  exclude-keywords-list))))
+                                                    (string-match-p (regexp-quote exclude-keyword) (org-roam-node-title node)))
+                                                  title-exclude-list))))
                           t)
-                        (if use-properties
-                            (let ((prop-pair (assoc property-name (org-roam-node-properties node))))
-                              (and prop-pair
-                                   (string= (cdr prop-pair) property-value)))
-                          t)))
+                        (if use-tags
+                            (let ((tag-include-list (if (string= tag-keywords "") '() (split-string tag-keywords " ")))
+                                  (tag-exclude-list (if (string= tag-exclude-keywords "") '() (split-string tag-exclude-keywords " "))))
+                              (and (or (null tag-include-list)
+                                       (cl-some (lambda (keyword)
+                                                  (cl-some (lambda (tag)
+                                                             (string-match-p (regexp-quote keyword) tag))
+                                                           (org-roam-node-tags node)))
+                                                tag-include-list))
+                                   (or (null tag-exclude-list)
+                                       (cl-notany (lambda (exclude-keyword)
+                                                    (cl-some (lambda (tag)
+                                                               (string-match-p (regexp-quote exclude-keyword) tag))
+                                                             (org-roam-node-tags node)))
+                                                  tag-exclude-list))))
+                          t)
+                        (cl-every (lambda (prop-pair)
+                                    (let ((node-prop (assoc (car prop-pair) (org-roam-node-properties node))))
+                                      (and node-prop
+                                           (string= (cdr node-prop) (cdr prop-pair)))))
+                                  property-list)))
                  all-nodes))
           (setq sorted-nodes
                 (sort filtered-nodes
