@@ -1115,8 +1115,71 @@ Nodes that match all specified criteria are then inserted with their hierarchy a
               (run-hook-with-args 'org-roam-post-node-insert-hook id arrow-chain))))
       (deactivate-mark))))
 
-;; Add keybindings
-(define-key dc-roam-map (kbd "a") 'dc/org-roam-insert-nodes-by-attributes)
+(defun dc/org-roam-find-nodes-by-attributes ()
+  "Interactive function to find  Org-roam nodes filtered by titles, tags, and properties.
+This function allows the user to choose between filtering nodes based on titles, tags, or properties, individually or in combination.
+For titles and tags, the user can specify keywords to include and exclude.
+The user can continuously add different properties to filter by, specifying the property name and value for each.
+Nodes that match all specified criteria are then displayed with their hierarchy."
+  (interactive)
+  (let ((use-titles (y-or-n-p "Filter by title? "))
+        title-keywords title-exclude-keywords
+        (use-tags)
+        tag-keywords tag-exclude-keywords
+        property-list
+        all-nodes filtered-nodes sorted-nodes)
+    
+    (when use-titles
+      (setq title-keywords (read-string "Include title keywords: "))
+      (setq title-exclude-keywords (read-string "Exclude title keywords: ")))
+    
+    (setq use-tags (y-or-n-p "Filter by tags? "))
+    (when use-tags
+      (setq tag-keywords (read-string "Include tags: "))
+      (setq tag-exclude-keywords (read-string "Exclude tags: ")))
+    
+    (while (y-or-n-p "Filter by a property? ")
+      (let ((property-name (read-string "Property name: "))
+            (property-value (read-string "Property value: ")))
+        (push (cons property-name property-value) property-list)))
+
+    (let ((filter-fn (lambda (node)
+                       (and (if use-titles
+                                (let ((title-include-list (if (string= title-keywords "") '() (split-string title-keywords " ")))
+                                      (title-exclude-list (if (string= title-exclude-keywords "") '() (split-string title-exclude-keywords " "))))
+                                  (and (or (null title-include-list)
+                                           (cl-some (lambda (keyword)
+                                                      (string-match-p (regexp-quote keyword) (org-roam-node-title node)))
+                                                    title-include-list))
+                                       (or (null title-exclude-list)
+                                           (cl-notany (lambda (exclude-keyword)
+                                                        (string-match-p (regexp-quote exclude-keyword) (org-roam-node-title node)))
+                                                      title-exclude-list))))
+                              t)
+                            (if use-tags
+                                (let ((tag-include-list (if (string= tag-keywords "") '() (split-string tag-keywords " ")))
+                                      (tag-exclude-list (if (string= tag-exclude-keywords "") '() (split-string tag-exclude-keywords " "))))
+                                  (and (or (null tag-include-list)
+                                           (cl-some (lambda (keyword)
+                                                      (cl-some (lambda (tag)
+                                                                 (string-match-p (regexp-quote keyword) tag))
+                                                               (org-roam-node-tags node)))
+                                                    tag-include-list))
+                                       (or (null tag-exclude-list)
+                                           (cl-notany (lambda (exclude-keyword)
+                                                        (cl-some (lambda (tag)
+                                                                   (string-match-p (regexp-quote exclude-keyword) tag))
+                                                                 (org-roam-node-tags node)))
+                                                      tag-exclude-list))))
+                              t)
+                            (cl-every (lambda (prop-pair)
+                                        (let ((node-prop (assoc (car prop-pair) (org-roam-node-properties node))))
+                                          (and node-prop
+                                               (string= (cdr node-prop) (cdr prop-pair)))))
+                                      property-list)))))
+      (let ((node (org-roam-node-read nil filter-fn)))
+        (when node
+          (org-roam-node-visit node))))))
 
 ;;;; Package - org-attach
 ;;;;; Configuration
