@@ -1416,7 +1416,7 @@ id[0:1]/id[2:] rule."
   )
 
 ;;;;; Function - Insert transcluded nodes
-(defun dc/org-tranclusion-set-link-prefix ()
+(defun dc/org-transclusion-set-link-prefix ()
   "Sets the dc-org-roam-link-prefix to #+transclude: .
 Used to add a prefix to the function which inserts org-roam
 nodes based on tags."
