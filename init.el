@@ -918,11 +918,17 @@ based on the system type."
 (org-super-agenda--def-auto-group parent "their parent heading or file title/filename"
   :key-form (dc/org-super-agenda-get-todo-parent item))
 
+;;;;; Function - Redefine TODO category group to not include CATEGORY:
+(org-super-agenda--def-auto-group category "their org-category property"
+  :key-form (org-super-agenda--when-with-marker-buffer (org-super-agenda--get-marker item)
+              (org-get-category))
+  :header-form key)
+
 ;;;;; Function - Change to all TODOs view
 (defun dc/org-agenda-todo-view ()
-  "Open Org Agenda in the todos view mode with super agenda. Use file title as groups"
+  "Open Org Agenda in the todos view mode with super agenda. Use category as groups"
   (interactive)
-  (let ((org-super-agenda-groups '((:auto-parent t)))
+  (let ((org-super-agenda-groups '((:auto-category t)))
         (org-agenda-sorting-strategy '((todo priority-down category-keep))))
     (org-agenda nil "t")
     (setq org-super-agenda-groups '())))
@@ -1025,9 +1031,10 @@ The hierarchy includes the NODE title and its ancestor node titles."
   (interactive)
   (setq dc-org-roam-link-prefix ""))
 
-(defun dc/org-roam-set-link-prefix (prefix-string)
+(defun dc/org-roam-set-link-prefix ()
   "Sets the dc-org-roam-link-prefix to prefix-string."
   (interactive)
+  (setq prefix-string (read-string "Prefix string: "))
   (setq dc-org-roam-link-prefix prefix-string))
 
 (defun dc/org-roam-insert-nodes-by-attributes ()
