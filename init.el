@@ -173,7 +173,7 @@
       make-backup-files nil)
 
 ;; Set custom file
-(setq custom-file (concat dc-documents-directory "Emacs/custom.el"))
+(setq custom-file (concat dc-documents-directory "custom.el"))
 (load custom-file 'noerror)
 
 ;; Create shortcuts in Android with volume-up and volume-down keys
@@ -1684,7 +1684,7 @@ am start -a android.intent.action.VIEW -t video/* -d file:///storage/emulated/0/
 (use-package eww
   :config
   ;; Set default eww-bookmarks directory
-  (setq eww-bookmarks-directory (concat dc-documents-directory "Emacs/"))
+  (setq eww-bookmarks-directory dc-documents-directory)
   )
 
 ;;;; Package - bookmark
@@ -1692,7 +1692,7 @@ am start -a android.intent.action.VIEW -t video/* -d file:///storage/emulated/0/
 (use-package bookmark
   :config
   ;; Set default bookmark file
-  (setq bookmark-default-file (concat dc-documents-directory "Emacs/bookmarks"))
+  (setq bookmark-default-file (concat dc-documents-directory "bookmarks.el"))
   )
 
 ;;;; Package - bookmark+
@@ -1821,7 +1821,7 @@ am start -a android.intent.action.VIEW -t video/* -d file:///storage/emulated/0/
   :config
   ;; Set auth-sources files
   (setq auth-sources
-        (cl-loop for file in (directory-files (concat dc-documents-directory "Emacs/.auth-sources/") t "\\.gpg$")
+        (cl-loop for file in (directory-files (concat dc-documents-directory ".auth-sources/") t "\\.gpg$")
                  collect `(:source ,file)))
 
   ;; Enable authinfo-mode for auth-source files
@@ -1991,5 +1991,11 @@ Function decrypts only the chosen auth-source file and lets you search through i
                  (propertize code 'face 'font-lock-string-face)
                  time-remaining))
       code)))
+
+;;;; Package - ledger-mode
+;;;;; Configuration
+(use-package ledger-mode
+  :ensure t
+  )
 
 ;;; init.el ends here
