@@ -429,6 +429,12 @@
   ;; Add new lines before headings but not in lists
   (setq org-blank-before-new-entry '((heading . auto) (plain-list-item . auto)))
 
+  ;; Display new lines at the end of heading when folded
+  (setq org-cycle-separator-lines -1)
+
+  ;; Oepn the org files with headings folded
+  (setq org-startup-folded 't)
+
   ;; Display inline images on startup
   (setq org-startup-with-inline-images t)
 
