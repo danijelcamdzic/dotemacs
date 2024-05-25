@@ -1992,6 +1992,7 @@ Function decrypts only the chosen auth-source file and lets you search through i
                  time-remaining))
       code)))
 
+;;; Finances
 ;;;; Package - ledger-mode
 ;;;;; Configuration
 (use-package ledger-mode
