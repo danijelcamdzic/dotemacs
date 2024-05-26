@@ -815,7 +815,7 @@ org file on the year calendar."
   :after org
   :config  
   ;; Set the prefix format for agenda items
-  (setq org-agenda-prefix-format  '((agenda . "  %t ")
+  (setq org-agenda-prefix-format  '((agenda . "  %t %c: ")
                                     (todo . "%t ")
                                     (tags . "")
                                     (search . "%i")))
@@ -910,27 +910,13 @@ based on the system type."
   (org-super-agenda-mode)
   )
 
-;;;;; Function - Get TODO parent name automatically
-(defun dc/org-super-agenda-get-todo-parent (item)
-  "Get the parent heading of ITEM, or if none, the file title or filename."
-  (org-super-agenda--when-with-marker-buffer (org-super-agenda--get-marker item)
-    (if (org-up-heading-safe)
-        (org-entry-get nil "ITEM") 
-      (let ((keywords (org-collect-keywords '("TITLE"))))
-        (if keywords
-            (car (cdr (assoc "TITLE" keywords))) 
-          (file-name-nondirectory (buffer-file-name))))))) 
-
-(org-super-agenda--def-auto-group parent "their parent heading or file title/filename"
-  :key-form (dc/org-super-agenda-get-todo-parent item))
-
-;;;;; Function - Redefine TODO category group to not include CATEGORY:
+;;;;; Function - Redefine TODO category group to not include CATEGORY: string
 (org-super-agenda--def-auto-group category "their org-category property"
   :key-form (org-super-agenda--when-with-marker-buffer (org-super-agenda--get-marker item)
               (org-get-category))
   :header-form key)
 
-;;;;; Function - Change to all TODOs view
+;;;;; Function - Show all TODOs view
 (defun dc/org-agenda-todo-view ()
   "Open Org Agenda in the todos view mode with super agenda. Use category as groups"
   (interactive)
@@ -1511,54 +1497,46 @@ Android port."
 ;;;;; Function - Change title of notifications
 (defvar dc-org-alert-title-type 'custom
   "Control the title type for `org-alert' notifications.
-  /home/danijelcamdzic/Projects/dotemacs/ Possible values are:
-      - 'custom: The usual workings of org-alert package. Uses `org-alert-notification-title'
-                 as the title of notifications sent.
-      - 'parent: Uses the immediate parent heading of the TODO as the title of the notification.
-                 If the TODO does not have a parent, it uses the file title instead. If the file
-                 does not have a title, it uses the filename as the title for notifications.")
+   Possible values are:
+      - 'custom': Uses `org-alert-notification-title' as the title of notifications sent.
+      - 'category': Uses the category property from the org file. If the category is not defined,
+                    it defaults to the filename.")
 
-(defun dc/org-alert--get-todo-parent ()
-  "Get the immediate parent heading of a TODO. If no parents, use file title. If no file title
-use filename."
-  (if (org-up-heading-safe)
-      (org-get-heading t t t t)
-    (let ((title (cdr (assoc "TITLE" (org-collect-keywords '("TITLE"))))))
-      (if (and title (listp title))
-          (car title)
-        title))))
+(defun dc/org-alert--get-category ()
+  "Retrieve the category from the current org entry, or use the filename if no category exists."
+  (or (org-entry-get nil "CATEGORY" t)
+      (file-name-nondirectory (buffer-file-name))))
 
-(defun org-alert--parse-entry--use-parent-as-title-advice (orig-fun &rest args)
-  "Advice for `org-alert--parse-entry' function. It adapts it to accept parameters from the
-`dc/org-alert--get-todo-parent' function which retrieves the parent heading or file title/name."
+(defun org-alert--parse-entry--use-category-as-title-advice (orig-fun &rest args)
+  "Advice for `org-alert--parse-entry' function to use the category as the notification title."
   (let ((head (org-alert--strip-text-properties (org-get-heading t t t t)))
-        (parent-or-file-head (dc/org-alert--get-todo-parent)))
+        (category-or-file (dc/org-alert--get-category)))
     (cl-destructuring-bind (body cutoff) (org-alert--grab-subtree)
       (if (string-match org-alert-time-match-string body)
-          (list head parent-or-file-head (match-string 1 body) cutoff)
+          (list head category-or-file (match-string 1 body) cutoff)
         nil))))
 
-(defun org-alert--dispatch--use-parent-as-title-advice (orig-fun &rest args)
-  "Advice for `org-alert--dispatch' function."
+(defun org-alert--dispatch--use-category-as-title-advice (orig-fun &rest args)
+  "Advice for `org-alert--dispatch' function to dispatch notifications with category as title."
   (let ((entry (org-alert--parse-entry)))
     (when entry
-      (cl-destructuring-bind (head parent-or-file-head time cutoff) entry
+      (cl-destructuring-bind (head category-or-file time cutoff) entry
         (if time
             (when (org-alert--check-time time cutoff)
-              (alert (concat time ": " head) :title parent-or-file-head))
-          (alert head :title parent-or-file-head))))))
+              (alert (concat time ": " head) :title category-or-file))
+          (alert head :title category-or-file))))))
 
 (defun dc/org-alert-update-advices ()
-  "Add or remove advice based on the value of `org-alert-title-type'."
-  (cond ((eq dc-org-alert-title-type 'parent)
-         (advice-add 'org-alert--parse-entry :around #'org-alert--parse-entry--use-parent-as-title-advice)
-         (advice-add 'org-alert--dispatch :around #'org-alert--dispatch--use-parent-as-title-advice))
+  "Add or remove advice based on the value of `dc-org-alert-title-type'."
+  (cond ((eq dc-org-alert-title-type 'category)
+         (advice-add 'org-alert--parse-entry :around #'org-alert--parse-entry--use-category-as-title-advice)
+         (advice-add 'org-alert--dispatch :around #'org-alert--dispatch--use-category-as-title-advice))
         ((eq dc-org-alert-title-type 'custom)
-         (advice-remove 'org-alert--parse-entry #'org-alert--parse-entry--use-parent-as-title-advice)
-         (advice-remove 'org-alert--dispatch #'org-alert--dispatch--use-parent-as-title-advice))))
+         (advice-remove 'org-alert--parse-entry #'org-alert--parse-entry--use-category-as-title-advice)
+         (advice-remove 'org-alert--dispatch #'org-alert--dispatch--use-category-as-title-advice))))
 
-;; Set up 'parent mode
-(setq dc-org-alert-title-type 'parent)
+;; Set up category mode
+(setq dc-org-alert-title-type 'category) 
 
 ;; Update to set up or remove advices based on dc-org-alert-title-type
 (dc/org-alert-update-advices)
