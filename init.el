@@ -54,6 +54,9 @@
 (setq user-mail-address "danijelcamdzic@tuta.com")
 
 ;;;; Keybinding menus
+;; Add keybinding for help
+(global-set-key (kbd "C-c h") 'apropos-command)
+
 ;; Add keybinding menu for dired
 (define-prefix-command 'dc-dired-map)
 (global-set-key (kbd "C-c d") 'dc-dired-map)
