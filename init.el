@@ -1979,4 +1979,19 @@ Function decrypts only the chosen auth-source file and lets you search through i
                  time-remaining))
       code)))
 
+;;; Finances
+;;;; Package - ledger-mode
+;;;;; Configuration
+(use-package ledger-mode
+  :ensure t
+  )
+
+;;;;; Function - Open ledger file
+(defvar dc-ledger-file (concat dc-documents-directory "finances.ledger"))
+
+(defun dc/open-ledger-file ()
+  "Open ledger file`."
+  (interactive)
+  (find-file dc-ledger-file))
+
 ;;; init.el ends here
