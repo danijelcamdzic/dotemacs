@@ -3,8 +3,11 @@
 ;;; Code:
 
 ;;; Package managers
+
 ;;;; Package - package
+
 ;;;;; Configuration
+
 (require 'package)
 
 ;; Temporarily disable signature checks
@@ -14,13 +17,17 @@
 (package-initialize)
 
 ;;;; Archive - melpa
+
 ;;;;; Configuration
+
 ;; Add melpa package archives
 (add-to-list 'package-archives
              '("melpa" . "http://melpa.org/packages/") t)
 
 ;;;; Package - use-package
+
 ;;;;; Configuration
+
 ;; Install use-package
 (unless (package-installed-p 'use-package)
   (package-refresh-contents)
@@ -29,7 +36,9 @@
 (require 'use-package)
 
 ;;;; Package - quelpa
+
 ;;;;; Configuration
+
 (use-package quelpa
   :ensure t
   :init
@@ -39,7 +48,9 @@
   )
 
 ;;;; Package - quelpa-use-package
+
 ;;;;; Configuration
+
 (use-package quelpa-use-package
   :ensure t
   :after (quelpa)
@@ -49,11 +60,13 @@
   )
 
 ;;; User
+
 ;; User name and email
 (setq user-full-name "Danijel Camdzic")
 (setq user-mail-address "danijelcamdzic@tuta.com")
 
 ;;;; Keybinding menus
+
 ;; Add keybinding for help
 (global-set-key (kbd "C-c h") 'apropos-command)
 
@@ -86,6 +99,7 @@
 (global-set-key (kbd "C-c r") 'dc-roam-map)
 
 ;;;; Directories
+
 ;; Define the home directories variables
 (defvar dc-android-home "/storage/emulated/0/")
 (defvar dc-gnu-linux-home "~/")
@@ -110,6 +124,7 @@
 (defvar dc-videos-directory (concat dc-home-directory "Videos/"))
 
 ;;;;; Function - Open home directories in dired
+
 (defun dc/open-folder-from-home-directory ()
   "Open a folder from home directory in dired."
   (interactive)
@@ -143,7 +158,9 @@
 (define-key dc-dired-map (kbd "r") 'dc/regex-open-folder-from-home-directory)
 
 ;;;;; Package - dired-sidebar
+
 ;;;;;; Configuration
+
 (use-package dired-sidebar
   :ensure t
   :config
@@ -152,6 +169,7 @@
   )
 
 ;;;;;; Function - Toggle dired-sidebar
+
 (defun dc/dired-sidebar-toggle ()
   "Toggle `dired-sidebar'."
   (interactive)
@@ -160,7 +178,8 @@
 ;; Add keybindings
 (define-key dc-dired-map (kbd "s") 'dc/dired-sidebar-toggle)
 
-;;; Theme
+;;; Themes
+
 ;; Install gruvbox-theme
 (use-package gruvbox-theme
   :ensure t
@@ -170,6 +189,7 @@
 (load-theme 'gruvbox-dark-hard t)
 
 ;;; Buffers
+
 ;; Disable backup and lock files
 (setq create-lockfiles nil
       auto-save-default nil
@@ -222,6 +242,7 @@
               )))
 
 ;;;; Function - Kill all buffers
+
 (defun dc/kill-background-buffers ()
   "Kill all buffers that are not currently visible in any window, except the *Messages*, *Org Agenda*,
 *scratch* and today's Org Roam daily buffer."
@@ -244,13 +265,16 @@
   (define-key org-agenda-mode-map (kbd "k") 'dc/kill-background-buffers))
 
 ;;;; Package - ibuffer
+
 ;;;;; Configuration
+
 (use-package ibuffer-sidebar
   :ensure t
   :config
   )
 
 ;;;;; Function - Toggle ibuffer-sidebar
+
 (defun dc/ibuffer-sidebar-toggle ()
   "Toggle `ibuffer-sidebar'."
   (interactive)
@@ -260,7 +284,9 @@
 (define-key dc-buffer-map (kbd "s") 'dc/ibuffer-sidebar-toggle)
 
 ;;;; Package - imenu-list
+
 ;;;;; Configuration
+
 (use-package imenu-list
   :ensure t
   :config
@@ -270,6 +296,7 @@
 (define-key dc-buffer-map (kbd "l") 'imenu-list-smart-toggle)
 
 ;;; Editor
+
 ;; Indentation
 (setq-default indent-tabs-mode nil
               tab-width 4
@@ -285,11 +312,14 @@
 (global-display-line-numbers-mode 0)
 
 ;;;; Visual
+
 ;; Enable outline-minor-mode as soon as .el file is opened
 (add-hook 'emacs-lisp-mode-hook 'outline-minor-mode)
 
 ;;;;; Package - outline-minor-faces
+
 ;;;;;; Configuration
+
 (use-package outline-minor-faces
   :ensure t
   :after outline
@@ -298,13 +328,17 @@
   )
 
 ;;;;; Package - pretty-hydra
+
 ;;;;;; Configuration
+
 (use-package pretty-hydra
   :ensure t
   )
 
 ;;;;; Package - which-key
+
 ;;;;;; Configuration
+
 (use-package which-key
   :ensure t
   :config
@@ -313,12 +347,16 @@
   )
 
 ;;;;; Package - doc-view
+
 ;; Set higher resolution for viewing documents
 (setq doc-view-resolution 400)
 
 ;;;; Completion
+
 ;;;;; Package - company
+
 ;;;;;; Configuration
+
 (use-package company
   :ensure t
   :config
@@ -330,13 +368,17 @@
   )
 
 ;;;;; Package - orderless
+
 ;;;;;; Configuration
+
 (use-package orderless
   :ensure t
   )
 
 ;;;;; Package - vertico
+
 ;;;;;; Configuration
+
 (use-package vertico
   :after orderless
   :ensure t
@@ -351,7 +393,9 @@
   )
 
 ;;;; Programming
+
 ;;;;; C/Cpp
+
 (defun dc/setup-c-cpp-mode ()
   "Set basic c and cpp offset."
   (setq c-basic-offset 4))
@@ -363,6 +407,7 @@
 (add-hook 'c-mode-common-hook 'dc/setup-c-cpp-mode)
 
 ;;;;; Python
+
 ;; Set the indentation level for Python code
 (setq python-indent-offset 4)
 
@@ -370,14 +415,19 @@
 (add-hook 'python-mode-hook (lambda () (display-line-numbers-mode 1)))
 
 ;;;; Version control
+
 ;;;;; Package - magit
+
 ;;;;;; Configuration
+
 (use-package magit
   :ensure t
   )
 
 ;;; GUI
+
 ;;;; Function - Manipulate GUI display modes
+
 (defun dc/gui-hide-all-bars ()
   "Disable scroll bar, menu bar, and tool bar."
   (interactive)
@@ -406,8 +456,11 @@
 (define-key dc-gui-map (kbd "s") 'dc/gui-scrolless-mode)
 
 ;;; Org-mode
+
 ;;;; Package - org
+
 ;;;;; Configuration
+
 (use-package org
   :ensure t
   :config
@@ -484,6 +537,7 @@
 (define-key dc-org-map (kbd "l") 'org-insert-link)
 
 ;;;;; Function - Insert datetime string
+
 (defun dc/org-insert-current-date-time ()
   "Insert the current date and time along with the three-letter weekday name in
 the format YYYY-MM-DD Day H:M."
@@ -491,6 +545,7 @@ the format YYYY-MM-DD Day H:M."
   (insert (format-time-string "%Y-%m-%d %a %H:%M")))
 
 ;;;;; Function - Clock in and clock out
+
 (defun dc/org-clock-in ()
   "Clock in the current org heading."
   (interactive)
@@ -515,6 +570,7 @@ the format YYYY-MM-DD Day H:M."
   (define-key org-agenda-mode-map (kbd "o") 'dc/org-clock-out))
 
 ;;;;; Function - Add and remove a schedule
+
 (defun dc/org-add-schedule ()
   "Add a scheduling timestamp to the current item in the Org Agenda or in
 an org file."
@@ -562,6 +618,7 @@ or in an org file."
   (define-key org-agenda-mode-map (kbd "r") 'dc/org-remove-schedule))
 
 ;;;;; Function - Change a TODO state
+
 (defun dc/org-todo-change-state ()
   "Change state of a current heading."
   (interactive)
@@ -619,6 +676,7 @@ current state is TODO."
   (define-key org-agenda-mode-map (kbd "t") 'dc/org-todo-change-state))
 
 ;;;;; Function - Add notes
+
 (defun dc/org-add-note ()
   "Add a note to an org heading."
   (interactive)
@@ -651,6 +709,7 @@ current state is TODO."
   (define-key org-agenda-mode-map (kbd "n") 'dc/org-add-note))
 
 ;;;;; Function - Vsualize logbook on calendar for notes and TODOs
+
 (defun dc/org-logbook--parse-logbook-states (logbook beg buffer)
   "Parse a logbook string and return a list of entries with states."
   (let ((lines (split-string logbook "\n" t))
@@ -813,7 +872,9 @@ org file on the year calendar."
   (define-key org-agenda-mode-map (kbd "N") 'dc/org-logbook-display-notes-on-calendar))
 
 ;;;; Package - org-agenda
+
 ;;;;; Configuration
+
 (use-package org-agenda
   :after org
   :config  
@@ -849,6 +910,7 @@ org file on the year calendar."
   )
 
 ;;;;; Function - Change org-agenda TODO views
+
 (defun dc/org-agenda--switch-to-view (view-fn)
   "Switch to the given Org Agenda view function VIEW-FN and insert timeline."
   (if (eq major-mode 'org-agenda-mode)
@@ -887,6 +949,7 @@ org file on the year calendar."
   (define-key org-agenda-mode-map (kbd "y") 'dc/org-agenda-year-view))
 
 ;;;;; Function - Integrate org-agenda-files between Android and Linux
+
 (defun dc/org-agenda-adjust-org-agenda-files-paths ()
   "Adjust the paths in `org-agenda-files` based on the system type.
 The function reads the org-agenda-files list and adjusts the paths
@@ -904,7 +967,9 @@ based on the system type."
 (dc/org-agenda-adjust-org-agenda-files-paths)
 
 ;;;; Package - org-super-agenda
+
 ;;;;; Configuration
+
 (use-package org-super-agenda
   :after org-agenda
   :ensure t
@@ -914,12 +979,14 @@ based on the system type."
   )
 
 ;;;;; Function - Redefine TODO category group to not include CATEGORY: string
+
 (org-super-agenda--def-auto-group category "their org-category property"
   :key-form (org-super-agenda--when-with-marker-buffer (org-super-agenda--get-marker item)
               (org-get-category))
   :header-form key)
 
 ;;;;; Function - Show all TODOs view
+
 (defun dc/org-agenda-todo-view ()
   "Open Org Agenda in the todos view mode with super agenda. Use category as groups"
   (interactive)
@@ -936,7 +1003,9 @@ based on the system type."
   (define-key org-agenda-mode-map (kbd "v") 'dc/org-agenda-todo-view))
 
 ;;;; Package - org-roam
+
 ;;;;; Configuration
+
 (use-package org-roam
   :after org
   :ensure t
@@ -956,6 +1025,7 @@ based on the system type."
 (define-key dc-roam-map (kbd "i") 'org-roam-node-insert)
 
 ;;;;; Function - Get node hierarchy
+
 (defun dc/org-roam--get-node-heirarchy (node)
   "Get the hierarchy of NODE as a list of titles, excluding non-node headings.
 The hierarchy includes the NODE title and its ancestor node titles."
@@ -975,6 +1045,7 @@ The hierarchy includes the NODE title and its ancestor node titles."
     (nreverse titles)))
 
 ;;;;; Function - Display nodes in org-roam search
+
 (defvar dc-org-roam-hierarchy-display-separator
   (propertize "->" 'face '(shadow))
   "Separator for org-roam hierarchy displaying.")
@@ -1014,6 +1085,7 @@ The hierarchy includes the NODE title and its ancestor node titles."
       (concat "${hierarchy}" "${node-type}" (propertize "${colon-tags}" 'face 'org-tag)))
 
 ;;;;; Function - Insert nodes by tags
+
 (defvar dc-org-roam-hierarchy-insert-separator
   (propertize "->" 'face '(shadow))
   "Separator for org-roam hierarchy insertion.")
@@ -1184,7 +1256,9 @@ Nodes that match all specified criteria are then displayed with their hierarchy.
           (org-roam-node-visit node))))))
 
 ;;;; Package - org-attach
+
 ;;;;; Configuration
+
 (use-package org-attach
   :after org
   :config
@@ -1211,6 +1285,7 @@ Nodes that match all specified criteria are then displayed with their hierarchy.
 (define-key dc-org-map (kbd "k") 'org-attach-attach)
 
 ;;;;; Function - Attach and insert attachment as a link
+
 (defvar dc-org-attach-search-starting-directory ""
   "Preferred starting directory to search files to attach in Org mode.")
 
@@ -1239,6 +1314,7 @@ The attached file is copied to the attachment directory and a link is inserted a
 (define-key dc-org-map (kbd "j") 'dc/org-attach-file-and-insert-link)
 
 ;;;;; Function - Copy attachments between org-roam nodes
+
 (defvar dc-org-attach-source-node nil
   "Temporary variable to store the source node for attachment copying.")
 
@@ -1286,6 +1362,7 @@ id[0:1]/id[2:] rule."
           (message "No attachment directory found for node '%s'." (org-roam-node-title source-node)))))))
 
 ;;;;; Function - Move attachments between org-roam nodes
+
 (defun dc/org-attach-move-attachments-from-node-to-node ()
   "Move marked attachments from one org-roam node to another using dired.
 Function presumes that the attachments directories are made according to
@@ -1330,6 +1407,7 @@ id[0:1]/id[2:] rule."
           (message "No attachment directory found for node '%s'." (org-roam-node-title source-node)))))))
 
 ;;;;; Function - Delete attachments from node
+
 (defun dc/org-attach-delete-attachments-from-node ()
   "Delete marked attachments from an org-roam node using dired.
 Function presumes that the attachments directories are made according to
@@ -1365,6 +1443,7 @@ id[0:1]/id[2:] rule."
           (message "No attachment directory found for node '%s'." (org-roam-node-title source-node)))))))
 
 ;;;;; Function - Delete unlinked attachment folders
+
 (defun dc/org-attach-delete-unlinked-folders ()
   "Find and display Org-attach directories that do not correspond to an existing Org-roam node and optionally delete them."
   (interactive)
@@ -1397,27 +1476,34 @@ id[0:1]/id[2:] rule."
         (message "All attachment directories are linked to nodes.")))))
 
 ;;;; Package - websocket
+
 ;;;;; Configuration
+
 (use-package websocket
   :after org-roam
   :ensure t
   )
 
 ;;;; Package - org-roam-ui
+
 ;;;;; Configuration
+
 (use-package org-roam-ui
   :after org-roam
   :ensure t
   )
 
 ;;;; Package - org-transclusion
+
 ;;;;; Configuration
+
 (use-package org-transclusion
   :after org
   :ensure t
   )
 
 ;;;;; Function - Insert transcluded nodes
+
 (defun dc/org-transclusion-set-link-prefix ()
   "Sets the dc-org-roam-link-prefix to #+transclude: .
 Used to add a prefix to the function which inserts org-roam
@@ -1439,7 +1525,9 @@ nodes based on tags."
 (define-key dc-org-map (kbd "z") 'dc/org-transclusion-insert-node)
 
 ;;;; Package - alert
+
 ;;;;; Configuration
+
 (use-package alert
   :ensure t
   :config
@@ -1450,6 +1538,7 @@ nodes based on tags."
   )
 
 ;;;;; Function - Support Android notifications
+
 (defun dc/alert-android-notifications-notify (info)
   "Send notifications using `android-notifications-notify'.
 `android-notifications-notify' is a built-in function in the native Emacs
@@ -1471,7 +1560,9 @@ Android port."
                     :notifier #'dc/alert-android-notifications-notify)
 
 ;;;; Package - org-alert
+
 ;;;;; Configuration
+
 (use-package org-alert
   :ensure t
   :after org
@@ -1498,6 +1589,7 @@ Android port."
   )
 
 ;;;;; Function - Change title of notifications
+
 (defvar dc-org-alert-title-type 'custom
   "Control the title type for `org-alert' notifications.
    Possible values are:
@@ -1545,13 +1637,17 @@ Android port."
 (dc/org-alert-update-advices)
 
 ;;;; Package - org-tempo
+
 ;;;;; Configuration
+
 (use-package org-tempo
   :after org
   )
 
 ;;;; Package - org-analyzer
+
 ;;;;; Configuration
+
 (use-package org-analyzer
   :after org
   :ensure t
@@ -1561,7 +1657,9 @@ Android port."
   )
 
 ;;;; Package - org-download
+
 ;;;;; Configuration
+
 (use-package org-download
   :ensure t
   :after org
@@ -1577,6 +1675,7 @@ Android port."
 (define-key dc-org-map (kbd "p") 'org-download-clipboard)
 
 ;;;;; Function - Prompt for screenshot filename
+
 (defun dc/org-download-clipboard--prompt-for-name-advice (orig-fun &optional basename)
   "Advice to prompt for a basename before calling `org-download-clipboard'."
   (message "Calling advice function")
@@ -1588,14 +1687,18 @@ Android port."
 (advice-add 'org-download-clipboard :around #'dc/org-download-clipboard--prompt-for-name-advice)
 
 ;;;; Package - org-ref
+
 ;;;;; Configuration
+
 (use-package org-ref
   :ensure t
   :after org
   )
 
 ;;;; Package - org-noter
+
 ;;;;; Configuration
+
 (use-package org-noter
   :ensure t  
   :after org 
@@ -1605,7 +1708,9 @@ Android port."
   )
 
 ;;;; Package - org-media-note
+
 ;;;;; Configuration
+
 (use-package org-media-note
   :quelpa (org-media-note :fetcher github :repo "yuchen-lea/org-media-note")
   :hook (org-mode .  org-media-note-mode)
@@ -1617,6 +1722,7 @@ Android port."
   )
 
 ;;;;; Function - Enable mpv-android support on Android
+
 ;; This should only be done on Android
 (when (eq system-type 'android)
   (defun dc/mpv-start--android-advice (orig-fun &rest args)
@@ -1646,6 +1752,7 @@ am start -a android.intent.action.VIEW -t video/* -d file:///storage/emulated/0/
   (advice-add 'mpv-start :around #'dc/mpv-start--android-advice))
 
 ;;;;; Function - Prepend timestamp to screenshot filename
+
 (defun dc/org-media-note--format-picture-file-name--prepend-timestamp-advice (orig-func &rest args)
   "Advice to prepend the current timestamp to the filename created by `org-media-note--format-picture-file-name'."
   (let ((original-filename (apply orig-func args))
@@ -1655,6 +1762,7 @@ am start -a android.intent.action.VIEW -t video/* -d file:///storage/emulated/0/
 (advice-add 'org-media-note--format-picture-file-name :around #'dc/org-media-note--format-picture-file-name--prepend-timestamp-advice)
 
 ;;;;; Function - Remove invalid characters from filename
+
 (defun dc/remove-invalid-characters-from-filename (filename)
   "Remove invalid characters from filename in order for it to sync to Android using syncthing."
   (replace-regexp-in-string "[/*\":<>?|]" "" filename))
@@ -1666,8 +1774,11 @@ am start -a android.intent.action.VIEW -t video/* -d file:///storage/emulated/0/
 (advice-add 'org-media-note--format-picture-file-name :around #'dc/org-media-note--format-picture-file-name--remove-invalid-characters-from-filename-advice)
 
 ;;; Browsing & bookmarks
+
 ;;;; Package - eww
+
 ;;;;; Configuration
+
 (use-package eww
   :config
   ;; Set default eww-bookmarks directory
@@ -1675,7 +1786,9 @@ am start -a android.intent.action.VIEW -t video/* -d file:///storage/emulated/0/
   )
 
 ;;;; Package - bookmark
+
 ;;;;; Configuration
+
 (use-package bookmark
   :config
   ;; Set default bookmark file
@@ -1683,7 +1796,9 @@ am start -a android.intent.action.VIEW -t video/* -d file:///storage/emulated/0/
   )
 
 ;;;; Package - bookmark+
+
 ;;;;; Configuration
+
 (use-package bookmark+
   :quelpa (bookmark+ :fetcher github :repo "emacsmirror/bookmark-plus")
   :config
@@ -1702,6 +1817,7 @@ am start -a android.intent.action.VIEW -t video/* -d file:///storage/emulated/0/
 (define-key dc-bookmark-map (kbd "t") 'bmkp-bmenu-filter-tags-incrementally)
 
 ;;;;; Function - Integrate bookmarks between Android and Linux
+
 (defun dc/bookmark-jump--modify-bookmark-path-advice (orig-fun &rest args)
   "Modify the bookmark filename and directory based on system type before opening."
   (let* ((bookmark (car args))
@@ -1737,7 +1853,9 @@ am start -a android.intent.action.VIEW -t video/* -d file:///storage/emulated/0/
 (advice-add 'bookmark-jump :around #'dc/bookmark-jump--modify-bookmark-path-advice)
 
 ;;; Date & time
+
 ;;;; Function - Override current time
+
 (defvar dc-adjusted-time nil
   "Adjusted time. This time will replace current time.")
 
@@ -1753,7 +1871,9 @@ am start -a android.intent.action.VIEW -t video/* -d file:///storage/emulated/0/
   (or dc-adjusted-time (current-time)))
 
 ;;;; Package - time-stamp
+
 ;;;;; Configuration
+
 (use-package time-stamp
   :config
   ;; Set up time-stamp format
@@ -1766,7 +1886,9 @@ am start -a android.intent.action.VIEW -t video/* -d file:///storage/emulated/0/
   )
 
 ;;;; Package - calendar
+
 ;;;;; Configuration
+
 (use-package calendar
   :config
   ;; Set calendar to start on Monday
@@ -1774,8 +1896,11 @@ am start -a android.intent.action.VIEW -t video/* -d file:///storage/emulated/0/
   )
 
 ;;; Encryption & authentication
+
 ;;;; Package - epa
+
 ;;;;; Configuration
+
 (use-package epa
   :ensure t
   :config
@@ -1802,7 +1927,9 @@ am start -a android.intent.action.VIEW -t video/* -d file:///storage/emulated/0/
   )
 
 ;;;; Package - auth-source
+
 ;;;;; Configuration
+
 (use-package auth-source
   :ensure t
   :config
@@ -1819,6 +1946,7 @@ am start -a android.intent.action.VIEW -t video/* -d file:///storage/emulated/0/
   )
 
 ;;;;; Function - Get auth-source secrets
+
 (defun dc/auth-display-all (search-string)
   "Select an authentication entry based on SEARCH-STRING from `auth-sources', and briefly display its value.
 Function decrypts all auth-source files and lets you search through them to find the SEARCH-STRING."
@@ -1863,6 +1991,7 @@ Function decrypts only the chosen auth-source file and lets you search through i
                  (propertize password 'face 'font-lock-string-face))))))
 
 ;;;;; Function - Get passwords
+
 (defun dc/password-display-all ()
   "Uses `dc/auth-get-secret-all' function to retrieve the passwords from all files in `auth-sources' by searching for PASS string."
   (interactive)
@@ -1875,6 +2004,7 @@ by searching for PASS string."
   (dc/auth-search "PASS:"))
 
 ;;;;; Function - Get TOTP
+
 (require 'bindat)
 (require 'gnutls)
 (require 'hexl)
@@ -1980,13 +2110,17 @@ Function decrypts only the chosen auth-source file and lets you search through i
       code)))
 
 ;;; Finances
+
 ;;;; Package - ledger-mode
+
 ;;;;; Configuration
+
 (use-package ledger-mode
   :ensure t
   )
 
 ;;;;; Function - Open ledger file
+
 (defvar dc-ledger-file (concat dc-documents-directory "finances.ledger"))
 
 (defun dc/open-ledger-file ()
