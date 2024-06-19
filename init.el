@@ -10,8 +10,8 @@
 
 (require 'package)
 
-;; Enable package signature checks
-(setq package-check-signature t)
+;; Disable package signature checks
+(setq package-check-signature nil)
 
 ;; Initialize packages
 (package-initialize)
@@ -185,7 +185,7 @@
   :ensure t
   )
 
-;; Set gruvbox-theme as the system theme
+;; Set gruvbox-dark-hard as the system theme
 (load-theme 'gruvbox-dark-hard t)
 
 ;;; Buffers
