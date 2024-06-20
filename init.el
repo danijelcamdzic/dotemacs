@@ -203,8 +203,8 @@
   (setq doom-themes-enable-bold t    
         doom-themes-enable-italic t))
 
-;; Set doom-feather-dark as the system theme
-(load-theme 'doom-feather-dark t)
+;; Set doom-tomorrow-night as the system theme
+(load-theme 'doom-tomorrow-night t)
 
 ;;;; Fonts
 
