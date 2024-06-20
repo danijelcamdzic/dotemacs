@@ -527,6 +527,7 @@
   ;; Configure heading logs to be logged in "LOGBOOK" drawer
   (setq org-log-into-drawer t)
   (setq org-log-note-clock-out t)
+  (setq org-log-states-order-reversed t)
   
   ;; Set path type to relative so it works on all platforms
   (setq org-link-file-path-type 'relative)
