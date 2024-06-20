@@ -178,15 +178,42 @@
 ;; Add keybindings
 (define-key dc-dired-map (kbd "s") 'dc/dired-sidebar-toggle)
 
-;;; Themes
+;;; Appearance
 
-;; Install gruvbox-theme
+;;;; Themes
+
+;;;;; Package - gruvbox-theme
+
+;;;;;; Configuration
+
 (use-package gruvbox-theme
   :ensure t
   )
 
 ;; Set gruvbox-dark-hard as the system theme
-(load-theme 'gruvbox-dark-hard t)
+;; (load-theme 'gruvbox-dark-hard t)
+
+;;;;; Package - Doom-themes
+
+;;;;;; Configuration
+
+(use-package doom-themes
+  :ensure t
+  :config
+  (setq doom-themes-enable-bold t    
+        doom-themes-enable-italic t))
+
+;; Set doom-feather-dark as the system theme
+(load-theme 'doom-feather-dark t)
+
+;;;; Fonts
+
+;; Set font depending on the system (could be the same font)
+(cond
+ ((eq system-type 'android)
+  (set-frame-font "-SRC-Hack-regular-normal-normal-*-13-*-*-*-m-0-iso10646-1" nil t))
+ ((eq system-type 'gnu/linux)
+  (set-frame-font "-SRC-Hack-regular-normal-normal-*-13-*-*-*-m-0-iso10646-1" nil t)))
 
 ;;; Buffers
 
