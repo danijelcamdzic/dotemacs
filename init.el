@@ -944,7 +944,14 @@ org file on the year calendar."
   (interactive)
   (dc/org-agenda--switch-to-view 'org-agenda-year-view))
 
-;; Note: To see full logbook view press 'l + [' on day, week or year agenda views.
+(defun dc/org-agenda-open-logbook-mode ()
+  "Open logbook mode in Org Agenda. To see full logbook view manually press
+'l + [' on day, week or year agenda views."
+  (interactive)
+  (if (eq major-mode 'org-agenda-mode)
+      (progn
+        (org-agenda-log-mode)
+        (org-agenda-manipulate-query-add))))
 
 ;; Add keybindings
 (define-key dc-agenda-map (kbd "d") 'dc/org-agenda-day-view)
