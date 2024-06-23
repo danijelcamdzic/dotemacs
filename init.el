@@ -11,6 +11,9 @@
 (require 'package)
 
 ;; Disable package signature checks
+;; Some packages don't have signatures so
+;; installing with Melpa creates problems
+;; if package signature check is enabled
 (setq package-check-signature nil)
 
 ;; Initialize packages
@@ -59,28 +62,42 @@
   (quelpa-use-package-activate-advice)
   )
 
+;;; Appearance
+
+;;;; Themes
+
+;; Use monokai theme as system theme
+(load-theme 'monokai t)
+
+;;;; Fonts
+
+;; Don't change default font
+
 ;;; User
 
 ;; User name and email
 (setq user-full-name "Danijel Camdzic")
 (setq user-mail-address "danijelcamdzic@tuta.com")
 
-;;;; Keybinding menus
+;;;; Keybindings
 
 ;; Add keybinding for help
 (global-set-key (kbd "C-c h") 'apropos-command)
 
+;; Add keybinding for rgrep
+(global-set-key (kbd "C-c r") 'rgrep)
+
 ;; Add keybinding menu for dired
 (define-prefix-command 'dc-dired-map)
-(global-set-key (kbd "C-c d") 'dc-dired-map)
+(global-set-key (kbd "C-c D") 'dc-dired-map)
 
 ;; Add keybinding menu for buffers
 (define-prefix-command 'dc-buffer-map)
-(global-set-key (kbd "C-c b") 'dc-buffer-map)
+(global-set-key (kbd "C-c B") 'dc-buffer-map)
 
 ;; Add keybinding menu for GUI
 (define-prefix-command 'dc-gui-map)
-(global-set-key (kbd "C-c g") 'dc-gui-map)
+(global-set-key (kbd "C-c G") 'dc-gui-map)
 
 ;; Add keybinding menu for bookmarks
 (define-prefix-command 'dc-bookmark-map)
@@ -88,15 +105,15 @@
 
 ;; Add keybinding menu for org
 (define-prefix-command 'dc-org-map)
-(global-set-key (kbd "C-c o") 'dc-org-map)
+(global-set-key (kbd "C-c O") 'dc-org-map)
 
 ;; Add keybinding menu for agenda
 (define-prefix-command 'dc-agenda-map)
-(global-set-key (kbd "C-c a") 'dc-agenda-map)
+(global-set-key (kbd "C-c A") 'dc-agenda-map)
 
 ;; Add keybinding menu for org-roam
 (define-prefix-command 'dc-roam-map)
-(global-set-key (kbd "C-c r") 'dc-roam-map)
+(global-set-key (kbd "C-c R") 'dc-roam-map)
 
 ;;;; Directories
 
@@ -178,53 +195,7 @@
 ;; Add keybindings
 (define-key dc-dired-map (kbd "s") 'dc/dired-sidebar-toggle)
 
-;;; Appearance
-
-;;;; Themes
-
-;;;;; Package - gruvbox-theme
-
-;;;;;; Configuration
-
-(use-package gruvbox-theme
-  :ensure t
-  )
-
-;; Set gruvbox-dark-hard as the system theme
-;; (load-theme 'gruvbox-dark-hard t)
-
-;;;;; Package - Doom-themes
-
-;;;;;; Configuration
-
-(use-package doom-themes
-  :ensure t
-  :config
-  (setq doom-themes-enable-bold t    
-        doom-themes-enable-italic t))
-
-;; Set doom-tomorrow-night as the system theme
-(load-theme 'doom-tomorrow-night t)
-
-;;;; Fonts
-
-;; Set font depending on the system (could be the same font)
-(cond
- ((eq system-type 'android)
-  (set-frame-font "-SRC-Hack-regular-normal-normal-*-13-*-*-*-m-0-iso10646-1" nil t))
- ((eq system-type 'gnu/linux)
-  (set-frame-font "-SRC-Hack-regular-normal-normal-*-13-*-*-*-m-0-iso10646-1" nil t)))
-
-;;; Buffers
-
-;; Disable backup and lock files
-(setq create-lockfiles nil
-      auto-save-default nil
-      make-backup-files nil)
-
-;; Set custom file
-(setq custom-file (concat dc-documents-directory "custom.el"))
-(load custom-file 'noerror)
+;;; Commands
 
 ;; Create shortcuts in Android with volume-up and volume-down keys
 (when (eq system-type 'android)
@@ -242,6 +213,17 @@
       (global-set-key (kbd "<volume-down>") command)))
   )
 
+;;; Buffers
+
+;; Disable backup and lock files
+(setq create-lockfiles nil
+      auto-save-default nil
+      make-backup-files nil)
+
+;; Set custom file
+(setq custom-file (concat dc-documents-directory "custom.el"))
+(load custom-file 'noerror)
+
 ;; Change buffer behavior on Android
 ;; Since screen size on Android is not suitable (for me) to use
 ;; split screen, I choose to open each buffer in full screen mode
@@ -258,6 +240,20 @@
 
 ;; Remove fringes from buffers
 (set-fringe-mode 0)
+
+;; Indentation
+(setq-default indent-tabs-mode nil
+              tab-width 4
+              indent-line-function 'insert-tab)
+
+;; Text faces
+(custom-set-faces
+ '(bold ((t (:foreground "#008000" :weight bold))))
+ '(italic ((t (:foreground "#B0A030" :slant italic))))
+ '(strike-through ((t (:foreground "#8B0000" :strike-through t)))))
+
+;; Disable line numbers
+(global-display-line-numbers-mode 0)
 
 ;; Open org-agenda day view and org-roam daily note on startup
 ;; (unless called with a file argument)
@@ -322,49 +318,31 @@
 ;; Set keybindings
 (define-key dc-buffer-map (kbd "l") 'imenu-list-smart-toggle)
 
-;;; Editor
+;;;; Package - outline-minor-faces
 
-;; Indentation
-(setq-default indent-tabs-mode nil
-              tab-width 4
-              indent-line-function 'insert-tab)
-
-;; Text faces
-(custom-set-faces
- '(bold ((t (:foreground "#008000" :weight bold))))
- '(italic ((t (:foreground "#B0A030" :slant italic))))
- '(strike-through ((t (:foreground "#8B0000" :strike-through t)))))
-
-;; Disable line numbers
-(global-display-line-numbers-mode 0)
-
-;;;; Visual
-
-;; Enable outline-minor-mode as soon as .el file is opened
-(add-hook 'emacs-lisp-mode-hook 'outline-minor-mode)
-
-;;;;; Package - outline-minor-faces
-
-;;;;;; Configuration
+;;;;; Configuration
 
 (use-package outline-minor-faces
   :ensure t
   :after outline
-  :config (add-hook 'outline-minor-mode-hook
-                    #'outline-minor-faces-mode)
+  :config
+  (add-hook 'outline-minor-mode-hook
+            #'outline-minor-faces-mode)
   )
 
-;;;;; Package - pretty-hydra
+;; Enable outline-minor-mode as soon as .el file is opened
+(add-hook 'emacs-lisp-mode-hook 'outline-minor-mode)
 
-;;;;;; Configuration
+;;;; Package - doc-view
 
-(use-package pretty-hydra
-  :ensure t
-  )
+;; Set higher resolution for viewing documents
+(setq doc-view-resolution 400)
 
-;;;;; Package - which-key
+;;; Completion
 
-;;;;;; Configuration
+;;;; Package - which-key
+
+;;;;; Configuration
 
 (use-package which-key
   :ensure t
@@ -373,12 +351,13 @@
   (which-key-mode)
   )
 
-;;;;; Package - doc-view
+;;;; Package - pretty-hydra
 
-;; Set higher resolution for viewing documents
-(setq doc-view-resolution 400)
+;;;;; Configuration
 
-;;;; Completion
+(use-package pretty-hydra
+  :ensure t
+  )
 
 ;;;;; Package - company
 
@@ -419,9 +398,9 @@
         completion-category-overrides '((file (styles . (partial-completion)))))
   )
 
-;;;; Programming
+;;; Programming
 
-;;;;; C/Cpp
+;;;; C/Cpp
 
 (defun dc/setup-c-cpp-mode ()
   "Set basic c and cpp offset."
@@ -433,7 +412,7 @@
 ;; Set hook to set indentation when in c/cpp file
 (add-hook 'c-mode-common-hook 'dc/setup-c-cpp-mode)
 
-;;;;; Python
+;;;; Python
 
 ;; Set the indentation level for Python code
 (setq python-indent-offset 4)
@@ -965,6 +944,8 @@ org file on the year calendar."
   (interactive)
   (dc/org-agenda--switch-to-view 'org-agenda-year-view))
 
+;; Note: To see full logbook view press 'l + [' on day, week or year agenda views.
+
 ;; Add keybindings
 (define-key dc-agenda-map (kbd "d") 'dc/org-agenda-day-view)
 (define-key dc-agenda-map (kbd "w") 'dc/org-agenda-week-view)
@@ -1072,7 +1053,7 @@ The hierarchy includes the NODE title and its ancestor node titles."
     (push title titles)
     (nreverse titles)))
 
-;;;;; Function - Display nodes in org-roam search
+;;;;; Function - Display of nodes in org-roam search
 
 (defvar dc-org-roam-hierarchy-display-separator
   (propertize "->" 'face '(shadow))
@@ -1112,7 +1093,7 @@ The hierarchy includes the NODE title and its ancestor node titles."
 (setq org-roam-node-display-template
       (concat "${hierarchy}" "${node-type}" (propertize "${colon-tags}" 'face 'org-tag)))
 
-;;;;; Function - Insert nodes by tags
+;;;;; Function - Insert and display nodes by attribute (name, tags, property)
 
 (defvar dc-org-roam-hierarchy-insert-separator
   (propertize "->" 'face '(shadow))
@@ -1132,7 +1113,7 @@ The hierarchy includes the NODE title and its ancestor node titles."
   (setq prefix-string (read-string "Prefix string: "))
   (setq dc-org-roam-link-prefix prefix-string))
 
-(defun dc/org-roam-insert-nodes-by-attributes ()
+(defun dc/org-roam-insert-nodes-by-name-tag-or-property ()
   "Interactive function to insert Org-roam nodes filtered by titles, tags, and properties into the current buffer.
 This function allows the user to choose between filtering nodes based on titles, tags, or properties, individually or in combination.
 For titles and tags, the user can specify keywords to include and exclude.
@@ -1217,7 +1198,7 @@ Nodes that match all specified criteria are then inserted with their hierarchy a
               (run-hook-with-args 'org-roam-post-node-insert-hook id arrow-chain))))
       (deactivate-mark))))
 
-(defun dc/org-roam-find-nodes-by-attributes ()
+(defun dc/org-roam-find-nodes-by-name-tag-or-property ()
   "Interactive function to find  Org-roam nodes filtered by titles, tags, and properties.
 This function allows the user to choose between filtering nodes based on titles, tags, or properties, individually or in combination.
 For titles and tags, the user can specify keywords to include and exclude.
@@ -1472,6 +1453,18 @@ id[0:1]/id[2:] rule."
 
 ;;;;; Function - Delete unlinked attachment folders
 
+(defun dc/org-attach-delete-empty-org-attach-folders ()
+  "Delete all empty directories in the `org-attach-id-dir`."
+  (interactive)
+  (let ((dir org-attach-id-dir))
+    (unless (file-directory-p dir)
+      (error "The `org-attach-id-dir` does not point to a valid directory"))
+    (dolist (file (directory-files dir t directory-files-no-dot-files-regexp))
+      (when (and (file-directory-p file)
+                 (= (length (directory-files file nil directory-files-no-dot-files-regexp)) 0))
+        (delete-directory file)
+        (message "Deleted empty directory: %s" file)))))
+
 (defun dc/org-attach-delete-unlinked-folders ()
   "Find and display Org-attach directories that do not correspond to an existing Org-roam node and optionally delete them."
   (interactive)
@@ -1501,7 +1494,17 @@ id[0:1]/id[2:] rule."
                   (delete-directory dir t)
                   (message "Deleted directory: %s" dir))
               (message "No directories were deleted.")))
-        (message "All attachment directories are linked to nodes.")))))
+        (message "All attachment directories are linked to nodes."))))
+  (dc/org-attach-delete-empty-org-attach-folders))
+
+;;;; Package - org-ql
+
+;;;;; Configuration
+
+(use-package org-ql
+  :after org
+  :ensure t
+  )
 
 ;;;; Package - websocket
 
