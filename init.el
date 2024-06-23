@@ -359,9 +359,9 @@
   :ensure t
   )
 
-;;;;; Package - company
+;;;; Package - company
 
-;;;;;; Configuration
+;;;;; Configuration
 
 (use-package company
   :ensure t
@@ -373,17 +373,17 @@
   (add-hook 'after-init-hook 'global-company-mode)
   )
 
-;;;;; Package - orderless
+;;;; Package - orderless
 
-;;;;;; Configuration
+;;;;; Configuration
 
 (use-package orderless
   :ensure t
   )
 
-;;;;; Package - vertico
+;;;; Package - vertico
 
-;;;;;; Configuration
+;;;;; Configuration
 
 (use-package vertico
   :after orderless
@@ -478,6 +478,9 @@
 
   ;; Set coloumn limit for a paragraph to 80 characters
   (add-hook 'org-mode-hook (lambda () (setq fill-column 80)))
+
+  ;; Hide leading stars in headings
+  (setq org-hide-leading-stars t)
 
   ;; Turn on auto-fill mode
   (add-hook 'org-mode-hook #'turn-on-auto-fill)
@@ -994,7 +997,7 @@ based on the system type."
   (org-super-agenda-mode)
   )
 
-;;;;; Function - Redefine TODO category group to not include CATEGORY: string
+;;;;; Function - Redefine TODO category group to not include 'CATEGORY:' string
 
 (org-super-agenda--def-auto-group category "their org-category property"
   :key-form (org-super-agenda--when-with-marker-buffer (org-super-agenda--get-marker item)
