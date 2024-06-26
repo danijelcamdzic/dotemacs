@@ -636,48 +636,6 @@ or in an org file."
       (org-agenda-todo)
     (org-todo)))
 
-(defun dc/org-todo-change-state-on-date ()
-  "Change state of the current heading and log with a chosen date."
-  (interactive)
-  (let ((selected-date (org-read-date nil t nil "Select Date:")))
-    (if selected-date
-        (progn
-          (setq dc-time-override-lock t)
-          (dc/time-adjust-time (format-time-string "<%Y-%m-%d %a>" selected-date))
-          (advice-add 'current-time :override #'dc/time-override-current-time)
-          (if (eq major-mode 'org-agenda-mode)
-              (org-agenda-todo)
-            (org-todo))
-          (advice-remove 'current-time #'dc/time-override-current-time)
-          (setq dc-adjusted-time nil)
-          (setq dc-time-override-lock nil))
-      (message "No date selected"))))
-
-(defun dc/org-todo-skip-overdue-tasks ()
-  "Mark tasks scheduled for yesterday or earlier as SKIP and
-log them as changed on their scheduled date, but only if their
-current state is TODO."
-  (interactive)
-  (dolist (file (org-agenda-files))
-    (with-current-buffer (find-file-noselect file)
-      (save-excursion
-        (goto-char (point-min))
-        (while (re-search-forward org-scheduled-time-regexp nil t)
-          (let ((scheduled-time (org-get-scheduled-time (point)))
-                (todo-state (org-get-todo-state)))
-            (when (and scheduled-time
-                       (string= todo-state "TODO")
-                       (< (time-to-days scheduled-time)
-                          (time-to-days (current-time))))
-              (unless dc-time-override-lock
-                (setq dc-time-override-lock t)
-                (dc/time-adjust-time (format-time-string "<%Y-%m-%d %a>" scheduled-time))
-                (advice-add 'current-time :override #'dc/time-override-current-time)
-                (org-todo "SKIP")
-                (advice-remove 'current-time #'dc/time-override-current-time)
-                (setq dc-adjusted-time nil)
-                (setq dc-time-override-lock nil)))))))))
-
 ;; Add keybindings
 (define-key dc-org-map (kbd "t") 'dc/org-todo-change-state)
 
@@ -693,23 +651,6 @@ current state is TODO."
   (if (eq major-mode 'org-agenda-mode)
       (org-agenda-add-note)
     (org-add-note)))
-
-(defun dc/org-add-note-on-date ()
-  "Change state of the current heading and log with a chosen date."
-  (interactive)
-  (let ((selected-date (org-read-date nil t nil "Select Date:")))
-    (if selected-date
-        (progn
-          (setq dc-time-override-lock t)
-          (dc/time-adjust-time (format-time-string "<%Y-%m-%d %a>" selected-date))
-          (advice-add 'current-time :override #'dc/time-override-current-time)
-          (if (eq major-mode 'org-agenda-mode)
-              (org-agenda-add-note)
-            (org-add-note))
-          (advice-remove 'current-time #'dc/time-override-current-time)
-          (setq dc-adjusted-time nil)
-          (setq dc-time-override-lock nil))
-      (message "No date selected"))))
 
 ;; Add keybindings
 (define-key dc-org-map (kbd "n") 'dc/org-add-note)
@@ -1895,22 +1836,6 @@ am start -a android.intent.action.VIEW -t video/* -d file:///storage/emulated/0/
 
 ;;; Date & time
 
-;;;; Function - Override current time
-
-(defvar dc-adjusted-time nil
-  "Adjusted time. This time will replace current time.")
-
-(defvar dc-time-override-lock nil
-  "Lock to prevent concurrent access to the time override.")
-
-(defun dc/time-adjust-time (time)
-  "Temporarily adjust `current-time' to the given TIME."
-  (setq dc-adjusted-time (append (org-read-date nil t time) '(0 0))))
-
-(defun dc/time-override-current-time ()
-  "Override for `current-time' using `dc/time-adjust-time'."
-  (or dc-adjusted-time (current-time)))
-
 ;;;; Package - time-stamp
 
 ;;;;; Configuration
@@ -1987,3 +1912,4 @@ am start -a android.intent.action.VIEW -t video/* -d file:///storage/emulated/0/
   (find-file dc-ledger-file))
 
 ;;; init.el ends here
+
