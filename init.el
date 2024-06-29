@@ -908,6 +908,52 @@ org file on the year calendar."
   (define-key org-agenda-mode-map (kbd "w") 'dc/org-agenda-week-view)
   (define-key org-agenda-mode-map (kbd "y") 'dc/org-agenda-year-view))
 
+;;;;; Function - Expand org-agenda-logbook-mode view
+
+(defun dc/org-agenda-logbook-mode-expand-view--check-for-notes (buffer pos)
+  "Check and return expanded note lines from BUFFER starting at POS."
+  (let ((note-regex "- Note taken on \\[.*?\\]")) 
+    (with-current-buffer buffer
+      (goto-char pos)
+      (let ((line (thing-at-point 'line t)))
+        (setq line (replace-regexp-in-string "\n\\'" "" line))
+        (if (string-match note-regex line)
+            (progn
+              (forward-line 1)
+              (while (and (not (looking-at "^-")) 
+                          (not (looking-at "^:END:"))
+                          (not (eobp)))
+                (let ((next-line (thing-at-point 'line t)))
+                  (setq next-line (replace-regexp-in-string "\n\\'" "" next-line))
+                  (setq line (concat line "\n" (make-string 14 ?\s) next-line)))
+                (forward-line 1))
+              line)
+          line)))))
+
+(defun dc/org-agenda-logbook-mode-expand-view ()
+  (interactive)
+  "Expand org-agenda view by including lines from org files. Only callable from org-agenda-mode."
+  (if (eq major-mode 'org-agenda-mode)
+      (let ((buffer-read-only nil))
+        (save-excursion
+          (goto-char (point-min))
+          (while (not (eobp))
+            (let* ((marker (org-get-at-bol 'org-marker)))
+              (when marker
+                (let ((todo-lines (dc/org-agenda-logbook-mode-expand-view--check-for-notes (marker-buffer marker) 
+                                                                                           (marker-position marker))))
+                  (end-of-line)
+                  (insert "\n" (make-string 14 ?\s) todo-lines))))
+            (forward-line 1))))
+    (message "This function can only be called from org-agenda-mode.")))
+
+;; Add keybindings
+(define-key dc-agenda-map (kbd "@") 'dc/org-agenda-logbook-mode-expand-view)
+
+;; Add org-agenda keybindings
+(with-eval-after-load 'org-agenda
+  (define-key org-agenda-mode-map (kbd "@") 'dc/org-agenda-logbook-mode-expand-view))
+
 ;;;;; Function - Integrate org-agenda-files between Android and Linux
 
 (defun dc/org-agenda-adjust-org-agenda-files-paths ()
@@ -1912,4 +1958,3 @@ am start -a android.intent.action.VIEW -t video/* -d file:///storage/emulated/0/
   (find-file dc-ledger-file))
 
 ;;; init.el ends here
-
