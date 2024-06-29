@@ -541,6 +541,17 @@
   (custom-set-faces
    '(org-scheduled ((t (:foreground "#555555"))))
    '(org-scheduled-today ((t (:foreground "grey")))))
+
+  ;; Set text emphasis
+  (setq org-emphasis-alist   
+        (quote (("*" bold)
+                ("/" italic)
+                ("_" underline)
+                ("=" (:foreground "yellow" :background "black"))
+                ("~" org-verbatim verbatim)
+                ("+"
+                 (:strike-through t))
+                )))
   )
 
 ;; Add keybindings
