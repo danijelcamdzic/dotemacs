@@ -2,11 +2,9 @@
 
 ;;; Code:
 
-;;; Package managers
+;;; Package management
 
 ;;;; Package - package
-
-;;;;; Configuration
 
 (require 'package)
 
@@ -19,28 +17,15 @@
 ;; Initialize packages
 (package-initialize)
 
-;;;; Archive - melpa
-
-;;;;; Configuration
-
 ;; Add melpa package archives
 (add-to-list 'package-archives
              '("melpa" . "https://melpa.org/packages/") t)
 
 ;;;; Package - use-package
 
-;;;;; Configuration
-
-;; Install use-package
-(unless (package-installed-p 'use-package)
-  (package-refresh-contents)
-  (package-install 'use-package))
-
 (require 'use-package)
 
 ;;;; Package - quelpa
-
-;;;;; Configuration
 
 (use-package quelpa
   :ensure t
@@ -52,8 +37,6 @@
 
 ;;;; Package - quelpa-use-package
 
-;;;;; Configuration
-
 (use-package quelpa-use-package
   :ensure t
   :after quelpa
@@ -64,22 +47,39 @@
 
 ;;; Appearance
 
-;;;; Themes
+;;;; Package - monokai-theme
+
+(use-package monokai-theme
+  :ensure t
+  :config
+  )
 
 ;; Use monokai theme as system theme
 (load-theme 'monokai t)
 
-;;;; Fonts
-
-;; Don't change default font
-
-;;; User
+;;; User credentials
 
 ;; User name and email
 (setq user-full-name "Danijel Camdzic")
 (setq user-mail-address "danijelcamdzic@tuta.com")
 
-;;;; Keybindings
+;;; Keybindings
+
+;; Create shortcuts in Android with volume-up and volume-down keys
+(when (eq system-type 'android)
+  ;; Volume up calls to execute the command
+  (global-set-key (kbd "<volume-up>") 'execute-extended-command)
+  
+  ;; Volume down is bound by default to org-ctrl-c-ctrl-c
+  (global-set-key (kbd "<volume-down>") 'org-ctrl-c-ctrl-c)
+
+  ;; Make volume down programmable
+  (defun dc/bind-to-android-volume-down ()
+    "Bind a command to the <volume-down> key on Android."
+    (interactive)
+    (let ((command (intern (completing-read "Command: " obarray 'commandp t))))
+      (global-set-key (kbd "<volume-down>") command)))
+  )
 
 ;; Add keybinding for help
 (global-set-key (kbd "C-c h") 'apropos-command)
@@ -115,7 +115,7 @@
 (define-prefix-command 'dc-roam-map)
 (global-set-key (kbd "C-c R") 'dc-roam-map)
 
-;;;; Directories
+;;; Directories
 
 ;; Define the home directories variables
 (defvar dc-android-home "/storage/emulated/0/")
@@ -139,8 +139,6 @@
 (defvar dc-projects-directory (concat dc-home-directory "Projects/"))    
 (defvar dc-recordings-directory (concat dc-home-directory "Recordings/"))
 (defvar dc-videos-directory (concat dc-home-directory "Videos/"))
-
-;;;;; Function - Open home directories in dired
 
 (defun dc/open-folder-from-home-directory ()
   "Open a folder from home directory in dired."
@@ -174,9 +172,7 @@
 (define-key dc-dired-map (kbd "h") 'dc/open-folder-from-home-directory)
 (define-key dc-dired-map (kbd "r") 'dc/regex-open-folder-from-home-directory)
 
-;;;;; Package - dired-sidebar
-
-;;;;;; Configuration
+;;;; Package - dired-sidebar
 
 (use-package dired-sidebar
   :ensure t
@@ -185,8 +181,6 @@
   (setq dired-sidebar-window-fixed nil)
   )
 
-;;;;;; Function - Toggle dired-sidebar
-
 (defun dc/dired-sidebar-toggle ()
   "Toggle `dired-sidebar'."
   (interactive)
@@ -194,24 +188,6 @@
 
 ;; Add keybindings
 (define-key dc-dired-map (kbd "s") 'dc/dired-sidebar-toggle)
-
-;;; Commands
-
-;; Create shortcuts in Android with volume-up and volume-down keys
-(when (eq system-type 'android)
-  ;; Volume up calls to execute the command
-  (global-set-key (kbd "<volume-up>") 'execute-extended-command)
-  
-  ;; Volume down is bound by default to org-ctrl-c-ctrl-c
-  (global-set-key (kbd "<volume-down>") 'org-ctrl-c-ctrl-c)
-
-  ;; Make volume down programmable
-  (defun dc/bind-to-android-volume-down ()
-    "Bind a command to the <volume-down> key on Android."
-    (interactive)
-    (let ((command (intern (completing-read "Command: " obarray 'commandp t))))
-      (global-set-key (kbd "<volume-down>") command)))
-  )
 
 ;;; Buffers
 
@@ -264,8 +240,6 @@
               (dc/org-agenda-day-view)
               )))
 
-;;;; Function - Kill all buffers
-
 (defun dc/kill-background-buffers ()
   "Kill all buffers that are not currently visible in any window, except the *Messages*, *Org Agenda*,
 *scratch* and today's Org Roam daily buffer."
@@ -289,14 +263,10 @@
 
 ;;;; Package - ibuffer
 
-;;;;; Configuration
-
 (use-package ibuffer-sidebar
   :ensure t
   :config
   )
-
-;;;;; Function - Toggle ibuffer-sidebar
 
 (defun dc/ibuffer-sidebar-toggle ()
   "Toggle `ibuffer-sidebar'."
@@ -308,8 +278,6 @@
 
 ;;;; Package - imenu-list
 
-;;;;; Configuration
-
 (use-package imenu-list
   :ensure t
   :config
@@ -318,121 +286,16 @@
 ;; Set keybindings
 (define-key dc-buffer-map (kbd "l") 'imenu-list-smart-toggle)
 
-;;;; Package - outline-minor-faces
-
-;;;;; Configuration
-
-(use-package outline-minor-faces
-  :ensure t
-  :after outline
-  :config
-  (add-hook 'outline-minor-mode-hook
-            #'outline-minor-faces-mode)
-  )
-
-;; Enable outline-minor-mode as soon as .el file is opened
-(add-hook 'emacs-lisp-mode-hook 'outline-minor-mode)
-
 ;;;; Package - doc-view
 
-;; Set higher resolution for viewing documents
-(setq doc-view-resolution 400)
-
-;;; Completion
-
-;;;; Package - which-key
-
-;;;;; Configuration
-
-(use-package which-key
-  :ensure t
+(use-package doc-view
+  :ensure nil
   :config
-  ;; Setup which-key-mode
-  (which-key-mode)
-  )
-
-;;;; Package - pretty-hydra
-
-;;;;; Configuration
-
-(use-package pretty-hydra
-  :ensure t
-  )
-
-;;;; Package - company
-
-;;;;; Configuration
-
-(use-package company
-  :ensure t
-  :config
-  ;; Enable company mode
-  (company-mode 1)
-
-  ;; Add hook to enable company mode globally
-  (add-hook 'after-init-hook 'global-company-mode)
-  )
-
-;;;; Package - orderless
-
-;;;;; Configuration
-
-(use-package orderless
-  :ensure t
-  )
-
-;;;; Package - vertico
-
-;;;;; Configuration
-
-(use-package vertico
-  :after orderless
-  :ensure t
-  :config
-  ;; Enable vertico
-  (vertico-mode 1)
-
-  ;; Set completion style and categories
-  (setq completion-styles '(orderless)
-        completion-category-defaults nil
-        completion-category-overrides '((file (styles . (partial-completion)))))
-  )
-
-;;; Programming
-
-;;;; C/Cpp
-
-(defun dc/setup-c-cpp-mode ()
-  "Set basic c and cpp offset."
-  (setq c-basic-offset 4))
-
-;; Enable line numbers for  C modes
-(add-hook 'c-mode-common-hook (lambda () (display-line-numbers-mode 1)))
-
-;; Set hook to set indentation when in c/cpp file
-(add-hook 'c-mode-common-hook 'dc/setup-c-cpp-mode)
-
-;;;; Python
-
-;; Set the indentation level for Python code
-(setq python-indent-offset 4)
-
-;; Enable line numbers for Python mode
-(add-hook 'python-mode-hook (lambda () (display-line-numbers-mode 1)))
-
-;;;; Version control
-
-;;;;; Package - magit
-
-;;;;;; Configuration
-
-(use-package magit
-  :ensure t
+  ;; Set higher resolution for viewing documents
+  (setq doc-view-resolution 400)
   )
 
 ;;; GUI
-
-;;;; Function - Manipulate GUI display modes
 
 (defun dc/gui-hide-all-bars ()
   "Disable scroll bar, menu bar, and tool bar."
@@ -461,14 +324,230 @@
 (define-key dc-gui-map (kbd "h") 'dc/gui-hide-all-bars)
 (define-key dc-gui-map (kbd "s") 'dc/gui-scrolless-mode)
 
-;;; Org-mode
+;;; Auto-completion
+
+;;;; Package - which-key
+
+(use-package which-key
+  :ensure t
+  :config
+  ;; Setup which-key-mode
+  (which-key-mode)
+  )
+
+;;;; Package - pretty-hydra
+
+(use-package pretty-hydra
+  :ensure t
+  )
+
+;;;; Package - company
+
+(use-package company
+  :ensure t
+  :config
+  ;; Enable company mode
+  (company-mode 1)
+
+  ;; Add hook to enable company mode globally
+  (add-hook 'after-init-hook 'global-company-mode)
+  )
+
+;;;; Package - orderless
+
+(use-package orderless
+  :ensure t
+  )
+
+;;;; Package - vertico
+
+(use-package vertico
+  :after orderless
+  :ensure t
+  :config
+  ;; Enable vertico
+  (vertico-mode 1)
+
+  ;; Set completion style and categories
+  (setq completion-styles '(orderless)
+        completion-category-defaults nil
+        completion-category-overrides '((file (styles . (partial-completion)))))
+  )
+
+;;; Editor
+
+;;;; C/Cpp
+
+(defun dc/setup-c-cpp-mode ()
+  "Set basic c and cpp offset."
+  (setq c-basic-offset 4))
+
+;; Enable line numbers for  C modes
+(add-hook 'c-mode-common-hook (lambda () (display-line-numbers-mode 1)))
+
+;; Set hook to set indentation when in c/cpp file
+(add-hook 'c-mode-common-hook 'dc/setup-c-cpp-mode)
+
+;;;; Python
+
+;; Set the indentation level for Python code
+(setq python-indent-offset 4)
+
+;; Enable line numbers for Python mode
+(add-hook 'python-mode-hook (lambda () (display-line-numbers-mode 1)))
+
+;;;; Package - outline-minor-faces
+
+(use-package outline-minor-faces
+  :ensure t
+  :after outline
+  :config
+  (add-hook 'outline-minor-mode-hook
+            #'outline-minor-faces-mode)
+  )
+
+;; Enable outline-minor-mode as soon as .el file is opened
+(add-hook 'emacs-lisp-mode-hook 'outline-minor-mode)
+
+;;;; Package - magit
+
+(use-package magit
+  :ensure t
+  )
+
+;;; Date & time
+
+;;;; Package - calendar
+
+(use-package calendar
+  :ensure nil
+  :config
+  ;; Set calendar to start on Monday
+  (setq calendar-week-start-day 1)
+  )
+
+;;;; Package - time-stamp
+
+(use-package time-stamp
+  :ensure t
+  :config
+  ;; Set up time-stamp format
+  (setq time-stamp-format "%Y-%m-%d %H:%M"
+        time-stamp-start "# Edited: "
+        time-stamp-end "$")
+
+  ;; Add hook to save time-stamp string on every file save
+  (add-hook 'before-save-hook 'time-stamp)
+  )
+
+;;; Encryption & authentication
+
+;;;; Package - epa
+
+(use-package epa
+  :ensure nil
+  :config
+  ;; Set the environment variable and configure EPA only if running on Android
+  (when (eq system-type 'android)
+    ;; Set the environment variable to use GPG on Termux
+    (setenv "GNUPGHOME" "/data/data/com.termux/files/home/.gnupg"))
+
+  ;; Set the gpg default program
+  (setq epg-gpg-program "gpg2")
+
+  ;; Enable the EPA file encryption/decryption features
+  (epa-file-enable)
+
+  ;; Set to nil to disable the key selection dialog
+  ;; Emacs will use the default GPG key automatically
+  (setq epa-file-select-keys nil)
+
+  ;; Set the pinentry mode to loopback, allowing Emacs to
+  ;; prompt for passphrases in the minibuffer
+  ;; This is useful when running Emacs in a terminal or
+  ;; environment where GUI pinentry dialogs are not available
+  (setq epa-pinentry-mode 'loopback)
+  )
+
+;;; Browsing & bookmarks
+
+;;;; Package - eww
+
+(use-package eww
+  :ensure nil
+  :config
+  ;; Set default eww-bookmarks directory
+  (setq eww-bookmarks-directory dc-documents-directory)
+  )
+
+;;;; Package - bookmark
+
+(use-package bookmark
+  :ensure nil
+  :config
+  ;; Set default bookmark file
+  (setq bookmark-default-file (concat dc-documents-directory "bookmarks.el"))
+  )
+
+;; Add keybindings
+(define-key dc-bookmark-map (kbd "l") 'list-bookmarks)
+(define-key dc-bookmark-map (kbd "s") 'bookmark-set)
+(define-key dc-bookmark-map (kbd "d") 'bmkp-bmenu-delete-marked)
+(define-key dc-bookmark-map (kbd "n") 'bmkp-bmenu-filter-bookmark-name-incrementally)
+(define-key dc-bookmark-map (kbd "t") 'bmkp-bmenu-filter-tags-incrementally)
+
+(defun dc/bookmark-jump--modify-bookmark-path-advice (orig-fun &rest args)
+  "Modify the bookmark filename and directory based on system type before opening."
+  (let* ((bookmark (car args))
+         (bookmark-data (bookmark-get-bookmark bookmark))
+         (filename (alist-get 'filename bookmark-data))
+         (dired-directory (alist-get 'dired-directory bookmark-data)))
+    ;; Modify filename for file bookmarks
+    (when filename
+      (if (eq system-type 'android)
+          (progn
+            (when (string-match-p (regexp-quote dc-gnu-linux-home) filename)
+              (setq filename (replace-regexp-in-string (regexp-quote dc-gnu-linux-home) dc-android-home filename)))
+            (when (string-match-p (regexp-quote dc-gnu-linux-home-extended) filename)
+              (setq filename (replace-regexp-in-string (regexp-quote dc-gnu-linux-home-extended) dc-android-home filename))))
+        (when (string-match-p (regexp-quote dc-android-home) filename)
+          (setq filename (replace-regexp-in-string (regexp-quote dc-android-home) dc-gnu-linux-home filename))))
+      (setf (alist-get 'filename bookmark-data) filename))
+    ;; Modify dired-directory for directory bookmarks
+    (when dired-directory
+      (if (eq system-type 'android)
+          (progn
+            (when (string-match-p (regexp-quote dc-gnu-linux-home) dired-directory)
+              (setq dired-directory (replace-regexp-in-string (regexp-quote dc-gnu-linux-home) dc-android-home dired-directory)))
+            (when (string-match-p (regexp-quote dc-gnu-linux-home-extended) dired-directory)
+              (setq dired-directory (replace-regexp-in-string (regexp-quote dc-gnu-linux-home-extended) dc-android-home dired-directory))))
+        (when (string-match-p (regexp-quote dc-android-home) dired-directory)
+          (setq dired-directory (replace-regexp-in-string (regexp-quote dc-android-home) dc-gnu-linux-home dired-directory))))
+      (setf (alist-get 'dired-directory bookmark-data) dired-directory))
+
+    (apply orig-fun args)))
+
+;; Add advice so bookmarks will be properly opened
+(advice-add 'bookmark-jump :around #'dc/bookmark-jump--modify-bookmark-path-advice)
+
+;;;; Package - bookmark+
+
+(use-package bookmark+
+  :quelpa (bookmark+ :fetcher github :repo "emacsmirror/bookmark-plus")
+  :config
+  ;; Set default .emacs-bmk-bmenu-state.el file path
+  (setq bmkp-bmenu-state-file (expand-file-name ".emacs-bmk-bmenu-state.el" user-emacs-directory))
+  
+  ;; Set default .emacs-bmk-bmenu-commands.el file path
+  (setq bmkp-bmenu-commands-file (expand-file-name ".emacs-bmk-bmenu-commands.el" user-emacs-directory))
+  )
+
+;;; Org
 
 ;;;; Package - org
 
-;;;;; Configuration
-
 (use-package org
-  :ensure t
+  :ensure nil
   :config
   ;; Set org directory
   (setq org-directory dc-notes-directory)
@@ -557,15 +636,11 @@
 ;; Add keybindings
 (define-key dc-org-map (kbd "l") 'org-insert-link)
 
-;;;;; Function - Insert datetime string
-
 (defun dc/org-insert-current-date-time ()
   "Insert the current date and time along with the three-letter weekday name in
 the format YYYY-MM-DD Day H:M."
   (interactive)
   (insert (format-time-string "%Y-%m-%d %a %H:%M")))
-
-;;;;; Function - Clock in and clock out
 
 (defun dc/org-clock-in ()
   "Clock in the current org heading."
@@ -589,8 +664,6 @@ the format YYYY-MM-DD Day H:M."
 (with-eval-after-load 'org-agenda
   (define-key org-agenda-mode-map (kbd "i") 'dc/org-clock-in)
   (define-key org-agenda-mode-map (kbd "o") 'dc/org-clock-out))
-
-;;;;; Function - Add and remove a schedule
 
 (defun dc/org-add-schedule ()
   "Add a scheduling timestamp to the current item in the Org Agenda or in
@@ -638,8 +711,6 @@ or in an org file."
   (define-key org-agenda-mode-map (kbd "a") 'dc/org-add-schedule)
   (define-key org-agenda-mode-map (kbd "r") 'dc/org-remove-schedule))
 
-;;;;; Function - Change a TODO state
-
 (defun dc/org-todo-change-state ()
   "Change state of a current heading."
   (interactive)
@@ -654,8 +725,6 @@ or in an org file."
 (with-eval-after-load 'org-agenda
   (define-key org-agenda-mode-map (kbd "t") 'dc/org-todo-change-state))
 
-;;;;; Function - Add notes
-
 (defun dc/org-add-note ()
   "Add a note to an org heading."
   (interactive)
@@ -669,8 +738,6 @@ or in an org file."
 ;; Add org-agenda keybindings
 (with-eval-after-load 'org-agenda
   (define-key org-agenda-mode-map (kbd "n") 'dc/org-add-note))
-
-;;;;; Function - Vsualize logbook on calendar for notes and TODOs
 
 (defun dc/org-logbook--parse-logbook-states (logbook beg buffer)
   "Parse a logbook string and return a list of entries with states."
@@ -835,9 +902,8 @@ org file on the year calendar."
 
 ;;;; Package - org-agenda
 
-;;;;; Configuration
-
 (use-package org-agenda
+  :ensure nil
   :after org
   :config  
   ;; Set the prefix format for agenda items
@@ -870,8 +936,6 @@ org file on the year calendar."
           (0000 0200 0400 0600 0800 1000 1200 1400 1600 1800 2000 2200 2359)
           "......" "----------------"))
   )
-
-;;;;; Function - Change org-agenda TODO views
 
 (defun dc/org-agenda--switch-to-view (view-fn)
   "Switch to the given Org Agenda view function VIEW-FN and insert timeline."
@@ -919,7 +983,14 @@ org file on the year calendar."
   (define-key org-agenda-mode-map (kbd "w") 'dc/org-agenda-week-view)
   (define-key org-agenda-mode-map (kbd "y") 'dc/org-agenda-year-view))
 
-;;;;; Function - Expand org-agenda-logbook-mode view
+(defun dc/org-agenda-logbook-mode-expand-view--check-for-scheduled (buffer pos)
+  "Check if the line at POS in BUFFER contains 'SCHEDULED:'."
+  (with-current-buffer buffer
+    (goto-char pos)
+    (let ((line (thing-at-point 'line t)))
+      (if (string-match "SCHEDULED:" line)
+          t
+        nil))))
 
 (defun dc/org-agenda-logbook-mode-expand-view--check-for-notes (buffer pos)
   "Check and return expanded note lines from BUFFER starting at POS."
@@ -951,10 +1022,12 @@ org file on the year calendar."
           (while (not (eobp))
             (let* ((marker (org-get-at-bol 'org-marker)))
               (when marker
-                (let ((todo-lines (dc/org-agenda-logbook-mode-expand-view--check-for-notes (marker-buffer marker) 
-                                                                                           (marker-position marker))))
-                  (end-of-line)
-                  (insert "\n" (make-string 14 ?\s) todo-lines))))
+                (unless (dc/org-agenda-logbook-mode-expand-view--check-for-scheduled (marker-buffer marker) 
+                                                                                    (marker-position marker))
+                  (let ((todo-lines (dc/org-agenda-logbook-mode-expand-view--check-for-notes (marker-buffer marker) 
+                                                                                             (marker-position marker))))
+                    (end-of-line)
+                    (insert "\n" (make-string 14 ?\s) todo-lines)))))
             (forward-line 1))))
     (message "This function can only be called from org-agenda-mode.")))
 
@@ -964,8 +1037,6 @@ org file on the year calendar."
 ;; Add org-agenda keybindings
 (with-eval-after-load 'org-agenda
   (define-key org-agenda-mode-map (kbd "@") 'dc/org-agenda-logbook-mode-expand-view))
-
-;;;;; Function - Integrate org-agenda-files between Android and Linux
 
 (defun dc/org-agenda-adjust-org-agenda-files-paths ()
   "Adjust the paths in `org-agenda-files` based on the system type.
@@ -985,8 +1056,6 @@ based on the system type."
 
 ;;;; Package - org-super-agenda
 
-;;;;; Configuration
-
 (use-package org-super-agenda
   :after org-agenda
   :ensure t
@@ -995,14 +1064,11 @@ based on the system type."
   (org-super-agenda-mode)
   )
 
-;;;;; Function - Redefine TODO category group to not include 'CATEGORY:' string
-
+;; Redefine the auto-category group of the org-super-agenda
 (org-super-agenda--def-auto-group category "their org-category property"
   :key-form (org-super-agenda--when-with-marker-buffer (org-super-agenda--get-marker item)
               (org-get-category))
   :header-form key)
-
-;;;;; Function - Show all TODOs view
 
 (defun dc/org-agenda-todo-view ()
   "Open Org Agenda in the todos view mode with super agenda. Use category as groups"
@@ -1020,8 +1086,6 @@ based on the system type."
   (define-key org-agenda-mode-map (kbd "v") 'dc/org-agenda-todo-view))
 
 ;;;; Package - org-roam
-
-;;;;; Configuration
 
 (use-package org-roam
   :after org
@@ -1041,8 +1105,6 @@ based on the system type."
 (define-key dc-roam-map (kbd "f") 'org-roam-node-find)
 (define-key dc-roam-map (kbd "i") 'org-roam-node-insert)
 
-;;;;; Function - Get node hierarchy
-
 (defun dc/org-roam--get-node-heirarchy (node)
   "Get the hierarchy of NODE as a list of titles, excluding non-node headings.
 The hierarchy includes the NODE title and its ancestor node titles."
@@ -1060,8 +1122,6 @@ The hierarchy includes the NODE title and its ancestor node titles."
           (push heading-title titles))))
     (push title titles)
     (nreverse titles)))
-
-;;;;; Function - Display of nodes in org-roam search
 
 (defvar dc-org-roam-hierarchy-display-separator
   (propertize "->" 'face '(shadow))
@@ -1100,8 +1160,6 @@ The hierarchy includes the NODE title and its ancestor node titles."
 ;; Set the hierarchy display formatting
 (setq org-roam-node-display-template
       (concat "${hierarchy}" "${node-type}" (propertize "${colon-tags}" 'face 'org-tag)))
-
-;;;;; Function - Insert and display nodes by attribute (name, tags, property)
 
 (defvar dc-org-roam-hierarchy-insert-separator
   (propertize "->" 'face '(shadow))
@@ -1274,9 +1332,8 @@ Nodes that match all specified criteria are then displayed with their hierarchy.
 
 ;;;; Package - org-attach
 
-;;;;; Configuration
-
 (use-package org-attach
+  :ensure nil
   :after org
   :config
   ;; Set attach directory
@@ -1300,8 +1357,6 @@ Nodes that match all specified criteria are then displayed with their hierarchy.
 
 ;; Add keybindings
 (define-key dc-org-map (kbd "k") 'org-attach-attach)
-
-;;;;; Function - Attach and insert attachment as a link
 
 (defvar dc-org-attach-search-starting-directory ""
   "Preferred starting directory to search files to attach in Org mode.")
@@ -1329,8 +1384,6 @@ The attached file is copied to the attachment directory and a link is inserted a
 
 ;; Add keybindings
 (define-key dc-org-map (kbd "j") 'dc/org-attach-file-and-insert-link)
-
-;;;;; Function - Copy attachments between org-roam nodes
 
 (defvar dc-org-attach-source-node nil
   "Temporary variable to store the source node for attachment copying.")
@@ -1378,8 +1431,6 @@ id[0:1]/id[2:] rule."
               (other-window 1))
           (message "No attachment directory found for node '%s'." (org-roam-node-title source-node)))))))
 
-;;;;; Function - Move attachments between org-roam nodes
-
 (defun dc/org-attach-move-attachments-from-node-to-node ()
   "Move marked attachments from one org-roam node to another using dired.
 Function presumes that the attachments directories are made according to
@@ -1423,8 +1474,6 @@ id[0:1]/id[2:] rule."
               (other-window 1))
           (message "No attachment directory found for node '%s'." (org-roam-node-title source-node)))))))
 
-;;;;; Function - Delete attachments from node
-
 (defun dc/org-attach-delete-attachments-from-node ()
   "Delete marked attachments from an org-roam node using dired.
 Function presumes that the attachments directories are made according to
@@ -1458,8 +1507,6 @@ id[0:1]/id[2:] rule."
                 (local-set-key (kbd "d") delete-fn))
               (other-window 1))
           (message "No attachment directory found for node '%s'." (org-roam-node-title source-node)))))))
-
-;;;;; Function - Delete unlinked attachment folders
 
 (defun dc/org-attach-delete-empty-org-attach-folders ()
   "Delete all empty directories in the `org-attach-id-dir`."
@@ -1507,16 +1554,12 @@ id[0:1]/id[2:] rule."
 
 ;;;; Package - org-ql
 
-;;;;; Configuration
-
 (use-package org-ql
   :after org
   :ensure t
   )
 
 ;;;; Package - websocket
-
-;;;;; Configuration
 
 (use-package websocket
   :after org-roam
@@ -1525,23 +1568,17 @@ id[0:1]/id[2:] rule."
 
 ;;;; Package - org-roam-ui
 
-;;;;; Configuration
-
 (use-package org-roam-ui
-  :after org-roam
+  :after (org-roam websocket)
   :ensure t
   )
 
 ;;;; Package - org-transclusion
 
-;;;;; Configuration
-
 (use-package org-transclusion
   :after org
   :ensure t
   )
-
-;;;;; Function - Insert transcluded nodes
 
 (defun dc/org-transclusion-set-link-prefix ()
   "Sets the dc-org-roam-link-prefix to #+transclude: .
@@ -1565,8 +1602,6 @@ nodes based on tags."
 
 ;;;; Package - alert
 
-;;;;; Configuration
-
 (use-package alert
   :ensure t
   :config
@@ -1575,8 +1610,6 @@ nodes based on tags."
     ;; android.R.drawable icons must be used
     (setq alert-default-icon "ic_popup_reminder"))
   )
-
-;;;;; Function - Support Android notifications
 
 (defun dc/alert-android-notifications-notify (info)
   "Send notifications using `android-notifications-notify'.
@@ -1599,8 +1632,6 @@ Android port."
                     :notifier #'dc/alert-android-notifications-notify)
 
 ;;;; Package - org-alert
-
-;;;;; Configuration
 
 (use-package org-alert
   :ensure t
@@ -1626,8 +1657,6 @@ Android port."
   ;; Enable org-alert
   (org-alert-enable)
   )
-
-;;;;; Function - Change title of notifications
 
 (defvar dc-org-alert-title-type 'custom
   "Control the title type for `org-alert' notifications.
@@ -1677,15 +1706,11 @@ Android port."
 
 ;;;; Package - org-tempo
 
-;;;;; Configuration
-
 (use-package org-tempo
   :after org
   )
 
 ;;;; Package - org-analyzer
-
-;;;;; Configuration
 
 (use-package org-analyzer
   :after org
@@ -1696,8 +1721,6 @@ Android port."
   )
 
 ;;;; Package - org-download
-
-;;;;; Configuration
 
 (use-package org-download
   :ensure t
@@ -1713,8 +1736,6 @@ Android port."
 ;; Add keybindings
 (define-key dc-org-map (kbd "p") 'org-download-clipboard)
 
-;;;;; Function - Prompt for screenshot filename
-
 (defun dc/org-download-clipboard--prompt-for-name-advice (orig-fun &optional basename)
   "Advice to prompt for a basename before calling `org-download-clipboard'."
   (message "Calling advice function")
@@ -1727,16 +1748,12 @@ Android port."
 
 ;;;; Package - org-ref
 
-;;;;; Configuration
-
 (use-package org-ref
   :ensure t
   :after org
   )
 
 ;;;; Package - org-noter
-
-;;;;; Configuration
 
 (use-package org-noter
   :ensure t  
@@ -1748,8 +1765,6 @@ Android port."
 
 ;;;; Package - org-media-note
 
-;;;;; Configuration
-
 (use-package org-media-note
   :quelpa (org-media-note :fetcher github :repo "yuchen-lea/org-media-note")
   :hook (org-mode .  org-media-note-mode)
@@ -1759,8 +1774,6 @@ Android port."
   (setq org-media-note-screenshot-save-method 'attach)
   (setq org-media-note-screenshot-link-type-when-save-in-attach-dir 'attach)
   )
-
-;;;;; Function - Enable mpv-android support on Android
 
 ;; This should only be done on Android
 (when (eq system-type 'android)
@@ -1790,8 +1803,6 @@ am start -a android.intent.action.VIEW -t video/* -d file:///storage/emulated/0/
   ;; Add advice to mpv-start so it open the correct player each time
   (advice-add 'mpv-start :around #'dc/mpv-start--android-advice))
 
-;;;;; Function - Prepend timestamp to screenshot filename
-
 (defun dc/org-media-note--format-picture-file-name--prepend-timestamp-advice (orig-func &rest args)
   "Advice to prepend the current timestamp to the filename created by `org-media-note--format-picture-file-name'."
   (let ((original-filename (apply orig-func args))
@@ -1799,8 +1810,6 @@ am start -a android.intent.action.VIEW -t video/* -d file:///storage/emulated/0/
     (concat timestamp "_" original-filename)))
 
 (advice-add 'org-media-note--format-picture-file-name :around #'dc/org-media-note--format-picture-file-name--prepend-timestamp-advice)
-
-;;;;; Function - Remove invalid characters from filename
 
 (defun dc/remove-invalid-characters-from-filename (filename)
   "Remove invalid characters from filename in order for it to sync to Android using syncthing."
@@ -1812,159 +1821,18 @@ am start -a android.intent.action.VIEW -t video/* -d file:///storage/emulated/0/
 
 (advice-add 'org-media-note--format-picture-file-name :around #'dc/org-media-note--format-picture-file-name--remove-invalid-characters-from-filename-advice)
 
-;;; Browsing & bookmarks
-
-;;;; Package - eww
-
-;;;;; Configuration
-
-(use-package eww
-  :config
-  ;; Set default eww-bookmarks directory
-  (setq eww-bookmarks-directory dc-documents-directory)
-  )
-
-;;;; Package - bookmark
-
-;;;;; Configuration
-
-(use-package bookmark
-  :config
-  ;; Set default bookmark file
-  (setq bookmark-default-file (concat dc-documents-directory "bookmarks.el"))
-  )
-
-;;;; Package - bookmark+
-
-;;;;; Configuration
-
-(use-package bookmark+
-  :quelpa (bookmark+ :fetcher github :repo "emacsmirror/bookmark-plus")
-  :config
-  ;; Set default .emacs-bmk-bmenu-state.el file path
-  (setq bmkp-bmenu-state-file (expand-file-name ".emacs-bmk-bmenu-state.el" user-emacs-directory))
-  
-  ;; Set default .emacs-bmk-bmenu-commands.el file path
-  (setq bmkp-bmenu-commands-file (expand-file-name ".emacs-bmk-bmenu-commands.el" user-emacs-directory))
-  )
-
-;; Add keybindings
-(define-key dc-bookmark-map (kbd "l") 'list-bookmarks)
-(define-key dc-bookmark-map (kbd "s") 'bookmark-set)
-(define-key dc-bookmark-map (kbd "d") 'bmkp-bmenu-delete-marked)
-(define-key dc-bookmark-map (kbd "n") 'bmkp-bmenu-filter-bookmark-name-incrementally)
-(define-key dc-bookmark-map (kbd "t") 'bmkp-bmenu-filter-tags-incrementally)
-
-;;;;; Function - Integrate bookmarks between Android and Linux
-
-(defun dc/bookmark-jump--modify-bookmark-path-advice (orig-fun &rest args)
-  "Modify the bookmark filename and directory based on system type before opening."
-  (let* ((bookmark (car args))
-         (bookmark-data (bookmark-get-bookmark bookmark))
-         (filename (alist-get 'filename bookmark-data))
-         (dired-directory (alist-get 'dired-directory bookmark-data)))
-    ;; Modify filename for file bookmarks
-    (when filename
-      (if (eq system-type 'android)
-          (progn
-            (when (string-match-p (regexp-quote dc-gnu-linux-home) filename)
-              (setq filename (replace-regexp-in-string (regexp-quote dc-gnu-linux-home) dc-android-home filename)))
-            (when (string-match-p (regexp-quote dc-gnu-linux-home-extended) filename)
-              (setq filename (replace-regexp-in-string (regexp-quote dc-gnu-linux-home-extended) dc-android-home filename))))
-        (when (string-match-p (regexp-quote dc-android-home) filename)
-          (setq filename (replace-regexp-in-string (regexp-quote dc-android-home) dc-gnu-linux-home filename))))
-      (setf (alist-get 'filename bookmark-data) filename))
-    ;; Modify dired-directory for directory bookmarks
-    (when dired-directory
-      (if (eq system-type 'android)
-          (progn
-            (when (string-match-p (regexp-quote dc-gnu-linux-home) dired-directory)
-              (setq dired-directory (replace-regexp-in-string (regexp-quote dc-gnu-linux-home) dc-android-home dired-directory)))
-            (when (string-match-p (regexp-quote dc-gnu-linux-home-extended) dired-directory)
-              (setq dired-directory (replace-regexp-in-string (regexp-quote dc-gnu-linux-home-extended) dc-android-home dired-directory))))
-        (when (string-match-p (regexp-quote dc-android-home) dired-directory)
-          (setq dired-directory (replace-regexp-in-string (regexp-quote dc-android-home) dc-gnu-linux-home dired-directory))))
-      (setf (alist-get 'dired-directory bookmark-data) dired-directory))
-
-    (apply orig-fun args)))
-
-;; Add advice so bookmarks will be properly opened
-(advice-add 'bookmark-jump :around #'dc/bookmark-jump--modify-bookmark-path-advice)
-
-;;; Date & time
-
-;;;; Package - time-stamp
-
-;;;;; Configuration
-
-(use-package time-stamp
-  :config
-  ;; Set up time-stamp format
-  (setq time-stamp-format "%Y-%m-%d %H:%M"
-        time-stamp-start "# Edited: "
-        time-stamp-end "$")
-
-  ;; Add hook to save time-stamp string on every file save
-  (add-hook 'before-save-hook 'time-stamp)
-  )
-
-;;;; Package - calendar
-
-;;;;; Configuration
-
-(use-package calendar
-  :config
-  ;; Set calendar to start on Monday
-  (setq calendar-week-start-day 1)
-  )
-
-;;; Encryption & authentication
-
-;;;; Package - epa
-
-;;;;; Configuration
-
-(use-package epa
-  :ensure t
-  :config
-  ;; Set the environment variable and configure EPA only if running on Android
-  (when (eq system-type 'android)
-    ;; Set the environment variable to use GPG on Termux
-    (setenv "GNUPGHOME" "/data/data/com.termux/files/home/.gnupg"))
-
-  ;; Set the gpg default program
-  (setq epg-gpg-program "gpg2")
-
-  ;; Enable the EPA file encryption/decryption features
-  (epa-file-enable)
-
-  ;; Set to nil to disable the key selection dialog
-  ;; Emacs will use the default GPG key automatically
-  (setq epa-file-select-keys nil)
-
-  ;; Set the pinentry mode to loopback, allowing Emacs to
-  ;; prompt for passphrases in the minibuffer
-  ;; This is useful when running Emacs in a terminal or
-  ;; environment where GUI pinentry dialogs are not available
-  (setq epa-pinentry-mode 'loopback)
-  )
-
 ;;; Finances
 
 ;;;; Package - ledger-mode
-
-;;;;; Configuration
 
 (use-package ledger-mode
   :ensure t
   )
 
-;;;;; Function - Open ledger file
-
 (defvar dc-ledger-file (concat dc-documents-directory "finances.ledger"))
 
 (defun dc/open-ledger-file ()
-  "Open ledger file`."
+  "Open ledger file."
   (interactive)
   (find-file dc-ledger-file))
 
