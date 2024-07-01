@@ -616,11 +616,6 @@
   (setq org-todo-keywords
         '((sequence "TODO(t)" "DOING(i!)" "|" "DONE(d!)" "SKIP(s!)" "FAIL(f!)")))
 
-  ;; Set custom faces for scheduled headings
-  (custom-set-faces
-   '(org-scheduled ((t (:foreground "#555555"))))
-   '(org-scheduled-today ((t (:foreground "grey")))))
-
   ;; Set text emphasis
   (setq org-emphasis-alist   
         (quote (("*" bold)
@@ -935,6 +930,14 @@ org file on the year calendar."
         '((daily weekly today require-timed)
           (0000 0200 0400 0600 0800 1000 1200 1400 1600 1800 2000 2200 2359)
           "......" "----------------"))
+
+  ;; Set custom faces for org-agenda views
+  ;; Use describe-face to see what face to change
+  (custom-set-faces
+   '(org-scheduled ((t (:foreground "grey"))))
+   '(org-scheduled-today ((t (:foreground "white"))))
+   '(org-agenda-done ((t (:foreground "grey" :slant italic))))
+   '(org-agenda-calendar-event ((t (:foreground "grey" :slant italic)))))
   )
 
 (defun dc/org-agenda--switch-to-view (view-fn)
@@ -983,26 +986,29 @@ org file on the year calendar."
   (define-key org-agenda-mode-map (kbd "w") 'dc/org-agenda-week-view)
   (define-key org-agenda-mode-map (kbd "y") 'dc/org-agenda-year-view))
 
-(defun dc/org-agenda-logbook-mode-expand-view--check-for-scheduled (buffer pos)
-  "Check if the line at POS in BUFFER contains 'SCHEDULED:'."
+(defun dc/org-agenda-logbook-mode-expand-view--check-for-states (buffer pos)
+  "Check for state change lines from BUFFER starting at POS, remove date and time."
+  (let ((state-regex "\\(- State \".*?\"\\s-*from \".*?\"\\)"))
   (with-current-buffer buffer
     (goto-char pos)
     (let ((line (thing-at-point 'line t)))
-      (if (string-match "SCHEDULED:" line)
-          t
-        nil))))
+      (setq line (replace-regexp-in-string "\n\\'" "" line))
+      (if (string-match state-regex line)
+          (match-string 1 line)
+        nil)))))
 
 (defun dc/org-agenda-logbook-mode-expand-view--check-for-notes (buffer pos)
-  "Check and return expanded note lines from BUFFER starting at POS."
-  (let ((note-regex "- Note taken on \\[.*?\\]")) 
+  "Check and return expanded note lines from BUFFER starting at POS, or nil if no note is found."
+  (let ((note-regex "- Note taken on \\[.*?\\]"))
     (with-current-buffer buffer
       (goto-char pos)
       (let ((line (thing-at-point 'line t)))
         (setq line (replace-regexp-in-string "\n\\'" "" line))
         (if (string-match note-regex line)
             (progn
+              (setq line "- Note taken on:")
               (forward-line 1)
-              (while (and (not (looking-at "^-")) 
+              (while (and (not (looking-at "^-"))
                           (not (looking-at "^:END:"))
                           (not (eobp)))
                 (let ((next-line (thing-at-point 'line t)))
@@ -1010,11 +1016,20 @@ org file on the year calendar."
                   (setq line (concat line "\n" (make-string 14 ?\s) next-line)))
                 (forward-line 1))
               line)
-          line)))))
+          nil)))))
 
-(defun dc/org-agenda-logbook-mode-expand-view ()
+(defun dc/org-agenda-logbook-mode-expand-view--check-for-clocks (buffer pos)
+  "Check for CLOCK entries from BUFFER starting at POS and reformat to show only duration."
+  (with-current-buffer buffer
+    (goto-char pos)
+    (let ((line (thing-at-point 'line t)))
+      (setq line (replace-regexp-in-string "\n\\'" "" line))
+      (if (string-match "CLOCK:.*=>\\s-*\\([0-9]+:[0-9]+\\)" line)
+          (format "CLOCK: %s" (match-string 1 line))
+        nil))))
+
+(defun dc/org-agenda-logbook-mode-provide-more-details ()
   (interactive)
-  "Expand org-agenda view by including lines from org files. Only callable from org-agenda-mode."
   (if (eq major-mode 'org-agenda-mode)
       (let ((buffer-read-only nil))
         (save-excursion
@@ -1022,21 +1037,24 @@ org file on the year calendar."
           (while (not (eobp))
             (let* ((marker (org-get-at-bol 'org-marker)))
               (when marker
-                (unless (dc/org-agenda-logbook-mode-expand-view--check-for-scheduled (marker-buffer marker) 
-                                                                                    (marker-position marker))
-                  (let ((todo-lines (dc/org-agenda-logbook-mode-expand-view--check-for-notes (marker-buffer marker) 
-                                                                                             (marker-position marker))))
-                    (end-of-line)
-                    (insert "\n" (make-string 14 ?\s) todo-lines)))))
-            (forward-line 1))))
+                (let ((content-lines (or (dc/org-agenda-logbook-mode-expand-view--check-for-notes (marker-buffer marker) (marker-position marker))
+                                         (dc/org-agenda-logbook-mode-expand-view--check-for-states (marker-buffer marker) (marker-position marker))
+                                         (dc/org-agenda-logbook-mode-expand-view--check-for-clocks (marker-buffer marker) (marker-position marker)))))
+                  (when content-lines  ; Only proceed if content-lines is not nil
+                    (unless (string= content-lines (thing-at-point 'line t))
+                      (end-of-line)
+                      (insert (propertize "\n" 'face '(:foreground "grey" :slant italic))
+                              (propertize (make-string 14 ?\s) 'face '(:foreground "grey" :slant italic))
+                              (propertize content-lines 'face '(:foreground "grey" :slant italic)))))))
+            (forward-line 1)))))
     (message "This function can only be called from org-agenda-mode.")))
 
 ;; Add keybindings
-(define-key dc-agenda-map (kbd "@") 'dc/org-agenda-logbook-mode-expand-view)
+(define-key dc-agenda-map (kbd "@") 'dc/org-agenda-logbook-mode-provide-more-details)
 
 ;; Add org-agenda keybindings
 (with-eval-after-load 'org-agenda
-  (define-key org-agenda-mode-map (kbd "@") 'dc/org-agenda-logbook-mode-expand-view))
+  (define-key org-agenda-mode-map (kbd "@") 'dc/org-agenda-logbook-mode-provide-more-details))
 
 (defun dc/org-agenda-adjust-org-agenda-files-paths ()
   "Adjust the paths in `org-agenda-files` based on the system type.
@@ -1643,7 +1661,7 @@ Android port."
                          'notifications))
   :config
   ;; Setup timing
-  (setq org-alert-interval 300
+  (setq org-alert-interval 600
         org-alert-notify-cutoff 10
         org-alert-notify-after-event-cutoff 10)
   
