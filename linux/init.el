@@ -140,6 +140,10 @@
 ;;                            Buffers   
 ;;                   -------------------------
 
+;; Set background and foreground color
+(add-to-list 'default-frame-alist '(foreground-color . "white"))
+(add-to-list 'default-frame-alist '(background-color . "#242424"))
+
 ;; Remove startup screen
 (setq inhibit-startup-screen t)
 
