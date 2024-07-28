@@ -4,3 +4,5 @@
 This repository contains my personal Emacs configuration. I use Emacs on Android
 and Linux so the =init.el= files for both OSes are present in their
 respective folders.
+
+If you wish to see detailed tutorial and a unified configuration this repository held for Android and Linux, browse repository from this point https://github.com/danijelcamdzic/dotemacs/tree/60fb0fceee7c94be9af5cf8c028874d36572c9a7
