@@ -503,6 +503,8 @@
                 ("=" (:foreground "yellow" :background "black"))
                 ("~" org-verbatim verbatim)
                 ("+" (:strike-through t)))))
+  (custom-set-faces
+   '(org-tag ((t (:foreground "#d92727" :weight bold)))))
 
   ;; Hooks for various modes and settings
   (add-hook 'org-mode-hook (lambda () (setq fill-column 80)))
