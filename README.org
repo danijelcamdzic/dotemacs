@@ -3,5 +3,5 @@
 
 This repository contains my personal Emacs configuration files for the following systems:
 
-- [X] Linux
-- [X] Android
+- Linux
+- Android
