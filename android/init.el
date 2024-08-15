@@ -1,4 +1,4 @@
-;;; init.el - Personal configuration file for Emacs on Linux
+;;; init.el - Personal configuration file for Emacs on Android
 
 ;;; Code:
 
@@ -7,7 +7,7 @@
 ;; =================================================================
 
 ;;                   -------------------------
-;;                    Package and use-package   
+;;                            Package  
 ;;                   -------------------------
 
 ;; Use package
@@ -26,20 +26,14 @@
 (add-to-list 'package-archives
              '("melpa" . "https://melpa.org/packages/") t)
 
+
+
+;;                   -------------------------
+;;                          Use-package  
+;;                   -------------------------
+
 ;; Use use-package
 (require 'use-package)
-
-
-
-;;                   -------------------------
-;;                        Custom lisp code   
-;;                   -------------------------
-
-;; Add packages from the lisp directory to the load path
-;; Here will reside the packages manually downloaded from git
-;; as well as standalone .el files
-(let ((default-directory (expand-file-name (concat user-emacs-directory "lisp"))))
-  (normal-top-level-add-subdirs-to-load-path))
 
 
 
@@ -62,11 +56,10 @@
 ;;                   -------------------------
 
 ;; Define the home directories variables
-(defvar dc-gnu-linux-home "~/")
-(defvar dc-gnu-linux-home-extended "/home/danijelcamdzic/")
+(defvar dc-android-home "/storage/emulated/0/")
 
 ;; Set the home directory based on system type
-(defvar dc-home-directory dc-gnu-linux-home-extended)
+(defvar dc-home-directory dc-android-home)
 
 ;; Define variables which represent my home directory folders
 (defvar dc-audio-directory (concat dc-home-directory "Audio/"))  
@@ -150,6 +143,9 @@
 ;; Remove fringes from buffers
 (set-fringe-mode 0)
 
+;; Spawn keyboard on Android even when buffer is read-only
+(setq touch-screen-display-keyboard t)
+
 (defun dc/kill-background-buffers ()
   "Kill all buffers that are not currently visible in any window."
   (interactive)
@@ -171,6 +167,7 @@
 ;;                   -------------------------
 
 (use-package dired-sidebar
+  :defer t
   :ensure t
   :config
   ;; Make the window size not fixed
@@ -261,6 +258,7 @@
 ;;                   -------------------------
 
 (use-package magit
+  :defer t
   :ensure t
   )
 
@@ -271,6 +269,7 @@
 ;;                   -------------------------
 
 (use-package which-key
+  :defer t
   :ensure t
   :config
   ;; Setup which-key-mode
@@ -284,6 +283,7 @@
 ;;                   -------------------------
 
 (use-package pretty-hydra
+  :defer t
   :ensure t
   )
 
@@ -1153,7 +1153,30 @@ id[0:1]/id[2:] rule."
 (use-package alert
   :ensure t
   :config
+  ;; Setup default icon for Android notifications
+  ;; android.R.drawable icons must be used
+  (setq alert-default-icon "ic_popup_reminder")
   )
+
+(defun dc/alert-android-notifications-notify (info)
+  "Send notifications using `android-notifications-notify'.
+`android-notifications-notify' is a built-in function in the native Emacs
+Android port."
+  (let ((title (or (plist-get info :title) "Android Notifications Alert"))
+        (body (or (plist-get info :message) ""))
+        (urgency (cdr (assq (plist-get info :severity)
+                            alert-notifications-priorities)))
+        (icon (or (plist-get info :icon) alert-default-icon))
+        (replaces-id (gethash (plist-get info :id) alert-notifications-ids)))
+    (android-notifications-notify
+     :title title
+     :body body
+     :urgency urgency
+     :icon icon
+     :replaces-id replaces-id)))
+
+(alert-define-style 'android-notifications :title "Android Notifications"
+                    :notifier #'dc/alert-android-notifications-notify)
 
 
 
@@ -1166,7 +1189,7 @@ id[0:1]/id[2:] rule."
   :after org
   :config
   ;; Setup alert type
-  (setq alert-default-style 'notifications)
+  (setq alert-default-style 'android-notifications)
   
   ;; Setup timing
   (setq org-alert-interval 600
@@ -1554,6 +1577,7 @@ nodes based on tags."
 ;;                   -------------------------
 
 (use-package org-download
+  :defer t
   :ensure t
   :after org
   :config
@@ -1584,6 +1608,7 @@ nodes based on tags."
 ;;                   -------------------------
 
 (use-package org-ref
+  :defer t
   :ensure t
   :after org
   )
@@ -1595,6 +1620,7 @@ nodes based on tags."
 ;;                   -------------------------
 
 (use-package org-noter
+  :defer t
   :ensure t  
   :after org 
   :config
@@ -1608,7 +1634,10 @@ nodes based on tags."
 ;;                         Package: mpv 
 ;;                   -------------------------
 
-(use-package mpv)
+(use-package mpv
+  :defer t
+  :ensure t
+  )
 
 
 
@@ -1617,6 +1646,7 @@ nodes based on tags."
 ;;                   -------------------------
 
 (use-package org-media-note
+  :defer t
   :hook (org-mode .  org-media-note-mode)
   :bind (("H-v" . org-media-note-hydra/body))
   :config

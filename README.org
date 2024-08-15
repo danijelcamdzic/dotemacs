@@ -1,7 +1,7 @@
 #+TITLE: DotEmacs
 #+AUTHOR: Danijel Camdzic
 
-This repository contains my personal Emacs configuration for Linux.
+This repository contains my personal Emacs configuration files for the following systems:
 
-If you are here to see a unified configuration between Android and Linux, browse
-the repository at this point https://github.com/danijelcamdzic/dotemacs/tree/60fb0fceee7c94be9af5cf8c028874d36572c9a7
+- [X] Linux
+- [X] Android
