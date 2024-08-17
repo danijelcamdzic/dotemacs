@@ -37,6 +37,18 @@
 
 
 
+;;                   -------------------------
+;;                        Custom lisp code   
+;;                   -------------------------
+
+;; Add packages from the lisp directory to the load path
+;; Here will reside the packages manually downloaded from git
+;; as well as standalone .el files
+(let ((default-directory (expand-file-name (concat user-emacs-directory "lisp"))))
+  (normal-top-level-add-subdirs-to-load-path))
+
+
+
 ;; =================================================================
 ;;                             User
 ;; =================================================================
