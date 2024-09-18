@@ -486,6 +486,21 @@
 
 
 
+;;                   -------------------------
+;;                       Package: bookmark+
+;;                   -------------------------
+
+(use-package bookmark+
+  :config
+  ;; Set default .emacs-bmk-bmenu-state.el file path
+  (setq bmkp-bmenu-state-file (expand-file-name ".emacs-bmk-bmenu-state.el" user-emacs-directory))
+  
+  ;; Set default .emacs-bmk-bmenu-commands.el file path
+  (setq bmkp-bmenu-commands-file (expand-file-name ".emacs-bmk-bmenu-commands.el" user-emacs-directory))
+  )
+
+
+
 ;; =================================================================
 ;;                             Org
 ;; =================================================================
@@ -516,7 +531,7 @@
                 ("~" org-verbatim verbatim)
                 ("+" (:strike-through t)))))
   (custom-set-faces
-   '(org-tag ((t (:foreground "#d92727" :weight bold)))))
+   '(org-tag ((t (:foreground "#008B8B" :weight bold)))))
 
   ;; Hooks for various modes and settings
   (add-hook 'org-mode-hook (lambda () (setq fill-column 80)))
