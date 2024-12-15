@@ -82,7 +82,8 @@
 (defvar dc-music-directory (concat dc-home-directory "Music/")) 
 (defvar dc-notes-directory (concat dc-home-directory "Notes/"))
 (defvar dc-pictures-directory (concat dc-home-directory "Pictures/"))   
-(defvar dc-projects-directory (concat dc-home-directory "Projects/"))    
+(defvar dc-projects-directory (concat dc-home-directory "Projects/"))
+(defvar dc-recordings-directory (concat dc-home-directory "Recordings/")) 
 (defvar dc-videos-directory (concat dc-home-directory "Videos/"))
 
 (defun dc/open-folder-from-home-directory ()
@@ -96,6 +97,7 @@
                         ("Notes" . dc-notes-directory)
                         ("Pictures" . dc-pictures-directory)
                         ("Projects" . dc-projects-directory)
+                        ("Recordings" . dc-recordings-directory)
                         ("Videos" . dc-videos-directory)))
          (choice (completing-read "Choose a directory: " directories))
          (directory-symbol (assoc-default choice directories))
