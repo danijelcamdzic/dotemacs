@@ -228,7 +228,7 @@
 
 ;; Text faces
 (custom-set-faces
- '(bold ((t (:foreground "#008000" :weight bold))))
+ '(bold ((t (:foreground "#4462B3" :weight bold))))
  '(italic ((t (:foreground "#B0A030" :slant italic))))
  '(strike-through ((t (:foreground "#8B0000" :strike-through t)))))
 
