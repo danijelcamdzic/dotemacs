@@ -462,7 +462,7 @@
   :ensure nil
   :config
   ;; Set default eww-bookmarks directory
-  (setq eww-bookmarks-directory user-emacs-directory)
+  (setq eww-bookmarks-directory dc-notes-directory)
   )
 
 
@@ -475,7 +475,7 @@
   :ensure nil
   :config
   ;; Set default bookmark file
-  (setq bookmark-default-file (concat user-emacs-directory "bookmarks"))
+  (setq bookmark-default-file (concat dc-notes-directory "bookmarks"))
   )
 
 ;; Add keybinding menu for bookmarks
