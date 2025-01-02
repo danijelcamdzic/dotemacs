@@ -1041,6 +1041,42 @@ id[0:1]/id[2:] rule."
 
 
 ;;                   -------------------------
+;;                       Package: org-yank 
+;;                   -------------------------
+
+;; This is a new addition to the Emacs 29.
+
+;; Register yank-media handlers
+(with-eval-after-load 'org
+  (setq yank-media--registered-handlers '(("image/.*" . #'dc/org-mode--image-yank-handler))))
+
+(yank-media-handler "image/.*" #'dc/org-mode--image-yank-handler)
+
+(defun dc/org-mode--image-yank-handler (type image)
+  "Save IMAGE of TYPE into the Org heading's attachment directory.
+Prompt for a basename, prepend a timestamp, then use .png as the extension."
+  (let* ((basename (read-string "Enter image name (without extension): "))
+         (timestamp (format-time-string "%Y-%m-%d_%H-%M-%S"))
+         ;; If user presses ENTER with no basename, just use timestamp.png
+         (final-name (if (string-empty-p basename)
+                         (concat timestamp ".png")
+                       (concat timestamp "_" basename ".png")))
+         (attach-dir (org-attach-dir t))               
+         (filename (expand-file-name final-name attach-dir)))
+    (with-temp-buffer
+      (set-buffer-multibyte nil)
+      (insert image)
+      (write-region (point-min) (point-max) filename))
+    (org-attach-sync)
+    (insert (format "[[attachment:%s]]\n"
+                    (file-relative-name filename attach-dir)))))
+
+;; Add keybindings
+(define-key dc-org-map (kbd "p") 'yank-media)
+
+
+
+;;                   -------------------------
 ;;                      Package: org-tempo  
 ;;                   -------------------------
 
@@ -1598,37 +1634,6 @@ nodes based on tags."
 
 ;; Add keybindings
 (define-key dc-org-map (kbd "z") 'dc/org-transclusion-insert-node)
-
-
-
-;;                   -------------------------
-;;                     Package: org-download 
-;;                   -------------------------
-
-(use-package org-download
-  :defer t
-  :ensure t
-  :after org
-  :config
-  ;; Use attachments and not file links
-  (setq org-download-method 'attach)
-  
-  ;; Don't create folders based on heading levels
-  (setq-default org-download-heading-lvl nil)
-  )
-
-(defun dc/org-download-clipboard--prompt-for-name-advice (orig-fun &optional basename)
-  "Advice to prompt for a basename before calling `org-download-clipboard'."
-  (message "Calling advice function")
-  (let ((name (if (called-interactively-p 'any)
-                  (read-string "Enter image name (without extension): ")
-                basename)))
-    (funcall orig-fun (if (string-empty-p name) basename (concat name ".png")))))
-
-(advice-add 'org-download-clipboard :around #'dc/org-download-clipboard--prompt-for-name-advice)
-
-;; Add keybindings
-(define-key dc-org-map (kbd "p") 'org-download-clipboard)
 
 
 
