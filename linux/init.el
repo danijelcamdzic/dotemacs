@@ -1536,6 +1536,21 @@ Nodes that match all specified criteria are then displayed with their hierarchy.
         (when node
           (org-roam-node-visit node))))))
 
+(defun dc/org-roam-copy-tags-from-node ()
+  "Prompt for an Org-roam node (the “source”) and copy its tags into the current Org-roam file."
+  (interactive)
+  (let* ((source-node (org-roam-node-read))
+         (source-tags (when source-node
+                        (org-roam-node-tags source-node))))
+    (if (and source-node source-tags)
+        (progn
+          (org-roam-tag-add source-tags)
+          (message "Copied tags from '%s' to current node: %s"
+                   (org-roam-node-title source-node)
+                   (string-join source-tags ", ")))
+      (message "No tags found for '%s'."
+               (when source-node (org-roam-node-title source-node))))))
+
 ;; Add keybinding menu for org-roam
 (define-prefix-command 'dc-roam-map)
 (global-set-key (kbd "C-c R") 'dc-roam-map)
@@ -1545,6 +1560,7 @@ Nodes that match all specified criteria are then displayed with their hierarchy.
 (define-key dc-roam-map (kbd "t") 'org-roam-dailies-goto-today)
 (define-key dc-roam-map (kbd "f") 'org-roam-node-find)
 (define-key dc-roam-map (kbd "i") 'org-roam-node-insert)
+(define-key dc-roam-map (kbd "p") 'dc/org-roam-copy-tags-from-node)
 
 
 
