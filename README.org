@@ -1,7 +1,4 @@
 #+TITLE: DotEmacs
 #+AUTHOR: Danijel Camdzic
 
-This repository contains my personal Emacs configuration files for the following systems:
-
-- Linux
-- Android
+This repository contains my personal Emacs configuration files.
