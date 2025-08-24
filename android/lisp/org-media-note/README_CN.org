@@ -1,0 +1,229 @@
+[[file:CHANGELOG.org][Changelog]]
+
+* 🌟 功能介绍
+这是一个方便在 org-mode 中为视频、音频做笔记的插件。基本功能：
+
+- 🎥 支持本地媒体和在线媒体（需要安装 yt-dlp，参见[[在线视频播放]]）
+- ⏯️ 控制多媒体：播放进度、速度、音量等
+- 🔗 定义了 =video=, =audio= 两种链接
+  + *时间戳链接* 类似 =[[video:course.mp4#0:01:56][0:01:56]]=
+    - 在播放多媒体时，如果当前光标位于一个以 org-media-note 链接开头的列表（例如 =- [[video:test.mp4#0:02:33][0:02:33]] note=），=M-RET= 会自动插入当前时间戳的链接
+    - 回顾笔记时，点击链接可跳转到指定时间戳播放
+  + *区间循环链接* 类似 =[[video:course.mp4#0:01:56-0:01:58][0:01:56-0:01:58]]=
+    - 在播放多媒体时，如果在AB循环，则插入区间循环链接
+    - 回顾笔记时，点击链接可跳转到0:01:56播放，并在0:01:56-0:01:58进行区间循环
+- 📝 记录笔记时，可以快速:
+  + 插入时间戳或区间循环链接
+  + 插入当前视频截图或者GIF
+  + 插入当前字幕
+  + 合并多条笔记，适合在导入字幕后的整理。
+  + 插入时间戳时，可额外设置：
+    - 是否自动插入当前的视频截图
+    - 是否在插入时间戳后自动暂停
+- 🔄 可以从已有文件导入笔记，目前支持的格式：
+  + 字幕文件：SRT、VTT、ASS
+  + 当前播放文件的章节列表
+  + PotPlayer 生成的 PBF 文件
+  + 由 [[https://www.notedapp.io/][Noted]] 导出的 TXT 文件
+  + [[https://orgmode.org/manual/Timers.html][Timers]]
+
+📚 如果你使用 [[https://github.com/jkitchin/org-ref][org-ref]]，可以与 org-ref 笔记协同使用：
+
+- 🤝 可以在 org-ref 笔记中快速打开该条目对应的媒体文件
+- 🔗 定义了 =videocite=, =audiocite= 两种链接
+  + 链接格式类似 =[[videocite:key#0:01:56][0:01:56]]= 或  =[[videocite:key#0:01:56-0:01:58][0:01:56-0:01:58]]=
+  + 点击链接，可跳转到key对应的文件的指定时间戳播放，或者进行区间循环
+  + 光标或鼠标置于链接时，显示 bib 条目的相关信息
+  + 可以快速打开该 bib 条目的 org-ref 动作列表，执行相应动作，例如跳转到对应笔记等
+
+* 🎥 功能演示
+
+快速打开org-ref对应的视频，播放置顶，快速插入当前时间戳、字幕
+
+[[../demo/org-media-note-add.gif?raw=true]]
+
+插入当前视频截图，也可以设置每次插入新笔记时，自动插入截图
+[[../demo/org-media-note-screenshot.gif?raw=true]]
+
+点击链接，从视频指定位置播放；光标位于链接时，minibuffer展示org-ref相关信息
+[[../demo/org-media-note-follow.gif?raw=true]]
+
+打开在线视频后，与本地文件的操作相同！
+[[../demo/org-media-note-online-video-zh.gif?raw=true]]
+
+* 🚀 快速指南
+
+- doom 用户
+  1. 安装
+      #+BEGIN_SRC emacs-lisp :tangle "packages.el"
+ (package! org-media-note :recipe (:host github :repo "yuchen-lea/org-media-note"))
+      #+END_SRC
+  2. 配置
+     + 不需要配合 org-ref
+       #+BEGIN_SRC emacs-lisp
+   (use-package! org-media-note
+   :hook (org-mode .  org-media-note-mode)
+   :bind (
+         ("H-v" . org-media-note-hydra/body))  ;; 主功能入口
+   :config
+   (setq org-media-note-screenshot-image-dir "~/Notes/imgs/")  ;; 用于存储视频截图的目录
+   )
+       #+END_SRC
+     + 需要配合 org-ref
+       #+BEGIN_SRC emacs-lisp
+   (use-package! org-media-note
+   :init (setq org-media-note-use-org-ref t)
+   :hook (org-mode .  org-media-note-mode)
+   :bind (
+       ("H-v" . org-media-note-hydra/body))  ;; 主功能入口
+   :config
+   (setq org-media-note-screenshot-image-dir "~/Notes/imgs/")  ;; 用于存储视频截图的目录
+   (setq org-media-note-use-refcite-first t)  ;; 插入链接时，优先使用refcite链接
+   )
+   #+END_SRC
+- 非 doom 用户：可以选择
+  + 手动下载org-media-note，将其包含在=load-path=中，然后参考上述配置
+  + 使用quelpa-use-package（感谢[[https://github.com/japhir][japhir]]提供此代码片段）
+      #+BEGIN_SRC emacs-lisp
+(use-package quelpa-use-package)  ;; to allow installation of github packages
+(use-package org-media-note
+  :quelpa (org-media-note :fetcher github :repo "yuchen-lea/org-media-note")
+  :hook (org-mode .  org-media-note-mode)
+  :bind (("H-v" . org-media-note-hydra/body))  ;; Main entrance
+  :config
+  (setq org-media-note-screenshot-image-dir "~/notes/imgs/"))
+      #+END_SRC
+  + 如果不使用像=package.el=或=straight=这样的包管理器，而是手动加载org-media-note，，需要使用 =(require 'org-media-note-org-ref)=。
+
+现在，你可以从 =org-media-note-pretty-hydra/body= 或 =org-media-note-transient=（默认）  访问所有功能。
+
+ℹ️️️️ 这里，我用 Hyper key =H= 进行绑定，好处在于快速触达，且不会与已有快捷键冲突。更多参见 [[http://ergoemacs.org/emacs/emacs_hyper_super_keys.html][Emacs: How to Bind Super Hyper Keys]]。当然，你也可以设置成任何适合你的快捷键，毕竟这是Emacs ;)
+* 📖 功能详解
+
+所有功能都可由 =org-media-note-pretty-hydra/body= 或 =org-media-note-transient= 触达（取决于 =org-media-note-interface= 变量的设置）：
+
+** pretty-hydra ui
+[[../demo/org-media-note-hydra.png?raw=true]]
+
+- Header：展示当前播放的基本信息，文件路径、音量、播放进度、播放速度等
+- File：关于视频文件的操作
+  + =o= 根据情况智能播放  (=org-media-note-play-smart=)
+    1. 如果当前光标位于文件链接，播放该文件
+    2. 如果在org-ref的笔记条目中执行该命令，则自动打开当前条目对应的媒体文件
+       + 需要满足以下所有条件：
+         - 当前位于org-ref笔记，即，当前heading的 =Custom_ID= 存放entry key
+         - 文件可通过 =bibtex-completion-find-pdf= 获得。一般地，保证变量 =bibtex-completion-pdf-field= 的值为存放文件路径的 field 即可。
+         - 文件类型包含于 =org-media-note--video-types= 或 =org-media-note--audio-types=
+    3. 如果对应的attach dir中有多媒体文件，只有一个则直接播放，有多个便从attach dir中选择
+    4. 如果不匹配上述规则，手动输入资源路径（本地或在线）
+  + =j= 切换视频的字幕显示
+  + =T= 切换mpv的置顶显示
+  + =c= 播放速度加0.1
+  + =x= 播放速度减0.1
+  + =z= 播放速度在原速和刚才自定义速度之间切换 (=org-media-note-mpv-toggle-speed=)
+- Playback：关于播放进度的操作
+  + =<SPC>= 播放/暂停
+  + =l= 设置A-B循环，如果已设置，会显示当前的A-B区间
+  + =g= 跳转到当前行所包含的时间戳，方便在浏览对应字幕时快速跳转。如果当前行没有找到时间戳，可以手动输入。
+  + =<left>= 后退5s（默认）。可用 =t <right>= 自定义步长。
+  + =<right>= 前进5s （默认）。可用 =t <right>= 自定义步长。
+  + =C-<left>= 跳转到前一字幕
+  + =C-<right>= 跳转到后一字幕
+  + =<prior>= (即=<PgUp>=) 跳转到前一章节
+  + =<next>= (即=<PgDown>=) 跳转到后一章节
+- Volume：关于音量的操作
+  + =+= 音量加5
+  + =-= 音量减5
+  + =0= 音量在100和刚才自定义的音量之间切换 (=org-media-note-mpv-toggle-volume=)
+  + =m= 切换静音状态
+- Note：插入笔记
+  + =i= 插入当前视频的链接，根据不同的设置和播放状态，具体插入的链接有以下几种情况：(=org-media-note-insert-link=)
+    - 当前是否为A-B循环
+      + 在进行A-B循环，也就是当 Playback 中显示「Clear A-B loop (xxx - xxx)」，插入 *区间循环链接* 。链接描述默认为当前 =A点时间戳-B点时间戳= ，可通过 =org-media-note-ab-loop-link-format= 进行自定义
+      + 没在进行A-B循环，插入 *时间戳链接* 。链接描述默认为 =当前时间戳= ，可通过 =org-media-note-timestamp-link-format= 进行自定义
+    - 是否优先使用ref key
+      + 优先使用ref key，即 Toggle 中显示 「Use ref key instead of absolute path (*)」，插入 =videocite= 或 =audiocite= 链接
+      + 否则，即 Toggle 中显示 「Use ref key instead of absolute path ( )」，插入 =video= 或 =audio= 链接
+    - 💡 如果位于形如 =- [[video:video.mp4#00:03:24][00:03:24]] description= 的列表中，直接 =<M-return>= 新建列表项就会自动插入对应的链接，无需手动调用 =i=
+    - 💡 视频的路径格式与 =org-link-file-path-type= 一致
+    - 💡 如果设置 =org-media-note-cursor-start-position= 为 =before= ，则插入链接后光标跳转到链接的开始位置。此选项只在单独插入链接时起作用，对通过 =<M-return>= 自动插入的时间戳不起作用。
+  + =a= 将光标所在位置的链接，调整为当前播放位置。并将该时间偏移（offset），应用到当前笔记的其他链接。适合导入org-timer后，或者更新视频后，统一调整偏移。
+  + =S= 如果当前没有ab-loop，插入当前的视频截图 (=org-media-note-insert-screenshot=)，否则插入当前ab-loop的视频片段或GIF（=org-media-note-capture-ab-loop-and-insert=）。
+    - ℹ️️️️ 相关变量:
+      + =org-media-note-screenshot-save-method= : 定义截图的保存位置
+        - directory: 保存到 =org-media-note-screenshot-image-dir=
+        - attach: 保存到对应 org-attach-dir.
+      + =org-media-note-screenshot-link-type-when-save-in-attach-dir= 当保存到对应 org-attach-dir时，使用file链接或attachment链接
+      + 图片的路径格式与 =org-link-file-path-type= 一致
+      + =org-media-note-capture-ab-loop-functions-alist= 定义了截取ab-loop片段的函数列表，默认有截取原始片段和转为gif两种。
+  + =s= 插入当前的字幕文本 (=org-media-note-insert-sub-text=)
+  + =H-m= 合并所选项为一条，只保留第一条的时间戳。适合导入字幕之后的处理 (=org-media-note-merge-item=)
+- Import: 导入
+  + =I p= 从已有的PotPlayer PBF文件导入笔记，会尝试搜寻当前条目对应的媒体文件的同名PBF (=org-media-note-insert-note-from-pbf=)
+  + =I n= 从已有的Noted TXT文件导入笔记 (=org-media-note-insert-note-from-noted=)
+  + =I t= 从 org-timer 形式的列表导入笔记 (=org-media-note-convert-from-org-timer=)
+  + =I s= 从 srt 字幕文件导入，会尝试搜寻同名srt (=org-media-note-insert-note-from-srt=)
+  + =I c= 从章节列表导入 (=org-media-note-insert-note-from-chapter-list=)
+- Config：功能设置
+  + =t m= 启用后，在形如 =- [[video:video.mp4#00:03:24][00:03:24]] description= 的列表中， =<M-return>= 新建列表项会自动插入对应时间戳链接。（=org-media-note-toggle-auto-insert-item=）
+  + =t s= 启用后， =<M-return>= 新建列表项时除了自动插入对应链接，也会自动插入当前视频截图 （=org-media-note-toggle-save-screenshot=）
+  + =t S= 启用后，保存的截图包含字幕，否则不包含字幕 （=org-media-note-toggle-screenshot-with-sub=）
+  + =t l= 设置截取ab-loop片段的方法 （=org-media-note-set-ab-loop-capture-method=）
+  + =t c= 启用时，会优先使用 =videocite= 或 =audiocite= 链接，而非 =video= 或 =audio= 链接 （=org-media-note-toggle-refcite=）
+  + =t p= 启用后，会在插入链接后，自动暂停媒体 （=org-media-note-toggle-pause-after-insertion=）
+  + =t t= 切换时间戳的格式：=hh:mm:ss= / =hh:mm:ss.fff= （=org-media-note-toggle-timestamp-pattern=）
+  + =t M= 设置执行合并所选项时的连接符 （=org-media-note-set-separator=）
+  + =t <right>= 设置控制播放进度时，前进/后退的步长。支持设置：秒数，百分比，帧数。 （=org-media-note-set-seek-method=）
+
+ℹ️️️️ 末尾括号为调用的函数，没有标注的功能多为直接调用mpv命令，可查阅 =org-media-note-pretty-hydra= 了解更多。
+
+** transient ui
+
+transient界面与pretty-hydra界面的功能和按键一致。
+
+为了适应更紧凑的布局，功能设置等命令进行了语义化分组：
+
+[[../demo/org-media-note-transient.png?raw=true]]
+
+** transient vs pretty-hydra
+
+二者的操作逻辑保持一致。如果输入不在界面内的其他快捷键，会退出界面并执行对应的命令。
+
+差异主要在显示风格：如果当前frame分割为多个window，transient的实际展示面积可能不够大。对比见下表：
+
+|          | transient                                     | pretty-hydra                              |
+|----------+-----------------------------------------------+-------------------------------------------|
+| 依赖     | 自 Emacs 28 起内置                            | [[https://github.com/jerrypnz/major-mode-hydra.el][pretty-hydra]]                              |
+| 出现位置 | 当前window的底部                              | 当前frame的底部                           |
+| 界面     | [[../demo/org-media-note-transient.png?raw=true]] | [[../demo/org-media-note-hydra.png?raw=true]] |
+
+
+* 🛠️ 依赖
+- [[https://github.com/kljohann/mpv.el][mpv.el]] 媒体的播放与功能接口
+- 目前提供 2 种前端，通过 =org-media-note-interface= 来自定义：
+  + [[https://github.com/magit/transient][transient]]（默认）：自 Emacs 28 起内置于 Emacs 中，显示在当前 window 底部。
+  + [[https://github.com/jerrypnz/major-mode-hydra.el][pretty-hydra]]：创建更美观、易用的Hydra界面，显示在当前 Frame 底部。
+
+如果要配合 org-ref 笔记使用，当然需要安装 [[https://github.com/jkitchin/org-ref][org-ref]]。
+** 🌐 在线视频播放
+
+使用 org-media-note 来进行在线视频的笔记依赖于 mpv 的流媒体播放功能，需要额外的外部依赖：
+- [[https://github.com/yt-dlp/yt-dlp?tab=readme-ov-file#installation][yt-dlp/yt-dlp: A youtube-dl fork with additional features and fixes]]: 用于下载网站视频，支持的网站参见[[https://github.com/yt-dlp/yt-dlp/blob/master/supportedsites.md][此处]]。它比mpv 默认使用的 youtube-dl 更流畅也更强大。如果想播放在线视频但是没有安装 yt-dlp，org-media-note 会报错提示。
+- [[https://github.com/UlyssesZh/yt-dlp-danmaku/][UlyssesZh/yt-dlp-danmaku: yt-dlp plugin for converting Bilibili danmaku into ASS format]]：如果需要加载bilibili的弹幕。
+
+可以在以下几处进行设置，优先级由低到高：
+
+1. =mpv.conf= 文件：mpv 的通用设置
+2. =org-media-note-mpv-general-options=变量：配置org-media-note中的通用设置。默认值指定使用 yt-dlp 来下载：
+    #+begin_src ini
+    --script-opts=ytdl_hook-ytdl_path=yt-dlp
+    #+end_src
+3. =org-media-note-mpv-online-website-options-alist= 变量：配置网站的单独设置，例如bilibili需要下载所有字幕和弹幕，而youtube自动生成的字幕只需要下载指定的语言。
+   - 默认配置，youtube会下载中英字幕，bilibili会加载所有字幕和弹幕。bilibili的字幕功能需要加载cookies，获取登录信息，请根据实际情况修改，参见 [[https://github.com/yt-dlp/yt-dlp/wiki/FAQ#how-do-i-pass-cookies-to-yt-dlp][FAQ · yt-dlp/yt-dlp Wiki]]
+4. =org-media-note-mpv-webstream-download-path= 变量：配置在线视频字幕等文件的下载目录。默认为临时文件夹。如果设置为nil，会下载到当前目录。
+
+只要你能在 mpv 中正常的加载字幕，那么，org-media-note 就可以像处理本地媒体一样，控制播放、插入时间戳和截图，甚至是导入字幕！
+
+
+下图演示了播放bilibili视频，弹幕导航，切换字幕，导入字幕等功能：
+[[../demo/org-media-note-online-video-zh.gif?raw=true]]

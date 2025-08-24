@@ -1,0 +1,49 @@
+- [2024-07-02] Version =1.11.0=
+  + Import from chapter list
+  + Support capture video clip or gif when ab-loop
+  + Support customize seek step
+  + Better support link
+    - org-yt: support open (Thanks @Ban3)
+    - video & audio:
+      + support completion
+      + for online video, export url with timestamp
+- [2024-03-14] Version =1.10.0=
+  + support ass subtitle
+  + =org-media-note-mpv-online-website-options-alist= to support mpv config per website
+  + allow custom function for screenshot dir
+- [2024-03-06] Version =1.9.0=
+  + ui improvement
+    - better hint and selection smart play
+    - select srt from minibuffer
+  + better support for online video:
+    - support import from mpv subtitle
+    - support vtt subtitle, which is default format of youtube
+    - better screenshot naming rule for online video, and you can customize the rule also!
+- [2023-12-30] Version =1.8.0=
+  + Import from srt subtitle
+  + Smart play: support play at point
+  + Support merge org-media-note item
+  + =C-a= goto char after media link in item list
+- [2021-03-26] Version =1.7.0=
+  + Import from org-timer
+  + Adjust timestamp offset
+  + =org-media-note-goto-timestamp=
+- [2021-02-26] Version =1.6.0=
+  + Support online videos
+  + Better support org-ref: bib file exported from calibre, zotero is supported
+- [2021-02-20] Version =1.5.0=
+  + open from org-attach
+- [2021-02-17] Version =1.4.0=
+  + Support A-B loop link
+- [2021-02-16] Version =1.3.0=
+  + add customization option for link text
+  + allow auto pause after insert link
+- [2021-02-03] Version =1.2.0=
+  + improve hydra menu: more options, like control volume, save screenshot with sub or not
+  + add help echo for videocite and audiocite link
+- [2021-01-14] Version =1.1.0=
+  + import from pbf and noted
+- [2021-01-08] Version =1.0.0=
+  + timestamp link for videos and audios
+  + quick insert current timestamp, screenshot, subtitles
+  + support org-ref
