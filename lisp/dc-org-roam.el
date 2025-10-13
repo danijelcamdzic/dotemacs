@@ -12,7 +12,7 @@
   :config
   ;; Set directories
   (setq org-roam-directory org-directory)
-  (setq org-roam-dailies-directory (concat org-directory "dailies/"))
+  (setq org-roam-dailies-directory (concat org-directory "/dailies"))
 
   ;; Setup org-roam
   (org-roam-setup)

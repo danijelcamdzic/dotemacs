@@ -10,7 +10,7 @@
   :ensure nil
   :config
   ;; Directory and startup settings
-  (setq org-directory dc-notes-directory)
+  (setq org-directory dc-journal-directory)
   (setq org-startup-indented t)
   (setq org-startup-folded 't)
   (setq org-startup-with-inline-images t)

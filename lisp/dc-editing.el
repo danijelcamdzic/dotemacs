@@ -92,6 +92,23 @@
 
 
 
+;;                   -------------------------
+;;                        Package: consult
+;;                   -------------------------
+
+(use-package consult
+  :after orderless
+  :ensure t
+  :config
+  )
+
+(defun dc/org-roam-consult-rg-search ()
+  "Search org-roam directory using consult-ripgrep. With live-preview."
+  (interactive)
+  (let ((consult-ripgrep-command "rg --multiline --null --ignore-case --type org --line-buffered --color=always --max-columns=500 --no-heading --line-number -e ARG OPTS"))
+    (consult-ripgrep org-roam-directory)))
+
+
 ;; Provide package
 (provide 'dc-editing)
 

@@ -10,7 +10,7 @@
   :ensure nil
   :config
   ;; Set default eww-bookmarks directory
-  (setq eww-bookmarks-directory dc-notes-directory)
+  (setq eww-bookmarks-directory dc-journal-directory)
   )
 
 
@@ -23,7 +23,7 @@
   :ensure nil
   :config
   ;; Set default bookmark file
-  (setq bookmark-default-file (concat dc-notes-directory "bookmarks"))
+  (setq bookmark-default-file (concat dc-journal-directory "bookmarks"))
   )
 
 ;; Add keybinding menu for bookmarks
