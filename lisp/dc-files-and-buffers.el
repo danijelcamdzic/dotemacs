@@ -31,6 +31,10 @@
 ;; Remove fringes from buffers
 (set-fringe-mode 0)
 
+;; Buffer display settings
+(setq display-buffer-alist
+      '((".*" (display-buffer-same-window) (inhibit-same-window . nil))))
+
 (defun dc/kill-background-buffers ()
   "Kill all buffers that are not currently visible in any window."
   (interactive)

@@ -17,11 +17,10 @@
 ;;                   -------------------------
 
 ;; Define the home directories variables
-(defvar dc-gnu-linux-home "~/")
-(defvar dc-gnu-linux-home-extended "/home/danijelcamdzic/")
+(defvar dc-android-home "/storage/emulated/0/")
 
 ;; Set the home directory based on system type
-(defvar dc-home-directory dc-gnu-linux-home-extended)
+(defvar dc-home-directory dc-android-home)
 
 ;; Define variables which represent my home directory folders
 (defvar dc-journal-directory (concat dc-home-directory "Journal/"))

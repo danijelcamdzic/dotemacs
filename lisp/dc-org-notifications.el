@@ -9,7 +9,33 @@
 (use-package alert
   :ensure t
   :config
+  ;; Setup default icon for Android notifications
+  (when (eq system-type 'android)
+    ;; android.R.drawable icons must be used
+    (setq alert-default-icon "ic_popup_reminder"))
   )
+
+;;;;; Function - Support Android notifications
+
+(defun dc/alert-android-notifications-notify (info)
+  "Send notifications using `android-notifications-notify'.
+`android-notifications-notify' is a built-in function in the native Emacs
+Android port."
+  (let ((title (or (plist-get info :title) "Android Notifications Alert"))
+        (body (or (plist-get info :message) ""))
+        (urgency (cdr (assq (plist-get info :severity)
+                            alert-notifications-priorities)))
+        (icon (or (plist-get info :icon) alert-default-icon))
+        (replaces-id (gethash (plist-get info :id) alert-notifications-ids)))
+    (android-notifications-notify
+     :title title
+     :body body
+     :urgency urgency
+     :icon icon
+     :replaces-id replaces-id)))
+
+(alert-define-style 'android-notifications :title "Android Notifications"
+                    :notifier #'dc/alert-android-notifications-notify)
 
 
 
@@ -20,12 +46,14 @@
 (use-package org-alert
   :ensure t
   :after org
+  :custom
+  ;; Use different backends depending on the platform
+  (alert-default-style (if (eq system-type 'android)
+                           'android-notifications
+                         'notifications))
   :config
-  ;; Setup alert type
-  (setq alert-default-style 'notifications)
-  
   ;; Setup timing
-  (setq org-alert-interval 600
+  (setq org-alert-interval 300
         org-alert-notify-cutoff 10
         org-alert-notify-after-event-cutoff 10)
   

@@ -20,6 +20,23 @@
 ;; Disable line numbers
 (global-display-line-numbers-mode 0)
 
+;; Create shortcuts in Android with volume-up and volume-down keys
+;; Volume up calls to execute the command
+(global-set-key (kbd "<volume-up>") 'execute-extended-command)
+
+;; Volume down is bound by default to org-ctrl-c-ctrl-c
+(global-set-key (kbd "<volume-down>") 'org-ctrl-c-ctrl-c)
+
+;; Make volume down programmable
+(defun dc/bind-to-android-volume-down ()
+  "Bind a command to the <volume-down> key on Android."
+  (interactive)
+  (let ((command (intern (completing-read "Command: " obarray 'commandp t))))
+    (global-set-key (kbd "<volume-down>") command)))
+
+;; Touchscreen keyboard spawn
+(setq touch-screen-display-keyboard t))
+
 
 
 ;;                   -------------------------
