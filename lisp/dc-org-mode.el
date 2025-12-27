@@ -31,8 +31,6 @@
    '(org-tag ((t (:foreground "#008B8B" :weight bold)))))
 
   ;; Hooks for various modes and settings
-  (add-hook 'org-mode-hook (lambda () (setq fill-column 80)))
-  (add-hook 'org-mode-hook #'turn-on-auto-fill)
   (add-hook 'org-mode-hook 'org-hide-block-all)
   (add-hook 'org-mode-hook 'org-hide-drawer-all)
 
